@@ -13,6 +13,7 @@ import org.hpccsystems.dashboard.entity.Process;
 import org.hpccsystems.dashboard.hipie.HipieSingleton;
 import org.hpccsystems.dashboard.hipie.servic.CompositionService;
 import org.hpccsystems.dashboard.hipie.util.HPCCConnection;
+import org.hpccsystems.dashboard.hipie.util.PluginUtil;
 import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -47,6 +48,7 @@ public class CompositionServiceImpl implements CompositionService {
 		composition.setLabel(label);
 		compName = label.replaceAll("[^a-zA-Z0-9]+", "");
 		composition.setName(compName);
+		PluginUtil.updateRawDataset(composition, "~" + widget.getChartData().getFiles().get(0),hpccConnection);
 		
 		Contract contract = HipieSingleton.getHipie().getContract(authenticationService.getUserCredential().getUserId(),
 				DASHBOARD_VISUALIZATION);
@@ -54,8 +56,7 @@ public class CompositionServiceImpl implements CompositionService {
 		visualisationPlugin.setProperty("attribute", ((XYChartData)widget.getChartData()).getAttribute().getColumn());
 		visualisationPlugin.setProperty("measure", ((XYChartData)widget.getChartData()).getMeasures().get(0).getColumn());
 		
-		//TODO:Need to iterate widget list create rawdataset
-		//PluginUtil.updateRawDataset(composition,widget.getChartData().getFiles().get(0),hpccConnection);
+		
 		//ContractInstance pluginContract = PluginUtil.createPlugin(label,composition,widget);		
 		
 		ContractInstance datasource=composition.getContractInstanceByName(HIPIE_RAW_DATASET);
