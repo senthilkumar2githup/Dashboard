@@ -1867,4 +1867,20 @@ public class DashboardController extends SelectorComposer<Window>{
             throw e;
         }    
     }
+    
+    private List<String> getUuidsOfLiveWidgets() {
+    	List<String> uiids = new ArrayList<String>();
+    	
+    	for (Portalchildren portalchildren : portalChildren) {
+    		final List<Component> list = portalchildren.getChildren();
+    		for (final Component component1 : list) {
+    			final ChartPanel panel = (ChartPanel) component1;
+    			if(panel.getPortlet().isLive()) {
+    				uiids.add(panel.getChartContainerUuid());
+    			}
+    		}
+		}
+    	
+    	return uiids;
+    }
 }

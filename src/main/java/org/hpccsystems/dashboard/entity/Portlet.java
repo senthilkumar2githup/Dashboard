@@ -1,6 +1,7 @@
 package org.hpccsystems.dashboard.entity;
 
 import org.hpccsystems.dashboard.chart.entity.ChartData;
+import org.hpccsystems.dashboard.common.Constants;
 
 public class Portlet {
 
@@ -87,6 +88,10 @@ public class Portlet {
     public void setChartData(ChartData chartData) {
         this.chartData = chartData;
     }
+    
+    public boolean isLive() {
+		return Constants.STATE_LIVE_CHART.equals(getWidgetState());
+	}
 
     @Override
     public String toString() {

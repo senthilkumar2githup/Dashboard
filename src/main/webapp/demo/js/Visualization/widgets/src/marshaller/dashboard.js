@@ -56,8 +56,7 @@
 
    
 	
-	DASHBOARD.prototype.doRender = function (ids) {
-
+	DASHBOARD.prototype.doRender = function (ids) {			
         for (var key in this.marshaller.dashboards) {
             var dashboard = this.marshaller.dashboards[key];
             
@@ -80,6 +79,8 @@
 								).enter().append("div")
 								.attr("class", "marshalViz")
 								.style({
+									width : d3.select('#'+ids[mat].div).style('width'),
+									height: d3.select('#'+ids[mat].div).style('height'),
 									display: "inline-block"
 								})
 								.each(function (item) {								    									

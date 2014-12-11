@@ -904,4 +904,8 @@ public class ChartPanel extends Panel {
         imageContainer.detach();
         return chartDiv;
     }
+    
+    public String getChartContainerUuid() {
+    	return chartDiv.getUuid();
+    }
 }
