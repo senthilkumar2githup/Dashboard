@@ -819,12 +819,12 @@ public class DashboardController extends SelectorComposer<Window>{
             ErrorBlock errorBlock = composition.validate();
             for (HError error : errorBlock) {
             	LOG.error(error);
-                Clients.showNotification(error.getErrorString(), Clients.NOTIFICATION_TYPE_ERROR, this.getSelf(), "middle_center", 3000);
+				Clients.showNotification(error.getErrorString(),
+						Clients.NOTIFICATION_TYPE_ERROR, this.getSelf(),"middle_center", 3000);
                 return null;
-            }
-                        
+            }                        
             compInstance = compositionService.runComposition(composition, new HPCCConnection().getHipieHPCCConnection());
-			
+            
         } catch (Exception e) {
             LOG.error(Constants.EXCEPTION, e);
             Clients.showNotification(e.getMessage(), Clients.NOTIFICATION_TYPE_ERROR, 
