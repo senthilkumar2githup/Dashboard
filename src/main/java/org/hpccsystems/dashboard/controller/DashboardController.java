@@ -661,9 +661,9 @@ public class DashboardController extends SelectorComposer<Window>{
             
             //To create Composition             
            composition = compositionService.createComposition(dashboard.getName(), new HPCCConnection(), portlet);
-         //Run composition
-           runComposition();            
-            
+           
+           //Run composition
+           runComposition();
         }
     };
     
@@ -794,11 +794,9 @@ public class DashboardController extends SelectorComposer<Window>{
                 Clients.showNotification(error.getErrorString(), Clients.NOTIFICATION_TYPE_ERROR, this.getSelf(), "middle_center", 3000);
                 return;
             }
-            Clients.showBusy(this.getSelf().getParent().getParent(), "Running project...");
-            //Run composition in separate thread
-           // desktop.enableServerPush(true);
-			CompositionInstance compositionInstance = compositionService
-					.runComposition(composition,new HPCCConnection().getHipieHPCCConnection());
+                        
+			compositionService.runComposition(composition, new HPCCConnection().getHipieHPCCConnection());
+			
         } catch (Exception e) {
             LOG.error(Constants.EXCEPTION, e);
             Clients.showNotification(e.getMessage(), Clients.NOTIFICATION_TYPE_ERROR, 
