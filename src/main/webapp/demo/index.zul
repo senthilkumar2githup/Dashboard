@@ -9,6 +9,9 @@
 <?style src="css/jquery-ui.css"?>
 <?script src="js/common.js"?>
 
+<?script src="js/Visualization/widgets/lib/requirejs/require.js"?>
+<?script src="js/visualization.js"?>
+
 <?script src="http://www.google.com/jsapi"?>
 
 <?style src="css/dashboard.css"?>

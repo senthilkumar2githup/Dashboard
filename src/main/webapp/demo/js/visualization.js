@@ -1,8 +1,14 @@
-function createCharts(url, ids) {
-	require([ "demo/js/Visualization/widgets/config" ], function() {
+function createVisualization(url, ids) {
+	console.log("Creating visualisation" + url + "ids - " + ids);
+	
+	ids = jq.parseJSON(ids);
+	
+	console.log(ids);
+	
+	require([ "js/Visualization/widgets/config" ], function() {
 
 		requirejs.config({
-			baseUrl : "demo/js/Visualization/widgets"
+			baseUrl : "js/Visualization/widgets"
 		});
 
 		require(["src/other/Comms", "src/common/Surface", "src/common/Text",

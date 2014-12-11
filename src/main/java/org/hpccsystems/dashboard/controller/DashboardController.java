@@ -110,6 +110,9 @@ import org.zkoss.zul.Toolbar;
 import org.zkoss.zul.Window;
 import org.hpccsystems.dashboard.hipie.HipieSingleton;
 import org.hpccsystems.dashboard.entity.Process;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 /**
  * DashboardController class is used to add new dashboard into sidebar and 
  *  controller class for dashboard.zul.
@@ -126,7 +129,6 @@ public class DashboardController extends SelectorComposer<Window>{
     
     private Dashboard dashboard; 
     private Integer oldColumnCount = null;
-    private  Composition composition;
     
     Integer dashboardId = null;
     String dashboardRole = null;
@@ -227,8 +229,7 @@ public class DashboardController extends SelectorComposer<Window>{
             }            
             if(dashboard != null){
             	HIPIEService hipieService = HipieSingleton.getHipie();
-            	composition =  hipieService.getComposition(authenticationService.getUserCredential().getUserId(),
-            			dashboard.getCompositionName());
+            	
                 dashboard.setPersisted(true);
                 if(LOG.isDebugEnabled()) {
                     LOG.debug("Visiblity - > " + dashboard.getVisibility());
@@ -278,32 +279,55 @@ public class DashboardController extends SelectorComposer<Window>{
             	addWidget.detach();
             	configureDashboard.detach();           	
             }
-          Process process = compositionService.getProcess(composition);
-          if(process != null){
-        	  //Render chart through marshaller
-        	  for (Portlet portlet : dashboard.getPortletList()) {                	
-                	createChartPanel(panel,portlet);  
-        	  }
-          }else{
-        	  //Render chart through c3.js
-        	  for (Portlet portlet : dashboard.getPortletList()) {
-              	
-              	createChartPanel(panel,portlet);                              
-                  
-                  //Constructing chart data only when live chart is drawn
-                  if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
-                      Clients.showBusy("Loading Dashboard");
-                      drawnLiveChartCount++;
-                      Map<String, Object> parameters = new HashMap<String, Object>();
-                      parameters.put(Constants.DASHBOARD_ID, dashboardId);
-                      parameters.put(Constants.COMMON_FILTERS_ENABLED, dashboard.getHasCommonFilter());
-                      
-                      Events.echoEvent(new Event("onCreateLiveChart", panel,parameters));
-                  }                
-                  
-              }
-        	  
-          }         
+            
+            
+            Process process = null;
+            if(dashboard.getCompositionName() != null ) {
+            	//Render chart through marshaller
+            	
+            	Composition composition =  HipieSingleton.getHipie().getComposition(
+            			authenticationService.getUserCredential().getUserId(),
+            			dashboard.getCompositionName());
+            	process =compositionService.getProcess(composition);
+            	
+            	if(process != null ){
+	  	        	  for (Portlet portlet : dashboard.getPortletList()) {                	
+	  	        		  createChartPanel(panel,portlet);  
+	  	        	  }
+	  	        	  
+	  	        	  if(LOG.isDebugEnabled()) {
+	  	        		LOG.debug("DDL Name JSON - " + composition.getVisualizationDDLs(authenticationService.getUserCredential().getUserId(), false));
+	  	        	  }
+	  	        	  
+	  	        	  String resultName = composition.getVisualizationDDLs(authenticationService.getUserCredential().getUserId(), false)
+	  	        			  .values().iterator().next().keySet().iterator().next();
+	  	        	 
+	  	        	  //TODO: Remopve hard coding - Waiting for HIPIE fix
+	  	        	  createVisualizations(process, "admin_Dashboard1_Comp_Ins003_DDL");
+	  	          }
+            } else {
+	        	  //Render chart through c3.js
+	        	  for (Portlet portlet : dashboard.getPortletList()) {
+	              	
+	              panel = createChartPanel(panel,portlet);                              
+	                  
+	              //Constructing chart data only when live chart is drawn
+	              if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
+	                  Clients.showBusy("Loading Dashboard");
+	                  
+	                  panel.showBusy();
+	                  
+	                  drawnLiveChartCount++;
+	                  Map<String, Object> parameters = new HashMap<String, Object>();
+	                  parameters.put(Constants.DASHBOARD_ID, dashboardId);
+	                  parameters.put(Constants.COMMON_FILTERS_ENABLED, dashboard.getHasCommonFilter());
+	                  
+	                  Events.echoEvent(new Event("onCreateLiveChart", panel,parameters));
+	              }                
+	                  
+	              }
+	        	  
+	          }         
 
           if(! authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID)
                     && dashboard.getRole().equals(Constants.ROLE_ADMIN)) {
@@ -343,22 +367,24 @@ public class DashboardController extends SelectorComposer<Window>{
     }
    
 
-    /**
-     * @param panel
-     * @param portlet
-     * Creates the panels to draw the chart
-     */
-    private void createChartPanel(ChartPanel panel,Portlet portlet) {
-    	 if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD) ||
-                 Constants.ROLE_ADMIN.equals(dashboard.getRole()) ) {
-         	panel = new ChartPanel(portlet, Constants.SHOW_ALL_BUTTONS);
-         } else if(Constants.ROLE_CONTRIBUTOR.equals(dashboard.getRole())) {
-         	 panel = new ChartPanel(portlet, Constants.SHOW_EDIT_ONLY);
-         } else {
-        		panel = new ChartPanel(portlet, Constants.SHOW_NO_BUTTONS);                    
-         }
-                         
-         portalChildren.get(portlet.getColumn()).appendChild(panel);		
+	/**
+	 * @param panel
+	 * @param portlet
+	 *            Creates the panels to draw the chart
+	 */
+	private ChartPanel createChartPanel(ChartPanel panel, Portlet portlet) {
+		if (authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)
+				|| Constants.ROLE_ADMIN.equals(dashboard.getRole())) {
+			panel = new ChartPanel(portlet, Constants.SHOW_ALL_BUTTONS);
+		} else if (Constants.ROLE_CONTRIBUTOR.equals(dashboard.getRole())) {
+			panel = new ChartPanel(portlet, Constants.SHOW_EDIT_ONLY);
+		} else {
+			panel = new ChartPanel(portlet, Constants.SHOW_NO_BUTTONS);
+		}
+
+		portalChildren.get(portlet.getColumn()).appendChild(panel);
+		
+		return panel;
 	}
 
 	/**
@@ -685,12 +711,12 @@ public class DashboardController extends SelectorComposer<Window>{
             }
             
             //To create Composition             
-           composition = compositionService.createComposition(dashboard.getName(), new HPCCConnection(), portlet);
+           Composition composition = compositionService.createComposition(dashboard.getName(), new HPCCConnection(), portlet);
            //updating dashboard with composition's canonical name
            dashboard.setCompositionName(composition.getCanonicalName());
            dashboardService.updateDashboard(dashboard);
            //Run composition
-           runComposition();
+           runComposition(composition);
         }
     };
     
@@ -813,7 +839,7 @@ public class DashboardController extends SelectorComposer<Window>{
     /**
      * Invokes service to run the composition, if the composition is valid.
      */
-    protected CompositionInstance runComposition() {
+    protected CompositionInstance runComposition(Composition composition) {
     	CompositionInstance compInstance = null;
     	try {
             ErrorBlock errorBlock = composition.validate();
@@ -1883,4 +1909,38 @@ public class DashboardController extends SelectorComposer<Window>{
     	
     	return uiids;
     }
+    
+    private void createVisualizations(Process process,String visualizationDDL){
+        org.hpcc.HIPIE.utils.HPCCConnection hpccConnection = process.getCompositionInstance().getHPCCConnection();
+        JsonArray dashboardDivs = new JsonArray();
+        JsonObject divRow=null;
+        String chartId="Chart";
+        int count=1;
+        
+        StringBuilder url = new StringBuilder(hpccConnection.getESPUrl())
+            .append("WsWorkunits/WUResult.json?")
+            .append("Wuid=")
+            .append(process.getCompositionInstance().getWorkunitId())
+            .append("&ResultName=")
+            .append(visualizationDDL)
+            .append("&SuppressXmlSchema=true");
+        
+        Iterator<String> iterator=getUuidsOfLiveWidgets().iterator();
+        
+		while (iterator.hasNext()) {
+			divRow = new JsonObject();
+			divRow.addProperty("div", iterator.next());
+			divRow.addProperty("chart", chartId + count);
+			dashboardDivs.add(divRow);
+			count++;
+		}
+                
+        if(LOG.isDebugEnabled()) {
+        	LOG.debug("Params - " + dashboardDivs.toString());
+        }
+        
+        Clients.evalJavaScript("createVisualization('" + url.toString() + "','" + dashboardDivs.toString() + "');");
+    
+    }
+
 }

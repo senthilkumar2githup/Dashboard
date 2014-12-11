@@ -347,7 +347,6 @@ public class ChartPanel extends Panel {
             addBtn.addEventListener(Events.ON_CLICK, editListener);
             resetBtn.setDisabled(false);
             createChartHolder();
-            Clients.showBusy(this, "Retriving data");
         } else if(portlet.getWidgetState().equals(Constants.STATE_GRAYED_CHART)){
             //Only Static image is added
             setStaticImage();
@@ -400,6 +399,11 @@ public class ChartPanel extends Panel {
 		}
 	}; 
     
+	
+	public void showBusy() {
+		Clients.showBusy(this, "Retriving data");
+	}
+	
     public void onDrawingQueryChart() {
         if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState()) && portlet.getChartData().getIsQuery() 
         		&& (Constants.CATEGORY_HIERARCHY !=  chartService.getCharts().get(portlet.getChartType())

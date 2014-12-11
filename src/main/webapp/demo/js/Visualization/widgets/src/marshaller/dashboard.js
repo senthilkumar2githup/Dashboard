@@ -60,43 +60,50 @@
         for (var key in this.marshaller.dashboards) {
             var dashboard = this.marshaller.dashboards[key];
             
+            for (mat in ids){
+            	console.log(ids[mat]);
+            }
 			
-			for (mat in ids){
-				console.log(ids[mat].div+":"+ids[mat].chart);
-				d3.select("#"+ids[mat].div).selectAll("marshalViz").data(
-								dashboard.visualizationsArray.filter(
-									function (d) { 
-										if (d.id == ids[mat].chart){
-											return d.widget; 
-										}	
-									}
-								), 
-									function (d) {
-										if (d.id == ids[mat].chart){
-											return d.id; 
-										}
-									}
-								).enter().append("div")
-								.attr("class", "marshalViz")
-								.style({
-									width : d3.select('#'+ids[mat].div).style('width'),
-									height: d3.select('#'+ids[mat].div).style('height'),
-									display: "inline-block"
-								})
-								.each(function (item) {								    									
-									if (item.id == ids[mat].chart){
-										console.log(item.id); 
-										console.log(this);
-										var element = d3.select(this);
-										item.widget
-											.target(this)
-											.render()
-										;
-									}
-								})
-							;
-			}
-			
+            try {
+    			for (mat in ids){
+    				console.log(ids[mat].div+":"+ids[mat].chart);
+    				d3.select("#"+ids[mat].div).selectAll("marshalViz").data(
+    								dashboard.visualizationsArray.filter(
+    									function (d) { 
+    										if (d.id == ids[mat].chart){
+    											return d.widget; 
+    										}	
+    									}
+    								), 
+    									function (d) {
+    										if (d.id == ids[mat].chart){
+    											return d.id; 
+    										}
+    									}
+    								).enter().append("div")
+    								.attr("class", "marshalViz")
+    								.style({
+    									width : d3.select('#'+ids[mat].div).style('width'),
+    									height: d3.select('#'+ids[mat].div).style('height'),
+    									display: "inline-block"
+    								})
+    								.each(function (item) {								    									
+    									if (item.id == ids[mat].chart){
+    										console.log(item.id); 
+    										console.log(this);
+    										var element = d3.select(this);
+    										item.widget
+    											.target(this)
+    											.render()
+    										;
+    									}
+    								})
+    							;
+    			}
+    			
+            } catch(e){
+            	console.log(e);
+            }
 							
 							
 							

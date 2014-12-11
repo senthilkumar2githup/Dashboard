@@ -22,29 +22,25 @@ public class HipieSingleton implements WebAppInit {
     private static final Logger LOGGER = LoggerFactory.getLogger(HipieSingleton.class);
     
     @Override
-    public void init(WebApp wapp) throws Exception {
-        context = wapp.getServletContext();
-        System.out.println("context 1 -->"+context);
-         try {
+	public void init(WebApp wapp) throws Exception {
+		context = wapp.getServletContext();
+		try {
 
-            String realPath = context.getRealPath("");  
-            context.setAttribute("absolutePath", realPath);
-            HipieSingleton.absolutePath=realPath;      
-            System.out.println("--->"+context.getInitParameter(HIPIE_CONFIG_FILE));
-            if (context.getInitParameter(HIPIE_CONFIG_FILE) != null){
-            	System.out.println("here -->");
-                repositoryConfigFile=context.getInitParameter(HIPIE_CONFIG_FILE);
-            }
-          } catch (Exception e) {
-                LOGGER.error(Constants.EXCEPTION, e);
-            }
-            loadHIPIE(context);
-    }
+			String realPath = context.getRealPath("");
+			context.setAttribute("absolutePath", realPath);
+			HipieSingleton.absolutePath = realPath;
+			if (context.getInitParameter(HIPIE_CONFIG_FILE) != null) {
+				repositoryConfigFile = context.getInitParameter(HIPIE_CONFIG_FILE);
+			}
+		} catch (Exception e) {
+			LOGGER.error(Constants.EXCEPTION, e);
+		}
+		loadHIPIE(context);
+	}
     
     private static ErrorBlock loadHIPIE(ServletContext ctx) {
         ErrorBlock er=new ErrorBlock();
         try {
-        	 System.out.println("========" + absolutePath + repositoryConfigFile);
             LOGGER.debug("absolutePath+repositoryConfigFile-->" + absolutePath + repositoryConfigFile);
             HIPIEService rm=HIPIEFactory.getInstance().getService(absolutePath + repositoryConfigFile);
             ctx.setAttribute(HIPIE, rm);
@@ -61,8 +57,7 @@ public class HipieSingleton implements WebAppInit {
             if(LOGGER.isDebugEnabled()) {
                 LOGGER.debug("CommonContext.HIPIE --> " + CommonContext.HIPIE);
             }
-            System.out.println("context -->"+context);
-            System.out.println("CommonContext.HIPIE -->"+CommonContext.HIPIE);
+            
             if (context.getAttribute(CommonContext.HIPIE) == null) {
                 loadHIPIE(context);
             }
