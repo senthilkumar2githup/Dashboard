@@ -27,6 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpcc.HIPIE.Composition;
 import org.hpcc.HIPIE.CompositionInstance;
+import org.hpcc.HIPIE.HIPIEService;
 import org.hpcc.HIPIE.utils.ErrorBlock;
 import org.hpcc.HIPIE.utils.HError;
 import org.hpccsystems.dashboard.chart.cluster.ClusterData;
@@ -107,7 +108,8 @@ import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Tabpanel;
 import org.zkoss.zul.Toolbar;
 import org.zkoss.zul.Window;
-
+import org.hpccsystems.dashboard.hipie.HipieSingleton;
+import org.hpccsystems.dashboard.entity.Process;
 /**
  * DashboardController class is used to add new dashboard into sidebar and 
  *  controller class for dashboard.zul.
@@ -224,6 +226,9 @@ public class DashboardController extends SelectorComposer<Window>{
                 LOG.error("Exception while fetching widget details from DB", ex);
             }            
             if(dashboard != null){
+            	HIPIEService hipieService = HipieSingleton.getHipie();
+            	composition =  hipieService.getComposition(authenticationService.getUserCredential().getUserId(),
+            			dashboard.getCompositionName());
                 dashboard.setPersisted(true);
                 if(LOG.isDebugEnabled()) {
                     LOG.debug("Visiblity - > " + dashboard.getVisibility());
@@ -273,32 +278,34 @@ public class DashboardController extends SelectorComposer<Window>{
             	addWidget.detach();
             	configureDashboard.detach();           	
             }
-            for (Portlet portlet : dashboard.getPortletList()) {    
-                if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD) ||
-                        Constants.ROLE_ADMIN.equals(dashboard.getRole()) ) {
-                	panel = new ChartPanel(portlet, Constants.SHOW_ALL_BUTTONS);
-                } else if(Constants.ROLE_CONTRIBUTOR.equals(dashboard.getRole())) {
-                	 panel = new ChartPanel(portlet, Constants.SHOW_EDIT_ONLY);
-                } else {
-               		panel = new ChartPanel(portlet, Constants.SHOW_NO_BUTTONS);                    
-                }
-                                
-                portalChildren.get(portlet.getColumn()).appendChild(panel);
-                
-                //Constructing chart data only when live chart is drawn
-                if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
-                    Clients.showBusy("Loading Dashboard");
-                    drawnLiveChartCount++;
-                    Map<String, Object> parameters = new HashMap<String, Object>();
-                    parameters.put(Constants.DASHBOARD_ID, dashboardId);
-                    parameters.put(Constants.COMMON_FILTERS_ENABLED, dashboard.getHasCommonFilter());
-                    
-                    Events.echoEvent(new Event("onCreateLiveChart", panel,parameters));
-                }                
-                
-            }
-            
-            if(! authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID)
+          Process process = compositionService.getProcess(composition);
+          if(process != null){
+        	  //Render chart through marshaller
+        	  for (Portlet portlet : dashboard.getPortletList()) {                	
+                	createChartPanel(panel,portlet);  
+        	  }
+          }else{
+        	  //Render chart through c3.js
+        	  for (Portlet portlet : dashboard.getPortletList()) {
+              	
+              	createChartPanel(panel,portlet);                              
+                  
+                  //Constructing chart data only when live chart is drawn
+                  if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
+                      Clients.showBusy("Loading Dashboard");
+                      drawnLiveChartCount++;
+                      Map<String, Object> parameters = new HashMap<String, Object>();
+                      parameters.put(Constants.DASHBOARD_ID, dashboardId);
+                      parameters.put(Constants.COMMON_FILTERS_ENABLED, dashboard.getHasCommonFilter());
+                      
+                      Events.echoEvent(new Event("onCreateLiveChart", panel,parameters));
+                  }                
+                  
+              }
+        	  
+          }         
+
+          if(! authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID)
                     && dashboard.getRole().equals(Constants.ROLE_ADMIN)) {
                 dashboardToolbar.setVisible(true);
             }
@@ -337,6 +344,24 @@ public class DashboardController extends SelectorComposer<Window>{
    
 
     /**
+     * @param panel
+     * @param portlet
+     * Creates the panels to draw the chart
+     */
+    private void createChartPanel(ChartPanel panel,Portlet portlet) {
+    	 if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD) ||
+                 Constants.ROLE_ADMIN.equals(dashboard.getRole()) ) {
+         	panel = new ChartPanel(portlet, Constants.SHOW_ALL_BUTTONS);
+         } else if(Constants.ROLE_CONTRIBUTOR.equals(dashboard.getRole())) {
+         	 panel = new ChartPanel(portlet, Constants.SHOW_EDIT_ONLY);
+         } else {
+        		panel = new ChartPanel(portlet, Constants.SHOW_NO_BUTTONS);                    
+         }
+                         
+         portalChildren.get(portlet.getColumn()).appendChild(panel);		
+	}
+
+	/**
      * Shows common filter panel
      */
     private void constructCommonFilterPanel() throws HpccConnectionException,RemoteException {
@@ -661,7 +686,9 @@ public class DashboardController extends SelectorComposer<Window>{
             
             //To create Composition             
            composition = compositionService.createComposition(dashboard.getName(), new HPCCConnection(), portlet);
-           
+           //updating dashboard with composition's canonical name
+           dashboard.setCompositionName(composition.getCanonicalName());
+           dashboardService.updateDashboard(dashboard);
            //Run composition
            runComposition();
         }
@@ -786,22 +813,24 @@ public class DashboardController extends SelectorComposer<Window>{
     /**
      * Invokes service to run the composition, if the composition is valid.
      */
-    protected void runComposition() {
+    protected CompositionInstance runComposition() {
+    	CompositionInstance compInstance = null;
     	try {
             ErrorBlock errorBlock = composition.validate();
             for (HError error : errorBlock) {
             	LOG.error(error);
                 Clients.showNotification(error.getErrorString(), Clients.NOTIFICATION_TYPE_ERROR, this.getSelf(), "middle_center", 3000);
-                return;
+                return null;
             }
                         
-			compositionService.runComposition(composition, new HPCCConnection().getHipieHPCCConnection());
+            compInstance = compositionService.runComposition(composition, new HPCCConnection().getHipieHPCCConnection());
 			
         } catch (Exception e) {
             LOG.error(Constants.EXCEPTION, e);
             Clients.showNotification(e.getMessage(), Clients.NOTIFICATION_TYPE_ERROR, 
                     this.getSelf(), "middle_center", 5000, true);
         }
+    	return compInstance;
 		
 	}
 

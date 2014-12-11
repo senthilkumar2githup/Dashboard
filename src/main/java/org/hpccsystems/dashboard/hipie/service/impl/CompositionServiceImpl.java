@@ -98,6 +98,11 @@ public class CompositionServiceImpl implements CompositionService {
 
 		CompositionInstance latestInstance = composition.getMostRecentInstance(
 				authenticationService.getUserCredential().getUserId(), true);
+		
+		if(latestInstance == null){
+			latestInstance = runComposition(composition,new HPCCConnection().getHipieHPCCConnection());
+		} 
+		//TODO:check for composition status complete/failed
 
 		process = new Process(name, latestInstance);
 		if (LOG.isDebugEnabled()) {

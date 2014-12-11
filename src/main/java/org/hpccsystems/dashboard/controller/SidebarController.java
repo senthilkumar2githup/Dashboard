@@ -52,8 +52,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
 
     private static final long serialVersionUID = 1L;
     
-    private static final  Log LOG = LogFactory
-            .getLog(SidebarController.class);
+    private static final  Log LOG = LogFactory.getLog(SidebarController.class);
     
     //wire components
     @Wire
