@@ -25,6 +25,10 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hpcc.HIPIE.Composition;
+import org.hpcc.HIPIE.CompositionInstance;
+import org.hpcc.HIPIE.utils.ErrorBlock;
+import org.hpcc.HIPIE.utils.HError;
 import org.hpccsystems.dashboard.chart.cluster.ClusterData;
 import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.Field;
@@ -120,6 +124,7 @@ public class DashboardController extends SelectorComposer<Window>{
     
     private Dashboard dashboard; 
     private Integer oldColumnCount = null;
+    private  Composition composition;
     
     Integer dashboardId = null;
     String dashboardRole = null;
@@ -633,7 +638,6 @@ public class DashboardController extends SelectorComposer<Window>{
         @Override
         public void onEvent(Event event) throws Exception {
         	
-        	LOG.debug("here -->");
             Portlet portlet = (Portlet) event.getData();
             
             Map<String, Set<Field>> newFiles;
@@ -655,15 +659,9 @@ public class DashboardController extends SelectorComposer<Window>{
                 constructFilterItem(newFiles);               
             }
             
-            //To create Composition 
-            LOG.debug(compositionService);
-            LOG.debug(SpringUtil.getBean("compositionService"));
-            LOG.debug(dashboard);
-            LOG.debug(portlet);
-            LOG.debug(new HPCCConnection());
-            
-            compositionService.createComposition(dashboard.getName(), new HPCCConnection(), portlet);
-            
+            //To create Composition             
+           composition = compositionService.createComposition(dashboard.getName(), new HPCCConnection(), portlet);
+           runComposition();            
             //Run composition
         }
     };
@@ -785,6 +783,31 @@ public class DashboardController extends SelectorComposer<Window>{
     }    
     
     /**
+     * Invokes service to run the composition, if the composition is valid.
+     */
+    protected void runComposition() {
+    	try {
+            ErrorBlock errorBlock = composition.validate();
+            for (HError error : errorBlock) {
+            	LOG.error(error);
+                Clients.showNotification(error.getErrorString(), Clients.NOTIFICATION_TYPE_ERROR, this.getSelf(), "middle_center", 3000);
+                return;
+            }
+            Clients.showBusy(this.getSelf().getParent().getParent(), "Running project...");
+            //Run composition in separate thread
+           // desktop.enableServerPush(true);
+			CompositionInstance compositionInstance = compositionService
+					.runComposition(composition,new HPCCConnection().getHipieHPCCConnection());
+        } catch (Exception e) {
+            LOG.error(Constants.EXCEPTION, e);
+            Clients.showNotification(e.getMessage(), Clients.NOTIFICATION_TYPE_ERROR, 
+                    this.getSelf(), "middle_center", 5000, true);
+        }
+		
+	}
+
+
+	/**
      * Event listener for string filters when there's a separate apply button.
      */
     EventListener<Event> stringFilterMultiCheckListener = new EventListener<Event>() {

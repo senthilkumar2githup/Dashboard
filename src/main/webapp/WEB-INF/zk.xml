@@ -49,6 +49,12 @@
 		-->
 	</system-config>
 
+	<!-- Hipie Service Initializer -->
+	<listener>
+        <description>Webapp Initializer for HIPIE Service</description>
+        <listener-class>org.hpccsystems.dashboard.hipie.HipieSingleton</listener-class>
+	</listener>
+	
 	<error-page>
 	    <exception-type>java.lang.Throwable</exception-type>    
 	    <location>/error.zul</location>    
