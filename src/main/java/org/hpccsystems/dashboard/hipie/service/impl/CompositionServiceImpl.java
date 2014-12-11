@@ -27,7 +27,6 @@ public class CompositionServiceImpl implements CompositionService {
 	private static final String DASHBOARD_VISUALIZATION = "DashboardVisualization";
 
 
-
 	private static final String HIPIE_RAW_DATASET  = "RawDataset";
 
 	

@@ -661,8 +661,9 @@ public class DashboardController extends SelectorComposer<Window>{
             
             //To create Composition             
            composition = compositionService.createComposition(dashboard.getName(), new HPCCConnection(), portlet);
+         //Run composition
            runComposition();            
-            //Run composition
+            
         }
     };
     

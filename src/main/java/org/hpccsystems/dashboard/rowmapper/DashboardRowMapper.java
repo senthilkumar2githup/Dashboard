@@ -12,6 +12,7 @@ public class DashboardRowMapper implements RowMapper<Dashboard> {
     public Dashboard mapRow(ResultSet rs, int rowNum) throws SQLException {
         Dashboard dashboard = new Dashboard();
         dashboard.setDashboardId(rs.getInt("dashboard_id"));
+        dashboard.setCompositionName(rs.getString("composition"));
         dashboard.setApplicationId("application_id");
         dashboard.setName(rs.getString("dashboard_name"));
         dashboard.setColumnCount(rs.getInt("column_count"));

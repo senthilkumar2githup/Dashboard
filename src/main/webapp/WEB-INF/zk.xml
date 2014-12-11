@@ -8,7 +8,7 @@
 		<name>org.zkoss.zk.ui.WebApp.name</name>
 		<value>Dashboard</value>
 	</preference>
-	-->
+	--> 
 	
 	<library-property>
 	    <name>org.zkoss.theme.preferred</name>

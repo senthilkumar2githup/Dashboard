@@ -140,6 +140,7 @@ public class DashboardDaoImpl implements DashboardDao {
             //updates dashboard Sequence & Column count,Name
             getJdbcTemplate().update(Queries.UPDATE_DASHBOARD, new Object[] { 
                     dashboard.getName(),
+                    dashboard.getCompositionName(),
                     dashboard.getColumnCount(),
                     dashboard.getSourceId(),
                     dashboard.getLastupdatedDate(),                

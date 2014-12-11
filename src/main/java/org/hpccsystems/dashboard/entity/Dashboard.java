@@ -19,6 +19,7 @@ public class Dashboard {
     private String sourceId;
     private String layout;
     private String name = "Dashboard Name";
+    private String compositionName;
     private Integer columnCount = 0;
     private Integer dashboardId;
     private String applicationId;
@@ -274,6 +275,14 @@ public class Dashboard {
         return buffer.toString();        
         
     }
+
+	public String getCompositionName() {
+		return compositionName;
+	}
+
+	public void setCompositionName(String compositionName) {
+		this.compositionName = compositionName;
+	}
     
     
 }
