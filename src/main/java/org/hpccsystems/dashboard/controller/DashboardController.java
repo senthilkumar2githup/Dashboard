@@ -794,7 +794,7 @@ public class DashboardController extends SelectorComposer<Window>{
                 Clients.showNotification(error.getErrorString(), Clients.NOTIFICATION_TYPE_ERROR, this.getSelf(), "middle_center", 3000);
                 return;
             }
-                        
+            
 			compositionService.runComposition(composition, new HPCCConnection().getHipieHPCCConnection());
 			
         } catch (Exception e) {
