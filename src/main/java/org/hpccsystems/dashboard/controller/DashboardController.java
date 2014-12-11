@@ -25,6 +25,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hpcc.HIPIE.Composition;
 import org.hpccsystems.dashboard.chart.cluster.ClusterData;
 import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.Field;
@@ -633,7 +634,6 @@ public class DashboardController extends SelectorComposer<Window>{
         @Override
         public void onEvent(Event event) throws Exception {
         	
-        	LOG.debug("here -->");
             Portlet portlet = (Portlet) event.getData();
             
             Map<String, Set<Field>> newFiles;
@@ -662,7 +662,11 @@ public class DashboardController extends SelectorComposer<Window>{
             LOG.debug(portlet);
             LOG.debug(new HPCCConnection());
             
-            compositionService.createComposition(dashboard.getName(), new HPCCConnection(), portlet);
+            Composition composition = compositionService.createComposition(dashboard.getName(), new HPCCConnection(), portlet);
+            
+            //Updating composition name to DB
+            dashboard.setCompositionName(composition.getCanonicalName());
+            dashboardService.updateDashboard(dashboard);
             
             //Run composition
         }

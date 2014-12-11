@@ -32,6 +32,7 @@ DROP TABLE IF EXISTS `dashboard_details`;
 create table dashboard_details (
 dashboard_id  INT NOT NULL auto_increment,  
 dashboard_name  VARCHAR(200) ,
+composition  VARCHAR(500) ,
 user_id VARCHAR(100) ,
 column_count TINYINT,
 sequence INT,
