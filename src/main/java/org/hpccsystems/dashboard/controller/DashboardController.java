@@ -23,6 +23,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.rpc.ServiceException;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpcc.HIPIE.Composition;
@@ -46,9 +47,11 @@ import org.hpccsystems.dashboard.controller.component.GroupListitem;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Group;
 import org.hpccsystems.dashboard.entity.Portlet;
+import org.hpccsystems.dashboard.entity.Process;
 import org.hpccsystems.dashboard.entity.QuerySchema;
 import org.hpccsystems.dashboard.exception.EncryptDecryptException;
 import org.hpccsystems.dashboard.exception.HpccConnectionException;
+import org.hpccsystems.dashboard.hipie.HipieSingleton;
 import org.hpccsystems.dashboard.hipie.servic.CompositionService;
 import org.hpccsystems.dashboard.hipie.util.HPCCConnection;
 import org.hpccsystems.dashboard.services.AuthenticationService;
@@ -108,9 +111,10 @@ import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Tabpanel;
 import org.zkoss.zul.Toolbar;
 import org.zkoss.zul.Window;
-import org.hpccsystems.dashboard.hipie.HipieSingleton;
-import org.hpccsystems.dashboard.entity.Process;
 
+import bsh.StringUtil;
+
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 /**
@@ -296,14 +300,24 @@ public class DashboardController extends SelectorComposer<Window>{
 	  	        	  }
 	  	        	  
 	  	        	  if(LOG.isDebugEnabled()) {
-	  	        		LOG.debug("DDL Name JSON - " + composition.getVisualizationDDLs(authenticationService.getUserCredential().getUserId(), false));
+	  	        		LOG.debug("DDL Name JSON - " + 
+	  	        				composition.getVisualizationDDLs(authenticationService.getUserCredential().getUserId(), false));
 	  	        	  }
 	  	        	  
 	  	        	  String resultName = composition.getVisualizationDDLs(authenticationService.getUserCredential().getUserId(), false)
 	  	        			  .values().iterator().next().keySet().iterator().next();
 	  	        	 
 	  	        	  //TODO: Remopve hard coding - Waiting for HIPIE fix
-	  	        	  createVisualizations(process, "admin_Dashboard1_Comp_Ins003_DDL");
+	  	        	  if(LOG.isDebugEnabled()) {
+	  	        		  LOG.debug("Original DDL - " + resultName);
+	  	        		  LOG.debug("Sub string - " + StringUtils.substringAfterLast(resultName, "admin"));
+	  	        		  LOG.debug("DDL Name - " + (!StringUtils.substringBeforeLast(resultName, "admin").isEmpty()?
+	  	        			  "admin" + StringUtils.substringAfterLast(resultName, "admin"):
+	  	        				  resultName));
+	  	        	  }
+	  	        	  createVisualizations(process, !StringUtils.substringBeforeLast(resultName, "admin").isEmpty()?
+	  	        			  "admin" + StringUtils.substringAfterLast(resultName, "admin"):
+	  	        				  resultName);
 	  	          }
             } else {
 	        	  //Render chart through c3.js
@@ -1939,7 +1953,8 @@ public class DashboardController extends SelectorComposer<Window>{
         	LOG.debug("Params - " + dashboardDivs.toString());
         }
         
-        Clients.evalJavaScript("createVisualization('" + url.toString() + "','" + dashboardDivs.toString() + "');");
+        Clients.evalJavaScript("createVisualization('" + url.toString() + "','" + 
+        		new GsonBuilder().create().toJson(dashboardDivs) + "');");
     
     }
 

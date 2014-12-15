@@ -10,7 +10,7 @@
 <?script src="js/common.js"?>
 
 <?script src="js/Visualization/widgets/lib/requirejs/require.js"?>
-<?script src="js/visualization.js"?>
+<?script src="js/visualization2.js"?>
 
 <?script src="http://www.google.com/jsapi"?>
 

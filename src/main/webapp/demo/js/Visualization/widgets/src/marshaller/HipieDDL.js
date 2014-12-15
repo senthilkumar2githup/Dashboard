@@ -325,10 +325,18 @@
                 this.loadWidget(this.source.mappings.contains("county") ? "src/map/ChoroplethCounties" : "src/map/ChoroplethStates");
                 break;
             case "2DCHART":
-            case "PIE":
             case "BUBBLE":
             case "BAR":
-			case "C3PIE":
+            case "C3_COLUMN":
+                this.loadWidget("src/c3/Column", function (widget) {
+                    widget
+                        .chartType(context.properties.charttype || context.type)
+                        .title(context.id)
+                    ;
+                });
+                break;
+            case "PIE":
+			case "C3_PIE":
                 this.loadWidget("src/c3/Pie", function (widget) {
                     widget
                         .chartType(context.properties.charttype || context.type)

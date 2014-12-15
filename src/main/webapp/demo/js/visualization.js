@@ -1,5 +1,5 @@
 function createVisualization(url, ids) {
-	console.log("Creating visualisation" + url + "ids - " + ids);
+	console.log("Creating visualisation - " + url + " ids - " + ids);
 	
 	ids = jq.parseJSON(ids);
 	
@@ -22,15 +22,16 @@ function createVisualization(url, ids) {
 				"src/other/Slider", "src/other/Table" ], function(Comms,
 				Surface, Text, TextBox, Shape, FAChar, Icon, List, Menu,
 				Palette, Graph, Edge, Vertex, MultiChartSurface, Pie, Bubble,
-				ChoroplethStates, GMap, HTMLMarshaller, GraphMarshaller,
+				ChoroplethStates, GMap, DashboardMarshaller, GraphMarshaller,
 				MorphText, Slider, Table) {
 			try {
-				dashboardMarshaller = new HTMLMarshaller();
-				
+				dashboardMarshaller = new DashboardMarshaller();
+								
 				dashboardMarshaller.url(url);
 				dashboardMarshaller.render(ids);
 
 			} catch (e) {
+				console.log(e.message);
 				alert(e.message);
 			}
 		});
