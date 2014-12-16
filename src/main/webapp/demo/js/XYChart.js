@@ -147,4 +147,5 @@ function createXYChart (divId, chartData) {
 	console.log(JSON.stringify(c3JSON));
 	
 	var chart = c3.generate(c3JSON);
+
 }

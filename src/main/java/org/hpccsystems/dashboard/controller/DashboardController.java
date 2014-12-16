@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.servlet.http.HttpSession;
@@ -28,7 +29,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpcc.HIPIE.Composition;
 import org.hpcc.HIPIE.CompositionInstance;
-import org.hpcc.HIPIE.HIPIEService;
 import org.hpcc.HIPIE.utils.ErrorBlock;
 import org.hpcc.HIPIE.utils.HError;
 import org.hpccsystems.dashboard.chart.cluster.ClusterData;
@@ -111,8 +111,6 @@ import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Tabpanel;
 import org.zkoss.zul.Toolbar;
 import org.zkoss.zul.Window;
-
-import bsh.StringUtil;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -232,8 +230,6 @@ public class DashboardController extends SelectorComposer<Window>{
                 LOG.error("Exception while fetching widget details from DB", ex);
             }            
             if(dashboard != null){
-            	HIPIEService hipieService = HipieSingleton.getHipie();
-            	
                 dashboard.setPersisted(true);
                 if(LOG.isDebugEnabled()) {
                     LOG.debug("Visiblity - > " + dashboard.getVisibility());
@@ -286,40 +282,49 @@ public class DashboardController extends SelectorComposer<Window>{
             
             
             Process process = null;
+            Composition composition = null;
             if(dashboard.getCompositionName() != null ) {
             	//Render chart through marshaller
             	
-            	Composition composition =  HipieSingleton.getHipie().getComposition(
+            	composition=  HipieSingleton.getHipie().getComposition(
             			authenticationService.getUserCredential().getUserId(),
             			dashboard.getCompositionName());
-            	process =compositionService.getProcess(composition);
             	
-            	if(process != null ){
-	  	        	  for (Portlet portlet : dashboard.getPortletList()) {                	
-	  	        		  createChartPanel(panel,portlet);  
-	  	        	  }
-	  	        	  
-	  	        	  if(LOG.isDebugEnabled()) {
-	  	        		LOG.debug("DDL Name JSON - " + 
-	  	        				composition.getVisualizationDDLs(authenticationService.getUserCredential().getUserId(), false));
-	  	        	  }
-	  	        	  
-	  	        	  String resultName = composition.getVisualizationDDLs(authenticationService.getUserCredential().getUserId(), false)
-	  	        			  .values().iterator().next().keySet().iterator().next();
-	  	        	 
-	  	        	  //TODO: Remopve hard coding - Waiting for HIPIE fix
-	  	        	  if(LOG.isDebugEnabled()) {
-	  	        		  LOG.debug("Original DDL - " + resultName);
-	  	        		  LOG.debug("Sub string - " + StringUtils.substringAfterLast(resultName, "admin"));
-	  	        		  LOG.debug("DDL Name - " + (!StringUtils.substringBeforeLast(resultName, "admin").isEmpty()?
-	  	        			  "admin" + StringUtils.substringAfterLast(resultName, "admin"):
-	  	        				  resultName));
-	  	        	  }
-	  	        	  createVisualizations(process, !StringUtils.substringBeforeLast(resultName, "admin").isEmpty()?
-	  	        			  "admin" + StringUtils.substringAfterLast(resultName, "admin"):
-	  	        				  resultName);
-	  	          }
+            	if(composition != null) {
+            		process =compositionService.getProcess(composition);
+            		
+            		if(process.getCompositionInstance().getWorkunitStatus().contains("failed")) {
+            			process = null;
+            		}
+            	}
+            }
+            
+            if(process != null ){
+            	for (Portlet portlet : dashboard.getPortletList()) {                	
+            		createChartPanel(panel,portlet);  
+            	}
+            	
+            	if(LOG.isDebugEnabled()) {
+            		LOG.debug("DDL Name JSON - " + 
+            				composition.getVisualizationDDLs(authenticationService.getUserCredential().getUserId(), false));
+            	}
+            	
+            	String resultName = composition.getVisualizationDDLs(authenticationService.getUserCredential().getUserId(), false)
+            			.values().iterator().next().keySet().iterator().next();
+            	
+            	//TODO: Remopve hard coding - Waiting for HIPIE fix
+            	if(LOG.isDebugEnabled()) {
+            		LOG.debug("Original DDL - " + resultName);
+            		LOG.debug("Sub string - " + StringUtils.substringAfterLast(resultName, "admin"));
+            		LOG.debug("DDL Name - " + (!StringUtils.substringBeforeLast(resultName, "admin").isEmpty()?
+            				"admin" + StringUtils.substringAfterLast(resultName, "admin"):
+            					resultName));
+            	}
+            	createVisualizations(process, !StringUtils.substringBeforeLast(resultName, "admin").isEmpty()?
+            			"admin" + StringUtils.substringAfterLast(resultName, "admin"):
+            				resultName);
             } else {
+
 	        	  //Render chart through c3.js
 	        	  for (Portlet portlet : dashboard.getPortletList()) {
 	              	
@@ -340,8 +345,7 @@ public class DashboardController extends SelectorComposer<Window>{
 	              }                
 	                  
 	              }
-	        	  
-	          }         
+            }
 
           if(! authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID)
                     && dashboard.getRole().equals(Constants.ROLE_ADMIN)) {
@@ -1908,15 +1912,24 @@ public class DashboardController extends SelectorComposer<Window>{
         }    
     }
     
-    private List<String> getUuidsOfLiveWidgets() {
-    	List<String> uiids = new ArrayList<String>();
+    private Map<String,String> getUuidsOfLiveWidgets() {
+    	Map<String,String> uiids = new HashMap<String, String>();
     	
+    	String chartName;
     	for (Portalchildren portalchildren : portalChildren) {
     		final List<Component> list = portalchildren.getChildren();
     		for (final Component component1 : list) {
     			final ChartPanel panel = (ChartPanel) component1;
     			if(panel.getPortlet().isLive()) {
-    				uiids.add(panel.getChartContainerUuid());
+    				chartName = chartService.getCharts().get(panel.getPortlet()
+    						.getChartType()).getName(); 
+    				if(chartName.contains("Bar")) {
+    					uiids.put(panel.getChartContainerUuid(), "BarChart");
+    				} else if(chartName.contains("Line")) {
+    					uiids.put(panel.getChartContainerUuid(), "LineChart");
+    				} else {
+    					uiids.put(panel.getChartContainerUuid(), "PieChart");
+    				}
     			}
     		}
 		}
@@ -1928,8 +1941,6 @@ public class DashboardController extends SelectorComposer<Window>{
         org.hpcc.HIPIE.utils.HPCCConnection hpccConnection = process.getCompositionInstance().getHPCCConnection();
         JsonArray dashboardDivs = new JsonArray();
         JsonObject divRow=null;
-        String chartId="Chart";
-        int count=1;
         
         StringBuilder url = new StringBuilder(hpccConnection.getESPUrl())
             .append("WsWorkunits/WUResult.json?")
@@ -1939,14 +1950,11 @@ public class DashboardController extends SelectorComposer<Window>{
             .append(visualizationDDL)
             .append("&SuppressXmlSchema=true");
         
-        Iterator<String> iterator=getUuidsOfLiveWidgets().iterator();
-        
-		while (iterator.hasNext()) {
-			divRow = new JsonObject();
-			divRow.addProperty("div", iterator.next());
-			divRow.addProperty("chart", chartId + count);
-			dashboardDivs.add(divRow);
-			count++;
+        for (Entry<String, String> entry : getUuidsOfLiveWidgets().entrySet()) {
+        	divRow = new JsonObject();
+        	divRow.addProperty("div", entry.getKey());
+        	divRow.addProperty("chart", entry.getValue());
+        	dashboardDivs.add(divRow);
 		}
                 
         if(LOG.isDebugEnabled()) {

@@ -28,14 +28,11 @@
                 position: 'bottom',
                 show: true
             },
-            color: {
-                pattern: d3.scale.category20().range()
-            },
             data: {
                 rows: []
             }
         };
-    };
+    }; 
     Common.prototype = Object.create(HTMLWidget.prototype);
     Common.prototype.implements(I2DChart.prototype);
 
