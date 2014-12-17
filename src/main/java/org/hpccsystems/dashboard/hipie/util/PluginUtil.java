@@ -112,7 +112,8 @@ public class PluginUtil {
         
         RecordInstance ri=new RecordInstance();
         ri.add(new FieldInstance(null,((XYChartData)widget.getChartData()).getAttribute().getColumn()));
-		ri.add(new FieldInstance(((XYChartData) widget.getChartData()).getMeasures().get(0).getAggregateFunction().toUpperCase(),
+		ri.add(new FieldInstance((((XYChartData) widget.getChartData()).getMeasures().get(0).getAggregateFunction() != null) ? 
+				((XYChartData) widget.getChartData()).getMeasures().get(0).getAggregateFunction().toUpperCase() : null,
 				((XYChartData) widget.getChartData()).getMeasures().get(0).getColumn()));
         ve.setBasisQualifier(ri);
         
