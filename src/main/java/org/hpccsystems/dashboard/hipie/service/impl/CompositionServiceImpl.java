@@ -56,11 +56,11 @@ public class CompositionServiceImpl implements CompositionService {
 				DASHBOARD_VISUALIZATION);
 		ContractInstance visualisationPlugin = contract.createContractInstance();
 		visualisationPlugin.setProperty("attribute", ((XYChartData)widget.getChartData()).getAttribute().getColumn());
-		visualisationPlugin.setProperty("measure", ((XYChartData)widget.getChartData()).getMeasures().get(0).getColumn());*/
+		visualisationPlugin.setProperty("measure", ((XYChartData)widget.getChartData()).getMeasures().get(0).getColumn());
 		
 		if(LOG.isDebugEnabled()) {
 			LOG.debug("Visuslisation plugin - " + visualisationPlugin.toCompositionString());
-		}
+		}*/
 		
 		ContractInstance pluginContract = PluginUtil.createPlugin(label,composition,widget);		
 		//refreshes the plugins
