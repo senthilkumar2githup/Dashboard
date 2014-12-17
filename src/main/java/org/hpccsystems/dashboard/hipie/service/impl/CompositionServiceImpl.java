@@ -45,6 +45,8 @@ public class CompositionServiceImpl implements CompositionService {
 		HIPIEService hipieService = HipieSingleton.getHipie();
 		Composition composition = hipieService.getCompositionTemplate(
 				authenticationService.getUserCredential().getUserId(),"BasicTemplate");
+		composition = new Composition(composition);
+		
 		composition.setLabel(label);
 		compName = label.replaceAll("[^a-zA-Z0-9]+", "");
 		composition.setName(compName);
@@ -55,6 +57,10 @@ public class CompositionServiceImpl implements CompositionService {
 		ContractInstance visualisationPlugin = contract.createContractInstance();
 		visualisationPlugin.setProperty("attribute", ((XYChartData)widget.getChartData()).getAttribute().getColumn());
 		visualisationPlugin.setProperty("measure", ((XYChartData)widget.getChartData()).getMeasures().get(0).getColumn());*/
+		
+		if(LOG.isDebugEnabled()) {
+			LOG.debug("Visuslisation plugin - " + visualisationPlugin.toCompositionString());
+		}
 		
 		ContractInstance pluginContract = PluginUtil.createPlugin(label,composition,widget);		
 		//refreshes the plugins
@@ -74,6 +80,9 @@ public class CompositionServiceImpl implements CompositionService {
 
 	@Override
 	public CompositionInstance runComposition(Composition composition,org.hpcc.HIPIE.utils.HPCCConnection hpccConnection) throws Exception {
+		if(LOG.isDebugEnabled()) {
+			LOG.debug("Running composition - \n" + composition.toString());
+		}
 		return HipieSingleton.getHipie().runComposition(composition, hpccConnection,
 				authenticationService.getUserCredential().getUserId());
 	}
