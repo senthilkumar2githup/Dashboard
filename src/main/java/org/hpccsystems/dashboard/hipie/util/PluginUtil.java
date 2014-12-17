@@ -14,7 +14,9 @@ import org.hpcc.HIPIE.dude.InputElement;
 import org.hpcc.HIPIE.dude.OutputElement;
 import org.hpcc.HIPIE.dude.RecordInstance;
 import org.hpcc.HIPIE.dude.VisualElement;
+import org.hpccsystems.dashboard.chart.entity.Measure;
 import org.hpccsystems.dashboard.chart.entity.XYChartData;
+import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.ChartDetails;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.hipie.HipieSingleton;
@@ -65,13 +67,27 @@ public class PluginUtil {
 		InputElement input = new InputElement();
 		input.setName("dsInput");		
 		//TODO:need to change for roxie query
-		input.setType(InputElement.TYPE_DATASET);
-		//TODO:set measure and attribute
-		/*input.addOption(new ElementOption(Element.LABEL,new FieldInstance(null,"attribute")));
-		input.addOption(new ElementOption(Element.LABEL,new FieldInstance(null,"measure")));*/
-		
+		input.setType(InputElement.TYPE_DATASET);	
 		input.addOption(new ElementOption(Element.MAPBYNAME));
-		contract.getInputElements().add(input);
+		
+		
+		//Set Fields for INPUT(measure and attribute fields)
+		InputElement attribute=new InputElement();
+        attribute.setName(((XYChartData)widget.getChartData()).getAttribute().getColumn());
+        attribute.addOption(new ElementOption(Element.LABEL,new FieldInstance(null,((XYChartData)widget.getChartData()).getAttribute().getColumn())));
+        attribute.setType(InputElement.TYPE_FIELD);
+        input.addChildElement(attribute);
+        
+        InputElement measure = null;
+        for(Measure chartMeasure : ((XYChartData)widget.getChartData()).getMeasures()){
+        	measure = new InputElement();
+             measure.setName(chartMeasure.getColumn());
+             measure.addOption(new ElementOption(Element.LABEL,new FieldInstance(null,chartMeasure.getColumn())));
+             measure.setType(InputElement.TYPE_FIELD);
+             input.addChildElement(measure);
+        }
+        contract.getInputElements().add(input);
+
 		
 		OutputElement output = new OutputElement();
 		output.setName("dsOutput");
@@ -88,13 +104,16 @@ public class PluginUtil {
         
 	    VisualElement ve=new VisualElement();
 	    //TODO:Need to set chart type using Hipie's 'Element' class
-        ve.setType("PIE");
+	    if(Constants.PIE_CHART.equals(chartInfo.getName())){
+	    	 ve.setType("PIE");
+	    }       
         ve.setName(chartInfo.getName());
         ve.setBasis(output);
         
         RecordInstance ri=new RecordInstance();
         ri.add(new FieldInstance(null,((XYChartData)widget.getChartData()).getAttribute().getColumn()));
-        ri.add(new FieldInstance(null, ((XYChartData)widget.getChartData()).getMeasures().get(0).getColumn()));
+		ri.add(new FieldInstance(((XYChartData) widget.getChartData()).getMeasures().get(0).getAggregateFunction().toUpperCase(),
+				((XYChartData) widget.getChartData()).getMeasures().get(0).getColumn()));
         ve.setBasisQualifier(ri);
         
         ve.addOption(new ElementOption(VisualElement.TITLE,new FieldInstance(null,chartInfo.getName())));
@@ -105,6 +124,7 @@ public class PluginUtil {
         
         visualization.addChildElement(ve);
         contract.getVisualElements().add(visualization);
+        
         contract = hipieService.saveContractAs(authenticationService.getUserCredential().getUserId(), contract,contract.getName());
 		return  contract.createContractInstance();
 

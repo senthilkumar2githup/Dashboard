@@ -57,7 +57,8 @@ public class CompositionServiceImpl implements CompositionService {
 		visualisationPlugin.setProperty("measure", ((XYChartData)widget.getChartData()).getMeasures().get(0).getColumn());*/
 		
 		ContractInstance pluginContract = PluginUtil.createPlugin(label,composition,widget);		
-		
+		//refreshes the plugins
+        hipieService.refreshData();
 		ContractInstance datasource=composition.getContractInstanceByName(HIPIE_RAW_DATASET);
 		pluginContract.addPrecursor(datasource);	
 				
