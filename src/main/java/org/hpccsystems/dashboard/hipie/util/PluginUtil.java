@@ -60,14 +60,15 @@ public class PluginUtil {
 		contract.setAuthor(authenticationService.getUserCredential().getUserId());
 		chartService = (ChartService)SpringUtil.getBean("chartService");
 		ChartDetails chartInfo=chartService.getCharts().get(widget.getChartType());
-		//if(chartInfo.getName().equals("PIE"))
-		contract.setDescription("PIE");
+		contract.setDescription(chartInfo.getDescription());
 		
 		InputElement input = new InputElement();
-		input.setName("dsInput");
+		input.setName("dsInput");		
 		//TODO:need to change for roxie query
 		input.setType(InputElement.TYPE_DATASET);
 		//TODO:set measure and attribute
+		/*input.addOption(new ElementOption(Element.LABEL,new FieldInstance(null,"attribute")));
+		input.addOption(new ElementOption(Element.LABEL,new FieldInstance(null,"measure")));*/
 		
 		input.addOption(new ElementOption(Element.MAPBYNAME));
 		contract.getInputElements().add(input);
@@ -79,32 +80,32 @@ public class PluginUtil {
 		output.addOption(new ElementOption("WUID"));
 		contract.getOutputElements().add(output);
 
-		
-        VisualElement visualization = new VisualElement();
-        visualization.setName("PIE");
+		VisualElement visualization = new VisualElement();
+        visualization.setName(compName);
         visualization.setType(VisualElement.VISUALIZE);
+        //TODO:set title for visualization
+        //visualization.addOption(new ElementOption(VisualElement.TITLE,new FieldInstance(null,compName)));
         
-        VisualElement visualElement = new VisualElement();
-        visualElement.setType(CHART_2D);
-        visualElement.setName("PIE");
-        visualElement.setBasis(output);
+	    VisualElement ve=new VisualElement();
+	    //TODO:Need to set chart type using Hipie's 'Element' class
+        ve.setType("PIE");
+        ve.setName(chartInfo.getName());
+        ve.setBasis(output);
         
         RecordInstance ri=new RecordInstance();
         ri.add(new FieldInstance(null,((XYChartData)widget.getChartData()).getAttribute().getColumn()));
-        //TODO:Check how to set aggregate function
-        ri.add(new FieldInstance(null,((XYChartData)widget.getChartData()).getMeasures().get(0).getColumn()));        
-        visualElement.setBasisQualifier(ri);
+        ri.add(new FieldInstance(null, ((XYChartData)widget.getChartData()).getMeasures().get(0).getColumn()));
+        ve.setBasisQualifier(ri);
         
-		visualElement.addOption(new ElementOption("LABEL", new FieldInstance(
-				null, ((XYChartData)widget.getChartData()).getAttribute().getColumn())));
-		visualElement.addOption(new ElementOption("WEIGHT", new FieldInstance(
-				null, ((XYChartData)widget.getChartData()).getMeasures().get(0).getColumn())));
-        visualElement.addCustomOption(new ElementOption("_chartType",new FieldInstance(null,"PIE")));
-        visualization.addChildElement(visualElement);
+        ve.addOption(new ElementOption(VisualElement.TITLE,new FieldInstance(null,chartInfo.getName())));
+        ve.addOption(new ElementOption(VisualElement.WEIGHT,new FieldInstance(null,((XYChartData)widget.getChartData()).getMeasures().get(0).getColumn())));
+        ve.addOption(new ElementOption(VisualElement.LABEL,new FieldInstance(null,((XYChartData)widget.getChartData()).getAttribute().getColumn())));
+        //chartType, uses addCustomOption instead of addOption       
+        ve.addCustomOption(new ElementOption("_chartType",new FieldInstance(null,"C3_PIE")));
         
+        visualization.addChildElement(ve);
         contract.getVisualElements().add(visualization);
         contract = hipieService.saveContractAs(authenticationService.getUserCredential().getUserId(), contract,contract.getName());
-		 
 		return  contract.createContractInstance();
 
 	}

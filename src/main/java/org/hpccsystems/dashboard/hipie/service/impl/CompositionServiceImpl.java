@@ -50,16 +50,16 @@ public class CompositionServiceImpl implements CompositionService {
 		composition.setName(compName);
 		PluginUtil.updateRawDataset(composition, "~" + widget.getChartData().getFiles().get(0),hpccConnection);
 		
-		Contract contract = HipieSingleton.getHipie().getContract(authenticationService.getUserCredential().getUserId(),
+		/*Contract contract = HipieSingleton.getHipie().getContract(authenticationService.getUserCredential().getUserId(),
 				DASHBOARD_VISUALIZATION);
 		ContractInstance visualisationPlugin = contract.createContractInstance();
 		visualisationPlugin.setProperty("attribute", ((XYChartData)widget.getChartData()).getAttribute().getColumn());
-		visualisationPlugin.setProperty("measure", ((XYChartData)widget.getChartData()).getMeasures().get(0).getColumn());
+		visualisationPlugin.setProperty("measure", ((XYChartData)widget.getChartData()).getMeasures().get(0).getColumn());*/
 		
-		//ContractInstance pluginContract = PluginUtil.createPlugin(label,composition,widget);		
+		ContractInstance pluginContract = PluginUtil.createPlugin(label,composition,widget);		
 		
 		ContractInstance datasource=composition.getContractInstanceByName(HIPIE_RAW_DATASET);
-		visualisationPlugin.addPrecursor(datasource);	
+		pluginContract.addPrecursor(datasource);	
 				
 		composition = HipieSingleton.getHipie().saveCompositionAs(authenticationService.getUserCredential().getUserId(), composition,
 				 compName + ".cmp");
