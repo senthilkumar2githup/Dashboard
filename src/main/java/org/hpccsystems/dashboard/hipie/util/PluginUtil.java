@@ -63,6 +63,8 @@ public class PluginUtil {
 		chartService = (ChartService)SpringUtil.getBean("chartService");
 		ChartDetails chartInfo=chartService.getCharts().get(widget.getChartType());
 		contract.setDescription(chartInfo.getDescription());
+		contract.setProp(Contract.CATEGORY, "VISUALIZE");
+		contract.setProp(Contract.VERSION, "0.1");
 		
 		InputElement input = new InputElement();
 		input.setName("dsInput");		
