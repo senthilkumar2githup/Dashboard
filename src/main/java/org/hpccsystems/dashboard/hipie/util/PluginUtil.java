@@ -3,6 +3,9 @@ package org.hpccsystems.dashboard.hipie.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hpcc.HIPIE.Composition;
 import org.hpcc.HIPIE.Contract;
 import org.hpcc.HIPIE.ContractInstance;
@@ -24,11 +27,11 @@ import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.ChartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.zkoss.zkplus.spring.SpringUtil;
-
 public class PluginUtil {
 
 	private static AuthenticationService authenticationService;
 	private static ChartService chartService;
+	private static final  Log LOG = LogFactory.getLog(PluginUtil.class);
 	
 	@Autowired
 	public static ChartService getChartService() {
@@ -102,14 +105,13 @@ public class PluginUtil {
         visualization.setName(compName);
         visualization.setType(VisualElement.VISUALIZE);
         //TODO:set title for visualization
-        //visualization.addOption(new ElementOption(VisualElement.TITLE,new FieldInstance(null,compName)));
         
 	    VisualElement ve=new VisualElement();
 	    //TODO:Need to set chart type using Hipie's 'Element' class
 	    if(Constants.PIE_CHART.equals(chartInfo.getName())){
 	    	 ve.setType("PIE");
 	    }       
-        ve.setName(chartInfo.getName());
+        ve.setName(StringUtils.remove(chartInfo.getName(), " "));
         ve.setBasis(output);
         
         RecordInstance ri=new RecordInstance();
@@ -120,6 +122,7 @@ public class PluginUtil {
         ve.setBasisQualifier(ri);
         
         ve.addOption(new ElementOption(VisualElement.TITLE,new FieldInstance(null,chartInfo.getName())));
+        //TODO:need to look way to set more than one measure
         ve.addOption(new ElementOption(VisualElement.WEIGHT,new FieldInstance(null,((XYChartData)widget.getChartData()).getMeasures().get(0).getColumn())));
         ve.addOption(new ElementOption(VisualElement.LABEL,new FieldInstance(null,((XYChartData)widget.getChartData()).getAttribute().getColumn())));
         //chartType, uses addCustomOption instead of addOption       
@@ -129,7 +132,18 @@ public class PluginUtil {
         contract.getVisualElements().add(visualization);
         
         contract = hipieService.saveContractAs(authenticationService.getUserCredential().getUserId(), contract,contract.getName());
-		return  contract.createContractInstance();
+        
+        ContractInstance pluginInstance = contract.createContractInstance();
+        //Mapping the selected attribute/measure to the visualization element 
+		pluginInstance.setProperty(((XYChartData) widget.getChartData()).getAttribute().getColumn(), 
+				((XYChartData) widget.getChartData()).getAttribute().getColumn());		
+		pluginInstance.setProperty(((XYChartData) widget.getChartData()).getMeasures().get(0).getColumn(),
+				((XYChartData) widget.getChartData()).getMeasures().get(0).getColumn());
+		
+		if(LOG.isDebugEnabled()) {
+			LOG.debug("Visuslisation plugin - " + pluginInstance.toCompositionString());
+		}
+		return  pluginInstance;
 
 	}
 	
