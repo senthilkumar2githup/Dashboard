@@ -76,20 +76,20 @@ PRIMARY KEY(id)
 INSERT INTO chart_details(name,description,configuration,created_by,category,isplugin) 
 VALUES('Bar Chart',
 'Chart displays data visually as bars',
-'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/c3.css</dependentCssURL><dependentJsURL>js/lib/d3.v3.min.js</dependentJsURL><dependentJsURL>js/lib/c3.js</dependentJsURL><functionName>createXYChart</functionName><imageURL>chart/bar.png</imageURL><jsURL>js/XYChart.js</jsURL><enableXGrouping>true</enableXGrouping><maxXColumns>2</maxXColumns><maxYColumns>0</maxYColumns></xyConfiguration>',
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/c3.css</dependentCssURL><functionName>createXYChart</functionName><imageURL>chart/bar.png</imageURL><jsURL>js/XYChart.js</jsURL><enableXGrouping>true</enableXGrouping><maxXColumns>2</maxXColumns><maxYColumns>0</maxYColumns></xyConfiguration>',
 '2',1,false);
 
 INSERT INTO chart_details(name,description,configuration,created_by,category,isplugin) 
 VALUES('Line Chart',
 'Chart displays data visually as lines',
-'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/c3.css</dependentCssURL><dependentJsURL>js/lib/d3.v3.min.js</dependentJsURL><dependentJsURL>js/lib/c3.js</dependentJsURL><functionName>createXYChart</functionName><imageURL>chart/line.png</imageURL><jsURL>js/XYChart.js</jsURL><enableXGrouping>true</enableXGrouping><maxXColumns>2</maxXColumns><maxYColumns>0</maxYColumns></xyConfiguration>',
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/c3.css</dependentCssURL><functionName>createXYChart</functionName><imageURL>chart/line.png</imageURL><jsURL>js/XYChart.js</jsURL><enableXGrouping>true</enableXGrouping><maxXColumns>2</maxXColumns><maxYColumns>0</maxYColumns></xyConfiguration>',
 '2',1,false);
 
 
 INSERT INTO chart_details(name,description,configuration,created_by,category,isplugin) 
 VALUES('Pie Chart',
 'Circular chart divided into sectors',
-'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/c3.css</dependentCssURL><dependentJsURL>js/lib/d3.v3.min.js</dependentJsURL><dependentJsURL>js/lib/c3.js</dependentJsURL><functionName>createXYChart</functionName><imageURL>chart/pie.png</imageURL><jsURL>js/XYChart.js</jsURL><enableXGrouping>false</enableXGrouping><maxXColumns>1</maxXColumns><maxYColumns>1</maxYColumns></xyConfiguration>',
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/c3.css</dependentCssURL><functionName>createXYChart</functionName><imageURL>chart/pie.png</imageURL><jsURL>js/XYChart.js</jsURL><enableXGrouping>false</enableXGrouping><maxXColumns>1</maxXColumns><maxYColumns>1</maxYColumns></xyConfiguration>',
 '2',2,false);
 
 INSERT INTO chart_details(name,description,configuration,created_by,category,isplugin) 
