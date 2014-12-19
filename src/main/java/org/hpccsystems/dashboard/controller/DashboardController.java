@@ -726,10 +726,14 @@ public class DashboardController extends SelectorComposer<Window>{
                 }
                 
                 constructFilterItem(newFiles);               
-            }
+            }         
+                      
+            dashboard.getPortletList().remove(portlet);
             
-            //To create Composition             
-           Composition composition = compositionService.createComposition(dashboard.getName(), new HPCCConnection(), portlet);
+            dashboard.getPortletList().add(portlet);
+            
+            //To create Composition  
+           Composition composition = compositionService.createComposition(dashboard.getName(), new HPCCConnection(), dashboard.getLivePortlet());
            //updating dashboard with composition's canonical name
            dashboard.setCompositionName(composition.getCanonicalName());
            dashboardService.updateDashboard(dashboard);

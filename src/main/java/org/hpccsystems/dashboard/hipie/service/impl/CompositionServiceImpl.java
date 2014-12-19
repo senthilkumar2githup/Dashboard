@@ -1,13 +1,13 @@
 package org.hpccsystems.dashboard.hipie.service.impl;
 
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpcc.HIPIE.Composition;
 import org.hpcc.HIPIE.CompositionInstance;
-import org.hpcc.HIPIE.Contract;
 import org.hpcc.HIPIE.ContractInstance;
 import org.hpcc.HIPIE.HIPIEService;
-import org.hpccsystems.dashboard.chart.entity.XYChartData;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.Process;
 import org.hpccsystems.dashboard.hipie.HipieSingleton;
@@ -39,7 +39,7 @@ public class CompositionServiceImpl implements CompositionService {
 	}
 
 	@Override
-	public Composition createComposition(String compName,HPCCConnection hpccConnection,Portlet widget)
+	public Composition createComposition(String compName,HPCCConnection hpccConnection, List<Portlet> portletList)
 			throws Exception {
 		String label = compName;
 		HIPIEService hipieService = HipieSingleton.getHipie();
@@ -50,19 +50,9 @@ public class CompositionServiceImpl implements CompositionService {
 		composition.setLabel(label);
 		compName = label.replaceAll("[^a-zA-Z0-9]+", "");
 		composition.setName(compName);
-		PluginUtil.updateRawDataset(composition, "~" + widget.getChartData().getFiles().get(0),hpccConnection);
+		PluginUtil.updateRawDataset(composition, "~" + portletList.get(0).getChartData().getFiles().get(0),hpccConnection);
 		
-		/*Contract contract = HipieSingleton.getHipie().getContract(authenticationService.getUserCredential().getUserId(),
-				DASHBOARD_VISUALIZATION);
-		ContractInstance visualisationPlugin = contract.createContractInstance();
-		visualisationPlugin.setProperty("attribute", ((XYChartData)widget.getChartData()).getAttribute().getColumn());
-		visualisationPlugin.setProperty("measure", ((XYChartData)widget.getChartData()).getMeasures().get(0).getColumn());
-		
-		if(LOG.isDebugEnabled()) {
-			LOG.debug("Visuslisation plugin - " + visualisationPlugin.toCompositionString());
-		}*/
-		
-		ContractInstance pluginContract = PluginUtil.createPlugin(label,composition,widget);		
+		ContractInstance pluginContract = PluginUtil.createPlugin(label,composition,portletList);		
 		//refreshes the plugins
         hipieService.refreshData();
 		ContractInstance datasource=composition.getContractInstanceByName(HIPIE_RAW_DATASET);

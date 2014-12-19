@@ -1,5 +1,7 @@
 package org.hpccsystems.dashboard.hipie.servic;
 
+import java.util.List;
+
 import org.hpcc.HIPIE.Composition;
 import org.hpcc.HIPIE.CompositionInstance;
 import org.hpccsystems.dashboard.entity.Portlet;
@@ -9,7 +11,7 @@ import org.hpccsystems.dashboard.hipie.util.HPCCConnection;
 public interface CompositionService {
 
 	Composition createComposition(String compName,
-			HPCCConnection hpccConnection, Portlet widget) throws Exception;
+			HPCCConnection hpccConnection, List<Portlet> portletList) throws Exception;
 
 	Composition updateComposition(String userId, String compName);
 

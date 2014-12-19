@@ -284,5 +284,13 @@ public class Dashboard {
 		this.compositionName = compositionName;
 	}
     
-    
+    public List<Portlet> getLivePortlet(){
+    	 List<Portlet> livePortlets = new ArrayList<Portlet>();
+    	for(Portlet portlet : portletList){
+    		if(portlet.isLive()){
+    			livePortlets.add(portlet);
+    		}
+    	}
+    	return livePortlets;
+    }
 }
