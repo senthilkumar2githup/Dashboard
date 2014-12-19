@@ -1,13 +1,14 @@
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3/d3", "c3/c3", "../common/HTMLWidget", "../common/Palette", "../chart/I2DChart", "css!c3/c3"], factory);
+        define(["d3/d3", "c3/c3", "../common/HTMLWidget", "../common/Palette", "../chart/I2DChart", "../chart/DashboardChart", "css!c3/c3"], factory);
     } else {
-        root.Pie = factory(root.d3, root.c3, root.HTMLWidget, root.Palette, root.I2DChart);
+        root.Pie = factory(root.d3, root.c3, root.HTMLWidget, root.Palette, root.I2DChart, root.DashboardChart);
     }
-}(this, function (d3, c3, HTMLWidget, Palette, I2DChart) {
+}(this, function (d3, c3, HTMLWidget, Palette, I2DChart, DashboardChart) {
     function Common(target) {
         HTMLWidget.call(this);
         I2DChart.call(this);
+		DashboardChart.call(this);
         this.d3Color = Palette.ordinal("category20");
 
         this._tag = "div";
@@ -28,13 +29,17 @@
                 position: 'bottom',
                 show: true
             },
+            color: {
+                pattern: d3.scale.category20().range()
+            },
             data: {
                 rows: []
             }
         };
-    }; 
+    };
     Common.prototype = Object.create(HTMLWidget.prototype);
     Common.prototype.implements(I2DChart.prototype);
+	Common.prototype.implements(DashboardChart.prototype);
 
     Common.prototype.d3Color = Palette.ordinal("category20");
 

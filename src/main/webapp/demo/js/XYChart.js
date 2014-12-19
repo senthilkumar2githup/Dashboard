@@ -1,4 +1,4 @@
-function createXYChart (divId, chartData) {
+function createXYChartdummy (divId, chartData) {
 	var response = jq.parseJSON(chartData);
 	var divElement = jq('$'+divId).empty();
 	
@@ -146,6 +146,34 @@ function createXYChart (divId, chartData) {
 	
 	console.log(JSON.stringify(c3JSON));
 	
-	var chart = c3.generate(c3JSON);
+	require([ "js/Visualization/widgets/config" ], function() {
+
+		requirejs.config({
+			baseUrl : "js/Visualization/widgets"
+		});
+
+		console.log(c3JSON['data']['types'][c3JSON['data']['rows'][0][0]]);
+		
+		displayCharts(c3JSON['data']['types'][c3JSON['data']['rows'][0][0]],c3JSON);
+
+		function displayCharts(type , data) {
+			require(["src/c3/Pie", "src/c3/Line", "src/c3/Column"], function (C3Pie, C3Line, C3Column) {
+				//  C3 Charts ---
+				new C3Pie()
+					.target("c3pie")
+					.setChartData(pieData,'pie')
+					.render();
+				new C3Line()
+					.target("c3line")
+					.setChartData(lineData,'line')
+					.render();
+                new C3Column()
+					.target("c3column")
+					.setChartData(barData,'bar')
+					.render();
+			   
+			});
+		}
+	});
 
 }
