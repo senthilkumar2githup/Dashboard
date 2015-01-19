@@ -319,13 +319,9 @@ public class CompositionServiceImpl implements CompositionService{
             //Compare last updated date
             LOGGER.debug("composition last updated date -->{}", new Date(composition.getLastModified()));
             
-            DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM);
-           
-           
             if (latestInstance == null
-                    || df.parse(
-                            df.format(latestInstance.getDate(latestInstance
-                                    .getWorkunitId()))).before(
+                    || latestInstance.getDate(latestInstance
+                                    .getWorkunitId()).before(
                             new Date(composition.getLastModified()))) {
                 latestInstance = runComposition(dashboard, user);
             } 
