@@ -61,7 +61,10 @@ public class StringFilter extends Filter {
     public String getHipieFilterQuery(Filter filter,int index,String chartName) {
 
         StringBuilder sql = new StringBuilder();
-        sql.append(getFilterName(filter,index,chartName)).append(" IN (");
+       sql.append("%");
+       sql.append(getFilterName(filter,index,chartName));
+       sql.append("%");
+       sql.append(" IN (");
 
         Iterator<String> valueIterator = ((StringFilter) filter).getValues()
                 .iterator();

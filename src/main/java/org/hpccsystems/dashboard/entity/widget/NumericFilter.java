@@ -1,9 +1,15 @@
 package org.hpccsystems.dashboard.entity.widget;
 
 import java.math.BigDecimal;
+
 import org.hpccsystems.dashboard.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NumericFilter extends Filter {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(NumericFilter.class);
+    
     private BigDecimal minValue;
     private BigDecimal maxValue;
     
@@ -55,12 +61,19 @@ public class NumericFilter extends Filter {
     public String getHipieFilterQuery(Filter filter, int index, String chartName) {
         
         StringBuilder sql = new StringBuilder();
-        sql.append(getFilterName(filter,index,chartName)).append(" <= ")
-        .append(maxValue)
-        .append(" AND ")
-        .append(this.getColumn())
-        .append(" >= ")
+        sql.append("%");
+        sql.append(getFilterName(filter,index,chartName));
+        sql.append("% ");
+        sql.append(" <= ")
+            .append(maxValue)
+            .append(" AND ");
+        sql.append("%");
+        sql.append(getFilterName(filter,index,chartName));
+        sql.append("% ");
+        sql.append(" >= ")
         .append(minValue);
+        
+        LOGGER.debug("Hipie filter query -->"+sql);
         
         return sql.toString();
     }

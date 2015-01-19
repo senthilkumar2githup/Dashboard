@@ -110,7 +110,6 @@ public class Pie extends Widget {
         // Setting Tittle for chart
         visualElement.addOption(new ElementOption(VisualElement.TITLE,
                 new FieldInstance(null, this.getTitle())));
-        System.out.println("here -->"+visualElement);
         return visualElement;
         
         
