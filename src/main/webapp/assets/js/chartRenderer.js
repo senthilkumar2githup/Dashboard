@@ -260,8 +260,9 @@ function injectPreviewChart(flowType) {
         			} else if (option == 'Delete') {
         				//var wid = document.getElementById(multiChartSurface['_id']);
                         if (confirm("Are you sure want to delete the widget?") == true) {
-                             document.getElementById(multiChartSurface['_id']).style.display = 'none';
-                             document.getElementById(multiChartSurface['_content']['_id']).style.display = 'none';                        	
+                        	 console.log(multiChartSurface);
+                             document.getElementById(multiChartSurface['_id']).style.display = 'none';                            
+                             document.getElementById(multiChartSurface['_content']['_chart']['_id']).style.display = 'none';                        	
                              zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onDeleteChart', payload, {toServer:true}));
                         } 
         				
