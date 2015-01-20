@@ -166,7 +166,7 @@ public class DashboardController extends SelectorComposer<Component> {
 	            composition = hipieService.getComposition(userId, dashboard.getCompositionName());
 	            contractInstance = composition.getContractInstanceByName(composition.getName());
 	          
-	         Widget widget =  HipieUtil.getVisualElementWidget(contractInstance,chartName);
+	         Widget widget =  HipieUtil.getVisualElementWidget(contractInstance,chartName,dashboard);
 	         WidgetConfiguration widgetConfiguration = new WidgetConfiguration(dashboard, chartDiv);
 	         widgetConfiguration.setWidget(widget);
 	         widgetConfiguration.setFlowType(FLOW.EDIT);

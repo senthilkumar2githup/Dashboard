@@ -13,10 +13,12 @@ import org.hpcc.HIPIE.ContractInstance;
 import org.hpcc.HIPIE.dude.Element;
 import org.hpcc.HIPIE.dude.ElementOption;
 import org.hpcc.HIPIE.dude.FieldInstance;
+import org.hpcc.HIPIE.dude.RecordInstance;
 import org.hpcc.HIPIE.dude.VisualElement;
 import org.hpccsystems.dashboard.ChartTypes;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.Constants.AGGREGATION;
+import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
 import org.hpccsystems.dashboard.entity.widget.ChartConfiguration;
 import org.hpccsystems.dashboard.entity.widget.Field;
@@ -33,7 +35,7 @@ public class HipieUtil {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(HipieUtil.class);
     
-   public static Widget getVisualElementWidget(ContractInstance contractInstance,String chartName){
+   public static Widget getVisualElementWidget(ContractInstance contractInstance,String chartName,Dashboard dashboard) throws Exception{
        
        Contract contract = contractInstance.getContract();
        
@@ -74,7 +76,7 @@ public class HipieUtil {
            ( (USMap) widget).setState(createAttribute(visualElement.getOption(VisualElement.STATE),contractInstance));
        }else if (chartConfig.getType() == ChartTypes.TABLE.getChartCode()) {
            widget = new Table();
-           ( (Table) widget).setTableColumns(createTableFields(visualElement,contractInstance));
+           ( (Table) widget).setTableColumns(createTableFields(visualElement,contractInstance,dashboard));
        }
        widget.setName(visualElement.getName());
        widget.setChartConfiguration(chartConfig);
@@ -103,19 +105,18 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
 }
 
     private static List<Field> createTableFields(VisualElement visualElement,
-            ContractInstance contractInstance) {
-        String structure = contractInstance.getPrecursors()
+            ContractInstance contractInstance,Dashboard dashboard) throws Exception {
+        String filename = contractInstance.getPrecursors()
                 .get(visualElement.getBasis().getBase())
-                .getProperty("Structure");
-      //TODO: structure is not returned properly,coma delimiter is missing need to find a way to do this.
-        LOGGER.debug("structure --->{}", structure);
+                .getProperty("LogicalFilename").substring(1);
+        RecordInstance recordInstance = dashboard.getHpccConnection().getDatasetFields(filename, null);
+        String structure=recordInstance.toString();
         String[] filecolumns = structure.split(","), dataType = null;
         HashMap<String, String> columnMap = new HashMap<String, String>();
         for (String property : filecolumns) {
-            dataType = property.split("|");
+            dataType = property.split(" ");
             columnMap.put(dataType[1], dataType[0]);
         }
-        LOGGER.debug("columnMap --->{}", columnMap);
         List<Field> tableColumns=new ArrayList<Field>();
         ElementOption option = visualElement.getOption(VisualElement.VALUE);
         option.getParams()
