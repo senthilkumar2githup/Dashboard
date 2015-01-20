@@ -250,9 +250,9 @@ function injectPreviewChart(flowType) {
         		multiChartSurface._menu.click = function(option) {
         			var payload = {};
         			payload.chartId=multiChartSurface._title;
-        			for(var i in multiChartSurface){
+        			/*for(var i in multiChartSurface){
         				console.log(i+":"+multiChartSurface[i]);
-        			}
+        			}*/
         			if(option == 'Configure') {
         				//console.log(multiChartSurface._title);
         				zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onEditChart', payload, {toServer:true}));
@@ -261,7 +261,7 @@ function injectPreviewChart(flowType) {
         				//var wid = document.getElementById(multiChartSurface['_id']);
                         if (confirm("Are you sure want to delete the widget?") == true) {
                              document.getElementById(multiChartSurface['_id']).style.display = 'none';
-                             document.getElementById(multiChartSurface['_content']['_id']).style.display = 'none';
+                             document.getElementById(multiChartSurface['_content']['_id']).style.display = 'none';                        	
                              zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onDeleteChart', payload, {toServer:true}));
                         } 
         				
@@ -279,21 +279,19 @@ function injectPreviewChart(flowType) {
 	});
 }
 
-function deleteWidget(){					
-	if (confirm("Are you sure want to delete the widget?") == true) {						
-		var newVertices = [];
-		var oldData = dashboardViz.graph._data;
-		for(var d in oldData.vertices){							
-			if(oldData.vertices[d]['_title'] != previewData.title){
-				newVertices.push(oldData.vertices[d]);							
-			}
-		}		
-		var newData = {"vertices":newVertices,"edges":[]};
-		console.log(oldData);
-		dashboardViz.graph
-      	.data(newData)
-      	.render();						
-	} 					
+function deleteWidget(){							
+	var newVertices = [];
+	var oldData = dashboardViz.graph._data;
+	for(var d in oldData.vertices){							
+		if(oldData.vertices[d]['_title'] != previewData.title){
+			newVertices.push(oldData.vertices[d]);							
+		}
+	}		
+	var newData = {"vertices":newVertices,"edges":[]};
+	console.log(oldData);
+	dashboardViz.graph
+	.data(newData)
+	.render();	 					
 }
 
 function saveLayout(chartDivId){
