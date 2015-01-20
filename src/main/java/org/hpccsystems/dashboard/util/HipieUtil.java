@@ -2,6 +2,7 @@
 package org.hpccsystems.dashboard.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -73,7 +74,7 @@ public class HipieUtil {
            ( (USMap) widget).setState(createAttribute(visualElement.getOption(VisualElement.STATE),contractInstance));
        }else if (chartConfig.getType() == ChartTypes.TABLE.getChartCode()) {
            widget = new Table();
-           ( (Table) widget).setTableColumns(null);
+           ( (Table) widget).setTableColumns(createTableFields(visualElement,contractInstance));
        }
        widget.setName(visualElement.getName());
        widget.setChartConfiguration(chartConfig);
@@ -100,6 +101,60 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
     VisualElement visualElement = (VisualElement)visualization.getChildElement(chartName);
     return visualElement;
 }
+
+    private static List<Field> createTableFields(VisualElement visualElement,
+            ContractInstance contractInstance) {
+        String structure = contractInstance.getPrecursors()
+                .get(visualElement.getBasis().getBase())
+                .getProperty("Structure");
+      //TODO: structure is not returned properly,coma delimiter is missing need to find a way to do this.
+        LOGGER.debug("structure --->{}", structure);
+        String[] filecolumns = structure.split(","), dataType = null;
+        HashMap<String, String> columnMap = new HashMap<String, String>();
+        for (String property : filecolumns) {
+            dataType = property.split("|");
+            columnMap.put(dataType[1], dataType[0]);
+        }
+        LOGGER.debug("columnMap --->{}", columnMap);
+        List<Field> tableColumns=new ArrayList<Field>();
+        ElementOption option = visualElement.getOption(VisualElement.VALUE);
+        option.getParams()
+                .stream()
+                .forEach(
+                        fieldInstance -> {
+                            Field tableField = new Field();
+                            tableField.setColumn(contractInstance
+                                    .getProperty(fieldInstance.getName()));
+                            if (fieldInstance.getType() != null) {
+                                tableField.setDataType("unsigned");
+                                Measure measure = new Measure(tableField);
+                                measure.setAggregation(AGGREGATION
+                                        .valueOf(fieldInstance.getType()));
+                                measure.setDisplayName(fieldInstance
+                                        .getFieldLabel());
+                                tableColumns.add(measure);
+                            } else {
+                                if ("STRING".equalsIgnoreCase(columnMap
+                                        .get(tableField.getColumn()))) {
+                                    tableField.setDataType("string");
+                                    Attribute attribute = new Attribute(
+                                            tableField);
+                                    attribute.setDisplayName(fieldInstance
+                                            .getFieldLabel());
+                                    tableColumns.add(attribute);
+                                } else {
+                                    tableField.setDataType("unsigned");
+                                    Measure measure = new Measure(tableField);
+                                    measure.setAggregation(AGGREGATION.NONE);
+                                    measure.setDisplayName(fieldInstance
+                                            .getFieldLabel());
+                                    tableColumns.add(measure);
+                                }
+                            }
+                        });
+        LOGGER.debug("tableColumns --->{}", tableColumns);
+        return tableColumns;
+    }
 
     private static Attribute createAttribute(ElementOption option,
             ContractInstance contractInstance) {
