@@ -205,6 +205,7 @@ function injectPreviewChart(flowType) {
 					
 				}else{
 					var newGraph=new MultiChartSurface()
+					.columns(previewData.data.columns)
                     .data(previewData.data.data)
                     .chartType(previewData.type)
                     .title(previewData.title)
@@ -226,9 +227,10 @@ function injectPreviewChart(flowType) {
 							.size({ width: 210, height: 210 })
 							.content(new ChoroplethStates().data(previewData.data.data))                                    
 						  );
-				}else{
+				}else{						
 						oldData.vertices.push( 
 							new MultiChartSurface()
+								.columns(previewData.data.columns)
 								.data(previewData.data.data)
 								.chartType(previewData.type)
 								.title(previewData.title)
