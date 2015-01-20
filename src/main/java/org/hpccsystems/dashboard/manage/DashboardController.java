@@ -4,15 +4,14 @@ import java.util.HashMap;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.hpcc.HIPIE.Composition;
-import org.hpcc.HIPIE.Contract;
 import org.hpcc.HIPIE.ContractInstance;
 import org.hpcc.HIPIE.HIPIEService;
-import org.hpcc.HIPIE.dude.VisualElement;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.Constants.FLOW;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.hpccsystems.dashboard.service.AuthenticationService;
+import org.hpccsystems.dashboard.service.CompositionService;
 import org.hpccsystems.dashboard.service.DashboardService;
 import org.hpccsystems.dashboard.util.HipieSingleton;
 import org.hpccsystems.dashboard.util.HipieUtil;
@@ -52,6 +51,8 @@ public class DashboardController extends SelectorComposer<Component> {
 	private DashboardService dashboardService;
 	@Wire
 	private Div chartDiv;
+	@WireVariable
+	private CompositionService compositionService;
 
 	private Dashboard dashboard;
 
@@ -64,14 +65,15 @@ public class DashboardController extends SelectorComposer<Component> {
 		// OnEditChart 
         comp.addEventListener("onEditChart", event -> {
             JSONObject json = (JSONObject) new JSONParser().parse(event.getData().toString()); 
-            LOGGER.info(json.get("chartId").toString());
+            LOGGER.debug("Editing chart -->{}",json.get("chartId").toString());
             editChart(json.get("chartId").toString());
         });
 		
      // OnDeleteChart 
         comp.addEventListener("onDeleteChart", event -> {
             JSONObject json = (JSONObject) new JSONParser().parse(event.getData().toString()); 
-            LOGGER.info(json.get("chartId").toString());
+            LOGGER.debug("Deleting chart -->{}",json.get("chartId").toString());
+            deleteChart(json.get("chartId").toString());
         });
         
 		if(dashboard.getCompositionName() != null){
@@ -87,7 +89,8 @@ public class DashboardController extends SelectorComposer<Component> {
 
 	}
 
-	/**
+
+    /**
 	 * Renders chart in dashboard container
 	 */
 	private void drawChart(boolean isLive) {
@@ -178,8 +181,22 @@ public class DashboardController extends SelectorComposer<Component> {
 	         window.doModal();
 	        } catch (Exception e) {
 	          LOGGER.debug(Constants.EXCEPTION,e);
+	          Clients.showNotification("Unable to edit the chart",
+	                    Clients.NOTIFICATION_TYPE_ERROR, chartDiv, "middle_center",
+	                    5000, true);
 	        }
 	        
 	    }
 
+
+	    private void deleteChart(String chartName) {
+            try {
+                compositionService.deleteCompositionChart(dashboard,authenticationService.getUserCredential().getId(),chartName);
+            } catch (Exception e) {
+                LOGGER.debug(Constants.EXCEPTION,e);
+                Clients.showNotification("Unable to delete the chart",
+                        Clients.NOTIFICATION_TYPE_ERROR, chartDiv, "middle_center",
+                        5000, true);
+              }
+	    }
  }

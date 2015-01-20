@@ -6,13 +6,15 @@ import org.hpccsystems.dashboard.entity.widget.Widget;
 
 public interface CompositionService {
     
-    void createComposition(Dashboard dashboard, Widget widget,String user) throws Exception;
+    void createComposition(Dashboard dashboard, Widget widget,String userId) throws Exception;
     
-    CompositionInstance runComposition(Dashboard dashboard,String user) throws Exception;
+    CompositionInstance runComposition(Dashboard dashboard,String userId) throws Exception;
     
-    String getWorkunitId(Dashboard dashboard,String user) throws Exception ;
+    String getWorkunitId(Dashboard dashboard,String userId) throws Exception ;
 
-    void addCompositionChart(Dashboard dashboard, Widget widget,String user);
+    void addCompositionChart(Dashboard dashboard, Widget widget,String userId);
     
-    void editCompositionChart(Dashboard dashboard, Widget widget,String user) throws Exception;
+    void editCompositionChart(Dashboard dashboard, Widget widget,String userId) throws Exception;
+    
+    void deleteCompositionChart(Dashboard dashboard, String userId, String chartName) throws Exception;
 }

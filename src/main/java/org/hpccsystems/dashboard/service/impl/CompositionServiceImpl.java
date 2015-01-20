@@ -18,17 +18,18 @@ import org.hpcc.HIPIE.dude.InputElement;
 import org.hpcc.HIPIE.dude.OutputElement;
 import org.hpcc.HIPIE.dude.RecordInstance;
 import org.hpcc.HIPIE.dude.VisualElement;
-import org.hpcc.HIPIE.utils.ErrorBlock;
 import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.hpccsystems.dashboard.service.CompositionService;
+import org.hpccsystems.dashboard.service.DashboardService;
 import org.hpccsystems.dashboard.util.HipieSingleton;
 import org.hpccsystems.dashboard.util.HipieUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,13 @@ public class CompositionServiceImpl implements CompositionService{
     private static final String BASIC_TEMPLATE = "BasicTemplate";
     private static final String HIPIE_RAW_DATASET  = "RawDataset";
     
+    private DashboardService dashboardService;
+    
+    @Autowired
+    public void setDashboardService(DashboardService dashboardService) {
+        this.dashboardService = dashboardService;
+    }
+
     @Override
     public void createComposition(Dashboard dashboard, Widget widget,String user) throws Exception {
     HIPIEService hipieService = HipieSingleton.getHipie();
@@ -249,11 +257,13 @@ public class CompositionServiceImpl implements CompositionService{
     }
     
     private ContractInstance createVisualContractInstance(String compName,Widget widget) throws Exception { 
+        
         Contract contract = new Contract();
         HIPIEService hipieService = HipieSingleton.getHipie();
         contract.setRepository(hipieService.getRepositoryManager().getDefaultRepository());     
         contract.setLabel(compName);
         contract.setName(compName);
+        
         AuthenticationService authenticationService =(AuthenticationService) SpringUtil.getBean("authenticationService");
         contract.setAuthor(authenticationService.getUserCredential().getId());      
         contract.setDescription("Dashboard charts integrated with Hipie/Marshaller");
@@ -371,4 +381,54 @@ public class CompositionServiceImpl implements CompositionService{
         
         HipieSingleton.getHipie().saveComposition(user, composition);
     }
+
+    @Override
+    public void deleteCompositionChart(Dashboard dashboard,String userId, String chartName) throws Exception{
+        Composition composition = null;
+        ContractInstance contractInstance = null;
+        HIPIEService hipieService = HipieSingleton.getHipie();
+        
+        composition = hipieService.getComposition(userId, dashboard.getCompositionName());
+        contractInstance = composition.getContractInstanceByName(composition.getName());        
+        Contract contract = contractInstance.getContract();
+        
+        VisualElement visualElement = HipieUtil.getVisualElement(contract, chartName);
+        
+        LOGGER.debug("Output -->"+visualElement.getBasis().getName());
+        LOGGER.debug("Input -->"+visualElement.getBasis().getBase());
+        
+        if (contract.getVisualElements().iterator().next().getChildElements().size() == 1) {
+            // TODO:delete dud file
+            
+            // deleting CMP file
+            hipieService.deleteComposition(composition);
+            hipieService.refreshData();
+            
+            // updating DB with null composition name
+            dashboard.setCompositionName(null);
+           
+        }else{
+            boolean outputExists = HipieUtil.checkOutputExists(contract,visualElement.getBasis().getName(),chartName);
+            LOGGER.debug("outputExists -->{}",outputExists);
+            if(outputExists){
+                //Remove visual elemnet and input fields,instance properties
+                HipieUtil.removeFieldsAndVisualElement(contractInstance,visualElement);
+            }else{
+                //Remove visual elemnet and input Element,output element,instance properties
+               HipieUtil.removeInputOutputAndVisualElement(contractInstance,visualElement);
+               ContractInstance precursor = contractInstance.getPrecursors().get(visualElement.getBasis().getBase());
+               LOGGER.debug("precursor -->{}",precursor);
+               contractInstance.removePrecursor(precursor, visualElement.getBasis().getBase());
+            }
+            contract.setRepository(hipieService.getRepositoryManager().getDefaultRepository());
+            hipieService.saveContract(userId, contract);
+            
+            HipieSingleton.getHipie().saveComposition(userId, composition);
+        }
+        //updating dashboard's last updated date
+        dashboardService.updateDashboard(dashboard);
+        
+    }
+    
+    
 }
