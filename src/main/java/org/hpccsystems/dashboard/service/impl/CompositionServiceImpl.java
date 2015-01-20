@@ -1,6 +1,5 @@
 package org.hpccsystems.dashboard.service.impl;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -131,26 +130,28 @@ public class CompositionServiceImpl implements CompositionService{
         HIPIEService hipieService=HipieSingleton.getHipie();
         
         //Adding additional input
-        InputElement input2=new InputElement();
-        input2.setName("dsInput2");
-        input2.setType(InputElement.TYPE_DATASET);
-        input2.addOption(new ElementOption(Element.MAPBYNAME));
-        contract.getInputElements().add(input2);        
+        InputElement input=new InputElement();
+        //setting Input Element name as dsInput2
+        input.setName("dsInput"+(contract.getInputElements().size()+1));
+        input.setType(InputElement.TYPE_DATASET);
+        input.addOption(new ElementOption(Element.MAPBYNAME));
+        contract.getInputElements().add(input);        
         
         widget.generateInputElement().stream().forEach(inputElement->
-            input2.addChildElement(inputElement)
+            input.addChildElement(inputElement)
         );
 
         //Adding additional output
-        OutputElement dsoutput2=new OutputElement();
-        dsoutput2.setName("dsOutput2");
-        dsoutput2.setType(OutputElement.TYPE_DATASET);
-        dsoutput2.setBase("dsInput2");
-        dsoutput2.addOption(new ElementOption("WUID"));
-        contract.getOutputElements().add(dsoutput2);
+        OutputElement output=new OutputElement();
+        //setting Output Element name as dsOutput2
+        output.setName("dsOutput"+(contract.getOutputElements().size()+1));
+        output.setType(OutputElement.TYPE_DATASET);
+        output.setBase(input.getName());
+        output.addOption(new ElementOption("WUID"));
+        contract.getOutputElements().add(output);
         
         VisualElement visualElement = widget.generateVisualElement();
-        visualElement.setBasis(dsoutput2);
+        visualElement.setBasis(output);
 
         VisualElement visualization=contract.getVisualElements().iterator().next();
         visualization.addChildElement(visualElement);
@@ -169,7 +170,8 @@ public class CompositionServiceImpl implements CompositionService{
         //Adding additional Rawdataset
         ContractInstance datasource2 = cloneRawdataset(composition,fileName,hpcc);        
         
-        contractInstance.addPrecursor(datasource2,"dsOutput","dsInput2"); 
+        //here "dsOutput" -> Rawdataset's output
+        contractInstance.addPrecursor(datasource2,"dsOutput",input.getName()); 
     }
 
 
@@ -271,7 +273,7 @@ public class CompositionServiceImpl implements CompositionService{
         contract.setProp(Contract.VERSION, "0.1");
         
         InputElement input = new InputElement();
-        input.setName("dsInput");       
+        input.setName("dsInput1");       
         //TODO:need to change for roxie query
         input.setType(InputElement.TYPE_DATASET);   
         input.addOption(new ElementOption(Element.MAPBYNAME));
@@ -283,9 +285,9 @@ public class CompositionServiceImpl implements CompositionService{
         contract.getInputElements().add(input);
     
         OutputElement output = new OutputElement();
-        output.setName("dsOutput");
+        output.setName("dsOutput1");
         output.setType(OutputElement.TYPE_DATASET);
-        output.setBase("dsInput");
+        output.setBase(input.getName());
         output.addOption(new ElementOption("WUID"));
         contract.getOutputElements().add(output);
     
