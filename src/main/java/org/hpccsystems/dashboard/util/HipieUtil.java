@@ -22,6 +22,7 @@ import org.hpccsystems.dashboard.entity.widget.Field;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.hpccsystems.dashboard.entity.widget.charts.Pie;
+import org.hpccsystems.dashboard.entity.widget.charts.Table;
 import org.hpccsystems.dashboard.entity.widget.charts.USMap;
 import org.hpccsystems.dashboard.entity.widget.charts.XYChart;
 import org.slf4j.Logger;
@@ -56,7 +57,7 @@ public class HipieUtil {
                || chartConfig.getType() == ChartTypes.STEP.getChartCode()
                || chartConfig.getType() == ChartTypes.AREA.getChartCode()) {
            widget = new XYChart();
-          // To do once the issue #21 closed iterate over the element option and prepare the measure list.
+         //TODO: once the issue #21 closed iterate over the element option and prepare the measure list.
            List<Measure> measures=new ArrayList<Measure>();
            measures.add(createMeasre(visualElement.getOption(VisualElement.WEIGHT),contractInstance));
            ( (XYChart) widget).setMeasure(measures);
@@ -70,6 +71,9 @@ public class HipieUtil {
            widget = new USMap();
            ( (USMap) widget).setMeasure(createMeasre(visualElement.getOption(VisualElement.WEIGHT),contractInstance));
            ( (USMap) widget).setState(createAttribute(visualElement.getOption(VisualElement.STATE),contractInstance));
+       }else if (chartConfig.getType() == ChartTypes.TABLE.getChartCode()) {
+           widget = new Table();
+           ( (Table) widget).setTableColumns(null);
        }
        widget.setName(visualElement.getName());
        widget.setChartConfiguration(chartConfig);
