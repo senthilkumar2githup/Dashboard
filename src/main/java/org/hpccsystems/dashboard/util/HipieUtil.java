@@ -57,8 +57,8 @@ public class HipieUtil {
            
        } else if (chartConfig.getType() == ChartTypes.US_MAP.getChartCode()) {
            widget = new USMap();
-           //TODO:set state and measure;
-           
+           ( (USMap) widget).setMeasure(createMeasre(visualElement.getOption(VisualElement.WEIGHT),contractInstance));
+           ( (USMap) widget).setState(cretaeAttribute(visualElement.getOption(VisualElement.STATE),contractInstance));
        }
        widget.setName(visualElement.getName());
        widget.setChartConfiguration(chartConfig);
@@ -76,7 +76,6 @@ public class HipieUtil {
        LOGGER.debug("label -->"+visualElement.getOption(VisualElement.LABEL));
       
        LOGGER.debug("widget -->"+widget);
-       LOGGER.debug("Pie -->"+(Pie)widget);
        return widget;
     }
 
