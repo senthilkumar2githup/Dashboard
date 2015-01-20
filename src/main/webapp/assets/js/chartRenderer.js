@@ -194,6 +194,7 @@ function injectPreviewChart(flowType) {
 		require(["src/chart/MultiChartSurface","src/map/ChoroplethStates"], function (MultiChartSurface,ChoroplethStates) {	
 			
 			var oldData = dashboardViz.graph._data;
+			console.log(oldData);
 			if(flowType == "EDIT"){
 				if (previewData.type == "CHORO") {
 					var newGraph=new MultiChartSurface()
@@ -211,7 +212,9 @@ function injectPreviewChart(flowType) {
                     .size({ width: 210, height: 210 });					
 				}
 				for(var d in oldData.vertices){						
-					if(oldData.vertices[d]['_title'] == previewData.title){						
+					if(oldData.vertices[d]['_title'] == previewData.title){
+						//document.getElementById(oldData.vertices[d]['_id']).style.display = 'none';
+                        document.getElementById(oldData.vertices[d]['_content']['_id']).style.display = 'none';
 						oldData.vertices[d]=newGraph;													
 					}						
 				}				
@@ -234,9 +237,41 @@ function injectPreviewChart(flowType) {
 					);
 				}
 			}
+			
+			console.log(oldData);
+			
+			dashboardViz.graph
+			 ._data
+        	.vertices
+        	.forEach(function(multiChartSurface) {
+        		multiChartSurface.menu(["Configure", "Delete"]);
+        		multiChartSurface._menu.click = function(option) {
+        			var payload = {};
+        			payload.chartId=multiChartSurface._title;
+        			for(var i in multiChartSurface){
+        				console.log(i+":"+multiChartSurface[i]);
+        			}
+        			if(option == 'Configure') {
+        				//console.log(multiChartSurface._title);
+        				zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onEditChart', payload, {toServer:true}));
+        				
+        			} else if (option == 'Delete') {
+        				//var wid = document.getElementById(multiChartSurface['_id']);
+                        if (confirm("Are you sure want to delete the widget?") == true) {
+                             document.getElementById(multiChartSurface['_id']).style.display = 'none';
+                             document.getElementById(multiChartSurface['_content']['_id']).style.display = 'none';
+                             zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onDeleteChart', payload, {toServer:true}));
+                        } 
+        				
+        			}
+        		}
+        	});
+			
 			 dashboardViz.graph
-         	.data(oldData)
+         	.data(oldData)         	
          	.render();
+			 
+			 	
 
 		});
 	});
