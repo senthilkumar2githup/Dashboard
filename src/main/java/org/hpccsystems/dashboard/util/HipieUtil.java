@@ -1,5 +1,7 @@
 package org.hpccsystems.dashboard.util;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.hpcc.HIPIE.Contract;
@@ -53,7 +55,15 @@ public class HipieUtil {
                || chartConfig.getType() == ChartTypes.STEP.getChartCode()
                || chartConfig.getType() == ChartTypes.AREA.getChartCode()) {
            widget = new XYChart();
-           //TODO:set measures and attribute
+          // To do once the issue #21 closed iterate over the element option and prepare the measure list.
+           List<Measure> measures=new ArrayList<Measure>();
+           measures.add(createMeasre(visualElement.getOption(VisualElement.WEIGHT),contractInstance));
+           ( (XYChart) widget).setMeasure(measures);
+           
+           LOGGER.debug("visualElement --->{}",visualElement.getOptions());
+           LOGGER.debug("visualElement --->{}",visualElement.getOptionValues());
+           
+           ( (XYChart) widget).setAttribute(cretaeAttribute(visualElement.getOption(VisualElement.LABEL),contractInstance));
            
        } else if (chartConfig.getType() == ChartTypes.US_MAP.getChartCode()) {
            widget = new USMap();
