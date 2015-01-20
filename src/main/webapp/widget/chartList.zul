@@ -1,7 +1,7 @@
 <window sclass="chart-list-window">
 	
-	<hbox hflex="1" vflex="0">
-		<label value="${labels.chartNameCaption}" hflex="1" sclass="h5"/>
+	<hbox vflex="0">
+		<label value="${labels.chartNameCaption}" hflex="1" sclass="h5" style="line-height:30px;vertical-align:middle;"/>
 		<textbox id="chartname" placeholder="${labels.chartName}" />
 	</hbox>
 	<space></space>	
