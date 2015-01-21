@@ -12,6 +12,7 @@ public class Constants {
 	//Events
 	public static final String ON_DELTE_DASHBOARD = "onDeleteDashboard";
 	public static final String ON_DRAW_CHART = "onDrawChart";
+	public static final String ON_RUN_COMPOSITION = "onRunComposition";
 	
 	public static final String HIPIE_RAW_DATASET = "RawDataset";
 	public static final String USER_CREDENTIAL = "userCredential";
@@ -25,7 +26,8 @@ public class Constants {
     public static final String FILTER = "filter";
     public static final String DOT=".";
     public static final String COMMA=" , ";
-
+    public static final String SUCCESS="Success";
+    public static final String FAIL="Fail";
     // Notification Types
     public static final String ERROR_NOTIFICATION = "error";
     // Notification positions

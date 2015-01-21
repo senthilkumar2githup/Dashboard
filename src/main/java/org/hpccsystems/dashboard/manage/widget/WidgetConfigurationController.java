@@ -1,5 +1,7 @@
 package org.hpccsystems.dashboard.manage.widget;
 
+import java.util.HashMap;
+
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.Constants.FLOW;
 import org.hpccsystems.dashboard.manage.WidgetConfiguration;
@@ -15,6 +17,7 @@ import org.zkoss.zk.ui.Desktop;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -98,17 +101,17 @@ public class WidgetConfigurationController extends SelectorComposer<Component> i
             try {
                 compositionService.runComposition(configuration.getDashboard(), userId);
             } catch (Exception e) {
-                Executions.schedule(desktop, this, new Event("OnRunCompositionFailed", null, e));
+                Executions.schedule(desktop, this, new Event("OnRunCompositionFailed", null, configuration.getDashboard().getCompositionName()));
                 LOGGER.error(Constants.EXCEPTION, e);
             }
-            Executions.schedule(desktop, this, new Event("OnRunCompositionCompleted"));
+            Executions.schedule(desktop, this, new Event("OnRunCompositionCompleted",null,configuration.getDashboard().getCompositionName()));
         };
         DashboardExecutorHolder.getExecutor().execute(runComposition);
         
         dashboardService.updateDashboard(configuration.getDashboard());
         
         if(LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Composition {}, Run sucessfully", configuration.getDashboard().getCompositionName());
+            LOGGER.debug("Composition {}, being Run in the background", configuration.getDashboard().getCompositionName());
         }
         
         this.getSelf().detach();
@@ -130,12 +133,16 @@ public class WidgetConfigurationController extends SelectorComposer<Component> i
 	@Override
     public void onEvent(Event arg0) throws Exception {
         
-        if ("OnRunCompositionCompleted".equals(arg0.getName())) {
-            LOGGER.debug("Run Composition completed");
+        HashMap<String,String> paramMap=new HashMap<String,String>();
+	    if ("OnRunCompositionCompleted".equals(arg0.getName())) {
+            LOGGER.debug("Composition {}, Run sucessfully", arg0.getData());
+            paramMap.put(Constants.SUCCESS, "Composition "+arg0.getData()+" Run sucessfully");
         } else {
-            LOGGER.debug("Run Composition failed");
-            //need to post the event to dashboard controller to show the failure message to the user.
+            LOGGER.debug("Composition {}, Failed to Run", arg0.getData());
+            paramMap.put(Constants.FAIL, "Composition "+arg0.getData()+" Failed to Run...See the log for more details.");
         }
+	    //Post event to the dashboard controller for showing the notification to the user.
+	    Events.postEvent(Constants.ON_RUN_COMPOSITION, getSelf().getParent().getParent(), paramMap);
     }
 
 }

@@ -86,6 +86,19 @@ public class DashboardController extends SelectorComposer<Component> {
 		   dashboard.setLayout(event.getData().toString());
 		   dashboardService.updateLayout(dashboard);
 		});
+		
+		comp.addEventListener(Constants.ON_RUN_COMPOSITION, event -> {
+            HashMap<String,String> paramMap=(HashMap<String,String>)event.getData();
+		    if(paramMap.get(Constants.SUCCESS)!=null){
+		        Clients.showNotification(paramMap.get(Constants.SUCCESS),
+	                    Clients.NOTIFICATION_TYPE_INFO, chartDiv, "middle_center",
+	                    5000, true);
+		    }else{
+		        Clients.showNotification(paramMap.get(Constants.FAIL),
+                        Clients.NOTIFICATION_TYPE_ERROR, chartDiv, "middle_center",
+                        5000, true);
+		    }
+        });
 
 	}
 
