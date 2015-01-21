@@ -129,7 +129,7 @@ public class Pie extends Widget {
                 new FieldInstance(null, getPluginAttribute())));
 
         // Measures settings
-        ri.add(new FieldInstance((getWeight().getAggregation() != null) ? getWeight()
+        ri.add(new FieldInstance((!AGGREGATION.NONE.equals(getWeight().getAggregation())) ? getWeight()
                 .getAggregation().toString() : null, getPluginMeasure()));
 
         visualElement.addOption(new ElementOption(VisualElement.WEIGHT,

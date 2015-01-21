@@ -1,4 +1,3 @@
-
 package org.hpccsystems.dashboard.util;
 
 import java.util.ArrayList;
@@ -35,7 +34,10 @@ public class HipieUtil {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(HipieUtil.class);
     
-   public static Widget getVisualElementWidget(ContractInstance contractInstance,String chartName,Dashboard dashboard) throws Exception{
+    private static final String LABEL = "label";
+    private static final String WEIGHT = "weight";
+    
+    public static Widget getVisualElementWidget(ContractInstance contractInstance,String chartName,Dashboard dashboard) throws Exception{
        
        Contract contract = contractInstance.getContract();
        
@@ -97,12 +99,7 @@ public class HipieUtil {
        return widget;
     }
 
-public static VisualElement getVisualElement(Contract contract ,String chartName) {
 
-    VisualElement visualization = contract.getVisualElements().iterator().next();
-    VisualElement visualElement = (VisualElement)visualization.getChildElement(chartName);
-    return visualElement;
-}
 
     private static List<Field> createTableFields(VisualElement visualElement,
             ContractInstance contractInstance,Dashboard dashboard) throws Exception {
@@ -156,6 +153,14 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         LOGGER.debug("tableColumns --->{}", tableColumns);
         return tableColumns;
     }
+
+    
+public static VisualElement getVisualElement(Contract contract ,String chartName) {
+
+    VisualElement visualization = contract.getVisualElements().iterator().next();
+    VisualElement visualElement = (VisualElement)visualization.getChildElement(chartName);
+    return visualElement;
+}
 
     private static Attribute createAttribute(ElementOption option,
             ContractInstance contractInstance) {
@@ -252,28 +257,9 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         VisualElement visualization = contract.getVisualElements().iterator().next();
         visualization.getChildElements().remove(visualElement);
         
-        ElementOption label = null;
-        ElementOption weight = null;
-        
-        Map<String, ChartConfiguration> chartTypes = Constants.CHART_CONFIGURATIONS;
-        ChartConfiguration chartConfig = chartTypes.get(visualElement.getType());
-        if (ChartTypes.PIE.getChartCode() == chartConfig.getType()
-                || ChartTypes.DONUT.getChartCode() == chartConfig.getType()
-                || ChartTypes.BAR.getChartCode() == chartConfig.getType()
-                || ChartTypes.COLUMN.getChartCode() == chartConfig.getType()) {
-
-            label = visualElement.getOption(VisualElement.LABEL);
-            weight = visualElement.getOption(VisualElement.WEIGHT);
-
-        } else if (ChartTypes.US_MAP.getChartCode() == chartConfig.getType()) {
-            label = visualElement.getOption(VisualElement.STATE);
-            weight = visualElement.getOption(VisualElement.WEIGHT);
-
-        } else if (ChartTypes.LINE.getChartCode().equals(chartConfig.getType())) {
-            label = visualElement.getOption(VisualElement.X);
-            weight = visualElement.getOption(VisualElement.Y);
-
-        }
+       Map<String,ElementOption> weightLableElement = getWeightLabelElementOption(visualElement);
+       ElementOption label = weightLableElement.get(LABEL);
+       ElementOption weight = weightLableElement.get(WEIGHT);
         
         FieldInstance labelFieldInstance = label.getParams().get(0);
         FieldInstance weightFieldInstance = weight.getParams().get(0);
@@ -285,13 +271,10 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         LOGGER.debug("contract -->{}",contract);
     }
 
-    public static void removeFieldsAndVisualElement(
-            ContractInstance contractInstance, VisualElement visualElement) {
+    private static Map<String, ElementOption> getWeightLabelElementOption(
+            VisualElement visualElement) {
         
-        Contract contract = contractInstance.getContract();
-        //Removing Visual element
-        VisualElement visualization = contract.getVisualElements().iterator().next();
-        visualization.getChildElements().remove(visualElement);
+        Map<String,ElementOption> weightLableElement = new HashMap<String, ElementOption>();
         
         ElementOption label = null;
         ElementOption weight = null;
@@ -314,12 +297,30 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
             label = visualElement.getOption(VisualElement.X);
             weight = visualElement.getOption(VisualElement.Y);
 
+        }else if(ChartTypes.TABLE.getChartCode() == chartConfig.getType()){
+            //TODO:
         }
+        weightLableElement.put(LABEL, label);
+        weightLableElement.put(WEIGHT, weight);
+        
+        return weightLableElement;
+    }
+
+    public static void removeFieldsAndVisualElement(
+            ContractInstance contractInstance, VisualElement visualElement) {
+        
+        Contract contract = contractInstance.getContract();
+        //Removing Visual element
+        VisualElement visualization = contract.getVisualElements().iterator().next();
+        visualization.getChildElements().remove(visualElement);
+        
+        Map<String,ElementOption> weightLableElement = getWeightLabelElementOption(visualElement);
+        ElementOption label = weightLableElement.get(LABEL);
+        ElementOption weight = weightLableElement.get(WEIGHT);
         
         FieldInstance labelFieldInstance = label.getParams().get(0);
         FieldInstance weightFieldInstance = weight.getParams().get(0);
        
-        
         //Removing instance properties
         contractInstance.getProps().remove(labelFieldInstance.getName());
         contractInstance.getProps().remove(weightFieldInstance.getName());
@@ -341,6 +342,33 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         LOGGER.debug("After removing fields -->{}",inputElement.getChildElements());
         
         LOGGER.debug("contract -->{}",contract);
+    }
+
+    public static void removeWeightAndLabel(VisualElement visualElement) {
+        
+        Map<String, ChartConfiguration> chartTypes = Constants.CHART_CONFIGURATIONS;
+        ChartConfiguration chartConfig = chartTypes.get(visualElement.getType());
+        
+        if (ChartTypes.PIE.getChartCode() == chartConfig.getType()
+                || ChartTypes.DONUT.getChartCode() == chartConfig.getType()
+                || ChartTypes.BAR.getChartCode() == chartConfig.getType()
+                || ChartTypes.COLUMN.getChartCode() == chartConfig.getType()) {
+
+            visualElement.getOptions().remove(VisualElement.LABEL);
+            visualElement.getOptions().remove(VisualElement.WEIGHT);
+
+        } else if (ChartTypes.US_MAP.getChartCode() == chartConfig.getType()) {
+            visualElement.getOptions().remove(VisualElement.STATE);
+            visualElement.getOptions().remove(VisualElement.WEIGHT);
+
+        } else if (ChartTypes.LINE.getChartCode().equals(chartConfig.getType())) {
+            visualElement.getOptions().remove(VisualElement.X);
+            visualElement.getOptions().remove(VisualElement.Y);
+
+        }else if(ChartTypes.TABLE.getChartCode() == chartConfig.getType()){
+            //TODO:
+        }
+       
     }
 
 }

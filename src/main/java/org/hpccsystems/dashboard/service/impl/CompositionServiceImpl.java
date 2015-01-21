@@ -359,12 +359,13 @@ public class CompositionServiceImpl implements CompositionService{
         VisualElement visualElement = HipieUtil.getVisualElement(contract,widget.getName());
         
         //Removing previous input fields
-        widget.removeInput(contract.getInputElement(0));
+        String inputName = visualElement.getBasis().getBase();
+        Element visualInput =  contract.getInputElements().stream().filter(element -> inputName.equals(element.getName())).findFirst().get();
+        widget.removeInput((InputElement)visualInput);
         
         //Removing previous weight and label
-        visualElement.getOptions().remove(VisualElement.LABEL);
-        visualElement.getOptions().remove(VisualElement.WEIGHT);
-        
+        HipieUtil.removeWeightAndLabel(visualElement);
+               
         //Removing instance properties
         widget.removeInstanceProperty(contractInstance.getProps());
         
@@ -413,10 +414,10 @@ public class CompositionServiceImpl implements CompositionService{
             boolean outputExists = HipieUtil.checkOutputExists(contract,visualElement.getBasis().getName(),chartName);
             LOGGER.debug("outputExists -->{}",outputExists);
             if(outputExists){
-                //Remove visual elemnet and input fields,instance properties
+                //Remove visual element and input fields,instance properties
                 HipieUtil.removeFieldsAndVisualElement(contractInstance,visualElement);
             }else{
-                //Remove visual elemnet and input Element,output element,instance properties
+                //Remove visual element and input Element,output element,instance properties
                HipieUtil.removeInputOutputAndVisualElement(contractInstance,visualElement);
                ContractInstance precursor = contractInstance.getPrecursors().get(visualElement.getBasis().getBase());
                LOGGER.debug("precursor -->{}",precursor);

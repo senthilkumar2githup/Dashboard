@@ -126,11 +126,9 @@ public class XYChart extends Widget{
 
     @Override
     public VisualElement generateVisualElement() {
-
-        StringBuilder meaureLabels = new StringBuilder();
+       
         VisualElement visualElement = new VisualElement();
         
-        // TODO:Need to set chart type using Hipie's 'Element' class
         visualElement.setType(this.getChartConfiguration().getType());
         visualElement.addCustomOption(new ElementOption("_chartType",
                 new FieldInstance(null, this.getChartConfiguration()
@@ -138,37 +136,8 @@ public class XYChart extends Widget{
 
         visualElement.setName(DashboardUtil.removeSpaceSplChar(this.getName()));
 
-        RecordInstance ri = new RecordInstance();
-        visualElement.setBasisQualifier(ri);
-
-        // Attribute settings
-        ri.add(new FieldInstance(null, getPluginAttribute()));
-
-        // Measures settings
-        getMeasures().listIterator().forEachRemaining(measure -> {           
-                meaureLabels.append(getPluginMeasure(measure)).append(",");
-                ri.add(new FieldInstance(
-                        (measure.getAggregation() != null) ? measure
-                                .getAggregation().toString() : null,getPluginMeasure(measure) ));
-            });
-
-        // TODO:Need to check how behaves for multiple measures
-        meaureLabels.deleteCharAt(meaureLabels.length() - 1);
-        if(ChartTypes.LINE.getChartCode().equals(this.getChartConfiguration().getType())
-                || ChartTypes.SCATTER.getChartCode().equals(this.getChartConfiguration().getType())
-                || ChartTypes.STEP.getChartCode().equals(this.getChartConfiguration().getType())){
-            visualElement.addOption(new ElementOption(VisualElement.X,
-                    new FieldInstance(null, getPluginAttribute())));
-            visualElement.addOption(new ElementOption(VisualElement.Y,
-                    new FieldInstance(null, meaureLabels.toString())));
-        }else{
-            visualElement.addOption(new ElementOption(VisualElement.LABEL,
-                    new FieldInstance(null, getPluginAttribute())));
-            visualElement.addOption(new ElementOption(VisualElement.WEIGHT,
-                    new FieldInstance(null, meaureLabels.toString())));
-        }
-       
-
+        generateVisualOption(visualElement);
+        
         // Setting Tittle for chart
         visualElement.addOption(new ElementOption(VisualElement.TITLE,
                 new FieldInstance(null, this.getTitle())));
@@ -259,18 +228,54 @@ public class XYChart extends Widget{
 
     @Override
     public void editVisualElement(VisualElement visualElement) {
-        // TODO Auto-generated method stub
+        visualElement.setBasisQualifier(null);
+        generateVisualOption(visualElement);
+    }
+
+    private void generateVisualOption(VisualElement visualElement) {
+        
+        RecordInstance ri = new RecordInstance();
+        visualElement.setBasisQualifier(ri);
+
+        StringBuilder meaureLabels = new StringBuilder();
+        // Attribute settings
+        ri.add(new FieldInstance(null, getPluginAttribute()));
+
+        // Measures settings
+        getMeasures().listIterator().forEachRemaining(measure -> {           
+                meaureLabels.append(getPluginMeasure(measure)).append(",");
+                ri.add(new FieldInstance(
+                        (measure.getAggregation() != null) ? measure
+                                .getAggregation().toString() : null,getPluginMeasure(measure) ));
+            });
+
+        // TODO:Need to check how behaves for multiple measures
+        meaureLabels.deleteCharAt(meaureLabels.length() - 1);
+        if(ChartTypes.LINE.getChartCode().equals(this.getChartConfiguration().getType())){
+            visualElement.addOption(new ElementOption(VisualElement.X,
+                    new FieldInstance(null, getPluginAttribute())));
+            visualElement.addOption(new ElementOption(VisualElement.Y,
+                    new FieldInstance(null, meaureLabels.toString())));
+        }else{
+            visualElement.addOption(new ElementOption(VisualElement.LABEL,
+                    new FieldInstance(null, getPluginAttribute())));
+            visualElement.addOption(new ElementOption(VisualElement.WEIGHT,
+                    new FieldInstance(null, meaureLabels.toString())));
+        }
+       
     }
 
     @Override
     public void removeInput(InputElement inputElement) {
-        // TODO Auto-generated method stub
-        
+        List<Element> inputs = inputElement.getChildElements();
+       // inputs.remove(inputElement.getChildElement(getPluginMeasure()));
+        inputs.remove(inputElement.getChildElement(getPluginAttribute()));
     }
 
     @Override
     public void removeInstanceProperty(LinkedHashMap<String, String[]> props) {
-        // TODO Auto-generated method stub
+        props.remove(getPluginAttribute());
+       // props.remove(getPluginMeasure());
         
     }
 }

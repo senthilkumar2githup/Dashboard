@@ -99,35 +99,15 @@ public class USMap extends Widget{
     public VisualElement generateVisualElement() {
 
         VisualElement visualElement = new VisualElement();
-        // TODO:Need to set chart type using Hipie's 'Element' class
         visualElement.setType(this.getChartConfiguration().getType());
-        
-
         visualElement.setName(DashboardUtil.removeSpaceSplChar(this.getName()));
 
-        RecordInstance ri = new RecordInstance();
-        visualElement.setBasisQualifier(ri);
-
-        // Attribute settings
-        ri.add(new FieldInstance(null,getPluginAttribute()));
-        visualElement.addOption(new ElementOption(VisualElement.STATE,
-                new FieldInstance(null, getPluginAttribute())));
-
-        // Measures settings
-        ri.add(new FieldInstance((!getMeasure().getAggregation().equals(AGGREGATION.NONE)) ? getMeasure()
-                .getAggregation().toString() : null, getPluginMeasure()));
-
-        visualElement.addOption(new ElementOption(VisualElement.WEIGHT,
-                new FieldInstance(null, getPluginMeasure())));
-
+        generateVisualOption(visualElement);
+        
         // Setting Tittle for chart
         visualElement.addOption(new ElementOption(VisualElement.TITLE,
                 new FieldInstance(null, this.getTitle())));
         
-      //Setting color
-        visualElement.addOption(new ElementOption(VisualElement.COLOR,
-                new FieldInstance(null, new String("Red_Yellow_Blue"))));
-
         return visualElement;
 
     }
@@ -203,19 +183,48 @@ public class USMap extends Widget{
 
     @Override
     public void editVisualElement(VisualElement visualElement) {
-        // TODO Auto-generated method stub
+        visualElement.setBasisQualifier(null);
+        generateVisualOption(visualElement);
+    }
+
+    private void generateVisualOption(VisualElement visualElement) {
+
+        RecordInstance ri = new RecordInstance();
+        visualElement.setBasisQualifier(ri);
+        
+        if(this.getFilters() != null && !this.getFilters().isEmpty()){
+            visualElement.setBasisFilter(getHipieFilterQuery());
+        }
+        
+        // Attribute settings
+        ri.add(new FieldInstance(null,getPluginAttribute()));
+        visualElement.addOption(new ElementOption(VisualElement.STATE,
+                new FieldInstance(null, getPluginAttribute())));
+
+        // Measures settings
+        ri.add(new FieldInstance((!AGGREGATION.NONE.equals(getMeasure().getAggregation())) ? getMeasure()
+                .getAggregation().toString() : null, getPluginMeasure()));
+
+        visualElement.addOption(new ElementOption(VisualElement.WEIGHT,
+                new FieldInstance(null, getPluginMeasure())));
+
+      //Setting color
+        visualElement.addOption(new ElementOption(VisualElement.COLOR,
+                new FieldInstance(null, new String("Red_Yellow_Blue"))));
+            
     }
 
     @Override
     public void removeInput(InputElement inputElement) {
-        // TODO Auto-generated method stub
-        
+        List<Element> inputs = inputElement.getChildElements();
+        inputs.remove(inputElement.getChildElement(getPluginMeasure()));
+        inputs.remove(inputElement.getChildElement(getPluginAttribute()));
     }
 
     @Override
     public void removeInstanceProperty(LinkedHashMap<String, String[]> props) {
-        // TODO Auto-generated method stub
-        
+        props.remove(getPluginAttribute());
+        props.remove(getPluginMeasure());        
     }
 
 }
