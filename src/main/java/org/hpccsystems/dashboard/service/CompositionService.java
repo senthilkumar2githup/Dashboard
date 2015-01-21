@@ -1,8 +1,12 @@
 package org.hpccsystems.dashboard.service;
 
+import java.util.List;
+
 import org.hpcc.HIPIE.CompositionInstance;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.widget.Widget;
+import org.hpccsystems.dashboard.manage.Interactivity;
+import org.hpccsystems.dashboard.manage.LiveWidget;
 
 public interface CompositionService {
     
@@ -17,4 +21,12 @@ public interface CompositionService {
     void editCompositionChart(Dashboard dashboard, Widget widget,String userId) throws Exception;
     
     void deleteCompositionChart(Dashboard dashboard, String userId, String chartName) throws Exception;
+    
+    List<LiveWidget> extractLiveWidgets(Dashboard dashboard, String user);
+    
+    List<Interactivity> extractInteractivities(Dashboard dashboard, String user);
+    
+    void addInteractivity(Dashboard dashboard, String user, Interactivity interactivity);
+    
+    void removeInteractivity(Dashboard dashboard, String user, Interactivity interactivity);
 }

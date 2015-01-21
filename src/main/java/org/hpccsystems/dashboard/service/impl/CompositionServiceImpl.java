@@ -21,6 +21,8 @@ import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.widget.Widget;
+import org.hpccsystems.dashboard.manage.Interactivity;
+import org.hpccsystems.dashboard.manage.LiveWidget;
 import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.hpccsystems.dashboard.service.CompositionService;
 import org.hpccsystems.dashboard.service.DashboardService;
@@ -434,4 +436,28 @@ public class CompositionServiceImpl implements CompositionService{
     }
     
     
+    
+    @Override
+    public List<LiveWidget> extractLiveWidgets(Dashboard dashboard, String user) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<Interactivity> extractInteractivities(Dashboard dashboard, String user) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void addInteractivity(Dashboard dashboard, String user, Interactivity interactivity) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void removeInteractivity(Dashboard dashboard, String user, Interactivity interactivity) {
+        // TODO Auto-generated method stub
+        
+    }
 }
