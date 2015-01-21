@@ -100,11 +100,11 @@ public class WidgetConfigurationController extends SelectorComposer<Component> i
         Runnable runComposition = () -> {
             try {
                 compositionService.runComposition(configuration.getDashboard(), userId);
+                Executions.schedule(desktop, this, new Event("OnRunCompositionCompleted",null,configuration.getDashboard().getCompositionName()));
             } catch (Exception e) {
                 Executions.schedule(desktop, this, new Event("OnRunCompositionFailed", null, configuration.getDashboard().getCompositionName()));
                 LOGGER.error(Constants.EXCEPTION, e);
             }
-            Executions.schedule(desktop, this, new Event("OnRunCompositionCompleted",null,configuration.getDashboard().getCompositionName()));
         };
         DashboardExecutorHolder.getExecutor().execute(runComposition);
         
@@ -142,7 +142,7 @@ public class WidgetConfigurationController extends SelectorComposer<Component> i
             paramMap.put(Constants.FAIL, "Composition "+arg0.getData()+" Failed to Run...See the log for more details.");
         }
 	    //Post event to the dashboard controller for showing the notification to the user.
-	    Events.postEvent(Constants.ON_RUN_COMPOSITION, getSelf().getParent().getParent(), paramMap);
+	    Events.postEvent(Constants.ON_RUN_COMPOSITION, configuration.getChartDiv(), paramMap);
     }
 
 }

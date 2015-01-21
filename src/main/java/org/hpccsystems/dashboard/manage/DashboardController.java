@@ -87,11 +87,11 @@ public class DashboardController extends SelectorComposer<Component> {
 		   dashboardService.updateLayout(dashboard);
 		});
 		
-		comp.addEventListener(Constants.ON_RUN_COMPOSITION, event -> {
+		chartDiv.addEventListener(Constants.ON_RUN_COMPOSITION, event -> {
             HashMap<String,String> paramMap=(HashMap<String,String>)event.getData();
 		    if(paramMap.get(Constants.SUCCESS)!=null){
 		        Clients.showNotification(paramMap.get(Constants.SUCCESS),
-	                    Clients.NOTIFICATION_TYPE_INFO, chartDiv, "middle_center",
+	                    Clients.NOTIFICATION_TYPE_INFO, chartDiv, "top_right",
 	                    5000, true);
 		    }else{
 		        Clients.showNotification(paramMap.get(Constants.FAIL),
@@ -138,7 +138,7 @@ public class DashboardController extends SelectorComposer<Component> {
 
     @Listen("onClick = #addWidget")
     public void onAddWidget() {
-        Window window = (Window) Executions.createComponents("widget/config.zul", null, new HashMap<String, Object>() {
+        Window window = (Window) Executions.createComponents("widget/config.zul", this.getSelf(), new HashMap<String, Object>() {
             private static final long serialVersionUID = 1L;
             {
                 WidgetConfiguration widgetConfig = new WidgetConfiguration(dashboard, chartDiv);
