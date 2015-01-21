@@ -147,12 +147,20 @@ function visualizeDDLChart(data) {
 
 			GraphMarshaller.createSingle(url, proxyMappings, visualizeRoxie,
 					function(graphDashboard, json) {
-						dashboardViz.graph = graphDashboard;
+						dashboardViz.graph = graphDashboard;						
 						if(chartData.layout) {
 							var deSerializedString=graphDashboard.deserialize(chartData.layout,[],["layout", "palette"]);
+							console.log(graphDashboard);
+							console.log(deSerializedString);
+							console.log(chartData.layout);
+							
 							graphDashboard.target(target)
-							.layout(layout).renderDashboards(deSerializedString);
+							.layout(layout)
+							//.deserialize(chartData.layout)
+							.renderDashboards();
+							
 						}else{
+							console.log("no chart data");
 							graphDashboard.target(target)
 							.layout(layout).renderDashboards();
 						}
