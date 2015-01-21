@@ -3,7 +3,6 @@ package org.hpccsystems.dashboard.entity.widget.charts;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -102,8 +101,8 @@ public class Table extends Widget{
 		 for (Field column : tableColumns) {
 			 if (column.isNumeric()) {
 					Measure measure = (Measure) column;
-					if ((measure.getAggregation() != null)
-							&& (measure.getAggregation() != AGGREGATION.NONE)) {
+					if (measure.getAggregation() != null
+							&& measure.getAggregation() != AGGREGATION.NONE) {
 						sqlColumnList.add(measure.getAggregation().toString()
 								+ "out" + listSize );
 					} else {
@@ -131,37 +130,7 @@ public class Table extends Widget{
                         .getHipieChartName())));
         visualElement.setName(DashboardUtil.removeSpaceSplChar(this.getName()));
 
-        RecordInstance ri = new RecordInstance();
-        visualElement.setBasisQualifier(ri);
-
-		String[] labelArray = new String[tableColumns.size()];
-		String[] valueArray = new String[tableColumns.size()];
-		List<String> labellist = new ArrayList<String>();
-		List<String> valueList = new ArrayList<String>();
-
-        // Columns settings
-		tableColumns.forEach(column -> {
-			if (column.isNumeric()) {
-				Measure measure = (Measure) column;
-				labellist.add((measure.getAggregation() != null) ? (measure
-						.getAggregation().toString()
-						+ "("
-						+ measure.getDisplayName() + ")") : measure
-						.getDisplayName());
-				ri.add(new FieldInstance(
-						(measure.getAggregation() != null) ? measure
-								.getAggregation().toString() : null,
-						createInputName(measure)));
-			} else {
-				Attribute attribute = new Attribute(column);
-				labellist.add(attribute.getDisplayName());
-				ri.add(new FieldInstance(null, createInputName(attribute)));
-			}
-			valueList.add(createInputName(column));
-		});
-		
-        visualElement.addOption(new ElementOption(VisualElement.LABEL, labellist.toArray(labelArray)));
-        visualElement.addOption(new ElementOption(VisualElement.VALUE, valueList.toArray(valueArray)));
+        generateVisualOption(visualElement);
         
         // Setting Title for chart
         visualElement.addOption(new ElementOption(VisualElement.TITLE,
@@ -197,8 +166,6 @@ public class Table extends Widget{
      * @return String
      */
     public String createInputName(Field field) {
-        
-        
         StringBuilder builder = new StringBuilder();
         builder.append("Column")
                 .append(getTableColumns().indexOf(field) + 1).append("_")
@@ -228,21 +195,43 @@ public class Table extends Widget{
 
     @Override
     public void editVisualElement(VisualElement visualElement) {
-        // TODO Auto-generated method stub
+        visualElement.setBasisQualifier(null);
+        generateVisualOption(visualElement);
     }
 
+    private void generateVisualOption(VisualElement visualElement) {
+        
+        RecordInstance ri = new RecordInstance();
+        visualElement.setBasisQualifier(ri);
 
-    @Override
-    public void removeInput(InputElement inputElement) {
-        // TODO Auto-generated method stub
+        String[] labelArray = new String[tableColumns.size()];
+        String[] valueArray = new String[tableColumns.size()];
+        List<String> labellist = new ArrayList<String>();
+        List<String> valueList = new ArrayList<String>();
+
+        // Columns settings
+        tableColumns.forEach(column -> {
+            if (column.isNumeric()) {
+                Measure measure = (Measure) column;
+                labellist.add((!AGGREGATION.NONE.equals(measure.getAggregation())) ? (measure
+                        .getAggregation().toString()
+                        + "("
+                        + measure.getDisplayName() + ")") : measure
+                        .getDisplayName());
+                ri.add(new FieldInstance(
+                        (!AGGREGATION.NONE.equals(measure.getAggregation())) ? measure
+                                .getAggregation().toString() : null,
+                        createInputName(measure)));
+            } else {
+                Attribute attribute = new Attribute(column);
+                labellist.add(attribute.getDisplayName());
+                ri.add(new FieldInstance(null, createInputName(attribute)));
+            }
+            valueList.add(createInputName(column));
+        });
+        
+        visualElement.addOption(new ElementOption(VisualElement.LABEL, labellist.toArray(labelArray)));
+        visualElement.addOption(new ElementOption(VisualElement.VALUE, valueList.toArray(valueArray)));
         
     }
-
-
-    @Override
-    public void removeInstanceProperty(LinkedHashMap<String, String[]> props) {
-        // TODO Auto-generated method stub
-        
-    }
-
 }

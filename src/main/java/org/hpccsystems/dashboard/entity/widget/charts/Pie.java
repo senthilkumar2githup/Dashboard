@@ -239,18 +239,4 @@ public class Pie extends Widget {
         generateVisualOption(visualElement);
     }
 
-    @Override
-    public void removeInput(InputElement inputElement) {
-       List<Element> inputs = inputElement.getChildElements();
-       inputs.remove(inputElement.getChildElement(getPluginMeasure()));
-       inputs.remove(inputElement.getChildElement(getPluginAttribute()));
-    }
-
-    @Override
-    public void removeInstanceProperty(LinkedHashMap<String, String[]> props) {
-        props.remove(getPluginAttribute());
-        props.remove(getPluginMeasure());
-    }
-    
-   
 }

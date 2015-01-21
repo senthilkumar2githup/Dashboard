@@ -13,6 +13,7 @@ import org.hpcc.HIPIE.ContractInstance;
 import org.hpcc.HIPIE.HIPIEService;
 import org.hpcc.HIPIE.dude.Element;
 import org.hpcc.HIPIE.dude.ElementOption;
+import org.hpcc.HIPIE.dude.FieldInstance;
 import org.hpcc.HIPIE.dude.InputElement;
 import org.hpcc.HIPIE.dude.OutputElement;
 import org.hpcc.HIPIE.dude.RecordInstance;
@@ -363,13 +364,24 @@ public class CompositionServiceImpl implements CompositionService{
         //Removing previous input fields
         String inputName = visualElement.getBasis().getBase();
         Element visualInput =  contract.getInputElements().stream().filter(element -> inputName.equals(element.getName())).findFirst().get();
-        widget.removeInput((InputElement)visualInput);
+        
+        Map<String,ElementOption> weightLableElement = HipieUtil.getWeightLabelElementOption(visualElement);
+        ElementOption label = weightLableElement.get(Constants.LABEL);
+        ElementOption weight = weightLableElement.get(Constants.WEIGHT);
+        
+        FieldInstance labelFieldInstance = label.getParams().get(0);
+        FieldInstance weightFieldInstance = weight.getParams().get(0);
+       
+        List<String> labelWeightNames = new ArrayList<String>();
+        labelWeightNames.add(labelFieldInstance.getName());
+        labelWeightNames.add(weightFieldInstance.getName());
+        widget.removeInput((InputElement)visualInput,labelWeightNames);
         
         //Removing previous weight and label
         HipieUtil.removeWeightAndLabel(visualElement);
                
         //Removing instance properties
-        widget.removeInstanceProperty(contractInstance.getProps());
+        widget.removeInstanceProperty(contractInstance.getProps(),labelWeightNames);
         
         //Adding present input
         Element input=contract.getInputElements().iterator().next();

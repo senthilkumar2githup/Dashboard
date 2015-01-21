@@ -34,9 +34,6 @@ public class HipieUtil {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(HipieUtil.class);
     
-    private static final String LABEL = "label";
-    private static final String WEIGHT = "weight";
-    
     public static Widget getVisualElementWidget(ContractInstance contractInstance,String chartName,Dashboard dashboard) throws Exception{
        
        Contract contract = contractInstance.getContract();
@@ -258,8 +255,8 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         visualization.getChildElements().remove(visualElement);
         
        Map<String,ElementOption> weightLableElement = getWeightLabelElementOption(visualElement);
-       ElementOption label = weightLableElement.get(LABEL);
-       ElementOption weight = weightLableElement.get(WEIGHT);
+       ElementOption label = weightLableElement.get(Constants.LABEL);
+       ElementOption weight = weightLableElement.get(Constants.WEIGHT);
         
         FieldInstance labelFieldInstance = label.getParams().get(0);
         FieldInstance weightFieldInstance = weight.getParams().get(0);
@@ -271,7 +268,7 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         LOGGER.debug("contract -->{}",contract);
     }
 
-    private static Map<String, ElementOption> getWeightLabelElementOption(
+    public static Map<String, ElementOption> getWeightLabelElementOption(
             VisualElement visualElement) {
         
         Map<String,ElementOption> weightLableElement = new HashMap<String, ElementOption>();
@@ -300,8 +297,8 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         }else if(ChartTypes.TABLE.getChartCode() == chartConfig.getType()){
             //TODO:
         }
-        weightLableElement.put(LABEL, label);
-        weightLableElement.put(WEIGHT, weight);
+        weightLableElement.put(Constants.LABEL, label);
+        weightLableElement.put(Constants.WEIGHT, weight);
         
         return weightLableElement;
     }
@@ -315,8 +312,8 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         visualization.getChildElements().remove(visualElement);
         
         Map<String,ElementOption> weightLableElement = getWeightLabelElementOption(visualElement);
-        ElementOption label = weightLableElement.get(LABEL);
-        ElementOption weight = weightLableElement.get(WEIGHT);
+        ElementOption label = weightLableElement.get(Constants.LABEL);
+        ElementOption weight = weightLableElement.get(Constants.WEIGHT);
         
         FieldInstance labelFieldInstance = label.getParams().get(0);
         FieldInstance weightFieldInstance = weight.getParams().get(0);

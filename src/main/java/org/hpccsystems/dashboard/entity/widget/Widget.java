@@ -117,9 +117,19 @@ public abstract class Widget {
                 + ", chartConfiguration=" + chartConfiguration + "]";
     }
 
-    public abstract void removeInput(InputElement inputElement);
+    public void removeInput(InputElement inputElement,List<String> labelWeightNames) {
+       List<Element> inputs = inputElement.getChildElements();
+       labelWeightNames.stream().forEach(fieldName -> {
+           inputs.remove(inputElement.getChildElement(fieldName));
+       });
+      
+    }
 
-    public abstract void removeInstanceProperty(LinkedHashMap<String, String[]> props);
+    public void removeInstanceProperty(LinkedHashMap<String, String[]> props,List<String> labelWeightNames) {
+        labelWeightNames.stream().forEach(fieldName -> {
+            props.remove(fieldName);
+        });
+    }
     
 }
 

@@ -126,7 +126,7 @@ public class XYChart extends Widget{
 
     @Override
     public VisualElement generateVisualElement() {
-       
+        
         VisualElement visualElement = new VisualElement();
         
         visualElement.setType(this.getChartConfiguration().getType());
@@ -245,7 +245,7 @@ public class XYChart extends Widget{
         getMeasures().listIterator().forEachRemaining(measure -> {           
                 meaureLabels.append(getPluginMeasure(measure)).append(",");
                 ri.add(new FieldInstance(
-                        (measure.getAggregation() != null) ? measure
+                        (measure.getAggregation() != null && (!AGGREGATION.NONE.equals(measure.getAggregation())) ) ? measure
                                 .getAggregation().toString() : null,getPluginMeasure(measure) ));
             });
 
@@ -265,17 +265,4 @@ public class XYChart extends Widget{
        
     }
 
-    @Override
-    public void removeInput(InputElement inputElement) {
-        List<Element> inputs = inputElement.getChildElements();
-       // inputs.remove(inputElement.getChildElement(getPluginMeasure()));
-        inputs.remove(inputElement.getChildElement(getPluginAttribute()));
-    }
-
-    @Override
-    public void removeInstanceProperty(LinkedHashMap<String, String[]> props) {
-        props.remove(getPluginAttribute());
-       // props.remove(getPluginMeasure());
-        
-    }
 }
