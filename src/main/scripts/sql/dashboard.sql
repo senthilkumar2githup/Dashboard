@@ -42,3 +42,8 @@ layout TEXT,
 PRIMARY KEY(id)
 ) ENGINE=InnoDB;
 
+create table hpccclusterdetails (
+hpcc_id VARCHAR(100),
+wssqlport int(4),
+PRIMARY KEY(hpcc_id)
+) ENGINE=InnoDB;
