@@ -1,0 +1,19 @@
+<window title="Error ${requestScope['javax.servlet.error.status_code']}"
+width="400px" border="normal" mode="modal" closable="true">
+
+   <zscript>
+        String _excepMessage = requestScope.get("javax.servlet.error.message");
+        Throwable _excepObj = org.zkoss.lang.Exceptions.getRealCause((Throwable)requestScope.get("javax.servlet.error.exception"));
+        if(_excepObj instanceof RuntimeException)
+        _excepMessage=org.zkoss.util.resource.Labels.getLabel("errorruntime");
+        else
+        _excepMessage=_excepMessage.indexOf(":")!=-1?_excepMessage.split(":")[1].trim().length()>0?_excepMessage.split(":")[1]:_excepMessage.split(":")[0]:_excepMessage;
+    </zscript>   
+ <vbox>
+Unexpected error : ${_excepMessage}
+        <hbox style="margin-left:auto; margin-right:auto">
+            <button label="Continue" onClick="spaceOwner.detach()"/>
+            <button label="Reload" onClick="Executions.sendRedirect(null)"/>
+        </hbox>
+    </vbox>
+</window>

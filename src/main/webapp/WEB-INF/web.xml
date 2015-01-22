@@ -107,7 +107,11 @@
         <url-pattern>*.do</url-pattern>
     </servlet-mapping>
     
-	
+	<!-- Error Page -->
+	<error-page>
+	    <exception-type>java.lang.Throwable</exception-type>    
+	    <location>/error/page.zul</location>    
+	</error-page>
 	<!-- Richlet filters for API -->
 	<!-- <filter>
 	    <filter-name>RichletFilter</filter-name>

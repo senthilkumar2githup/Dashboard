@@ -43,8 +43,8 @@
         <listener-class>org.hpccsystems.dashboard.util.DashboardExecutorHolder</listener-class>
 	</listener>
 
-	<!-- <error-page>
+	<error-page>
 	    <exception-type>java.lang.Throwable</exception-type>    
-	    <location>/error.zul</location>    
-	</error-page> -->
+	    <location>/error/popup.zul</location>    
+	</error-page>
 </zk>
