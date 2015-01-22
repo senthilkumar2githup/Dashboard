@@ -32,6 +32,7 @@ public class DashboardDaoImpl implements DashboardDao {
         dashboard.setVisiblity(rs.getInt("visibility"));
         dashboard.setCompositionName(rs.getString("composition_name"));
         dashboard.setLayout(rs.getString("layout"));
+        dashboard.setWssqlPort(rs.getInt("wssqlport"));
         return dashboard;
     };
 
@@ -66,7 +67,8 @@ public class DashboardDaoImpl implements DashboardDao {
     @Override
     public List<Dashboard> getDashboards(String userId, String applicationId) {
         
-        String sql="SELECT * FROM dashboard WHERE user_id = ? AND application_id = ?";
+        String sql="SELECT dash.*,cluster.wssqlport FROM dashboard dash LEFT JOIN hpccclusterdetails "
+                + "cluster ON dash.hpcc_id=cluster.hpcc_id where user_id = ? AND application_id = ?";
         return jdbcTemplate.query(sql, new Object[]{userId,applicationId}, dahboardRowMapper);
     }
     

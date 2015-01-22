@@ -21,6 +21,7 @@ import javax.xml.stream.events.XMLEvent;
 
 import org.apache.commons.lang.StringUtils;
 import org.hpcc.HIPIE.utils.HPCCConnection;
+import org.hpcc.HIPIE.utils.Utility;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.ChartdataJSON;
 import org.hpccsystems.dashboard.entity.widget.Field;
@@ -73,13 +74,12 @@ public  class WSSQLServiceImpl implements WSSQLService{
 
 		if(LOGGER.isDebugEnabled()) {
 		    LOGGER.debug("WS SQL End point - {}", endpoint.toString());
-		    LOGGER.debug("Connection name - {}, Password - {}", hpccConnection.getUserName(), hpccConnection.getPwd());
+		    LOGGER.debug("Connection name - {}, Password - {}", hpccConnection.getUserName(), Utility.decrypt(hpccConnection.getPwd()));
 		}
 		
 		locator.setWs_sqlServiceSoapAddress(endpoint.toString());
 		locator.setWs_sqlServiceSoap_userName(hpccConnection.getUserName());
-		//TODO Find out the way to get unencryped password from HIPIE
-		locator.setWs_sqlServiceSoap_password("Lexis123!");
+		locator.setWs_sqlServiceSoap_password(Utility.decrypt(hpccConnection.getPwd()));
 
 		ExecuteSQLRequest req = new ExecuteSQLRequest();
 		req.setSqlText(sql);
