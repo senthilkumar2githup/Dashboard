@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hpcc.HIPIE.Composition;
+import org.hpcc.HIPIE.Contract;
+import org.hpcc.HIPIE.ContractInstance;
 import org.hpcc.HIPIE.HIPIEService;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.Dashboard;
@@ -89,12 +91,21 @@ public class NavigationController extends SelectorComposer<Component> {
             
            
             try{
-                 //Deleting composition from the HIPIE
-            	  Composition compositionToDelete = hipieService.getComposition(authenticationService.getUserCredential().getId(),dashboard.getName());
-            	  if(compositionToDelete != null){
-            	  	     hipieService.deleteComposition(compositionToDelete);
-            	    	 hipieService.refreshData();
-            	     }
+                Composition compositionToDelete = hipieService.
+                        getComposition(authenticationService.getUserCredential().getId(),dashboard.getName());
+                
+              //Deleting Contract/DUD file
+                ContractInstance contractInstance = compositionToDelete.getContractInstanceByName(compositionToDelete.getName());
+                Contract contract = contractInstance.getContract();
+                hipieService.getRepositoryManager().getDefaultRepository().deleteFile(contract.getFileName());
+                hipieService.getRepositoryManager().refreshAll();
+
+                 //Deleting composition file            	  
+                if(compositionToDelete != null){
+            	  	hipieService.deleteComposition(compositionToDelete);
+            	    hipieService.refreshData();
+            	   }
+            	
             }catch(Exception e){
             	 LOGGER.error(Constants.EXCEPTION, e);
             	 
