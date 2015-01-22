@@ -150,7 +150,19 @@ public class DashboardController extends SelectorComposer<Component> {
         window.doModal();
     }
 
-	@Listen("onClick = #deleteDashboard")
+    @Listen("onClick = #interactiveWidget")
+    public void oninteractiveWidget() {
+        Window window = (Window) Executions.createComponents("widget/interactive_config.zul", null, new HashMap<String, Object>() {
+            private static final long serialVersionUID = 1L;
+            {
+                put(Constants.DASHBOARD, dashboard);
+            }
+        });
+
+        window.doModal();
+    }
+	
+    @Listen("onClick = #deleteDashboard")
 	public void deleteDashboard() {
         EventListener<ClickEvent> clickListener = event -> {
             if (Messagebox.Button.YES.equals(event.getButton())) {
