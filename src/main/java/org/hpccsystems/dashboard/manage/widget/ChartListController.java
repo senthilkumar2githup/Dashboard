@@ -48,7 +48,6 @@ public class ChartListController extends SelectorComposer<Component>{
         
         widgetConfiguration = (WidgetConfiguration) Executions.getCurrent().getArg().get(Constants.WIDGET_CONFIG);
         
-        
       
         for (Entry<String, ChartConfiguration> entry : Constants.CHART_CONFIGURATIONS.entrySet()) {
         	
