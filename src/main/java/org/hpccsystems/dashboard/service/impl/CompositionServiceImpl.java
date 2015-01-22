@@ -1,11 +1,13 @@
 package org.hpccsystems.dashboard.service.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.hpcc.HIPIE.Composition;
 import org.hpcc.HIPIE.CompositionInstance;
 import org.hpcc.HIPIE.Contract;
@@ -19,8 +21,10 @@ import org.hpcc.HIPIE.dude.OutputElement;
 import org.hpcc.HIPIE.dude.RecordInstance;
 import org.hpcc.HIPIE.dude.VisualElement;
 import org.hpcc.HIPIE.utils.HPCCConnection;
+import org.hpccsystems.dashboard.ChartTypes;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.Dashboard;
+import org.hpccsystems.dashboard.entity.widget.ChartConfiguration;
 import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.hpccsystems.dashboard.manage.Interactivity;
 import org.hpccsystems.dashboard.manage.LiveWidget;
@@ -366,15 +370,9 @@ public class CompositionServiceImpl implements CompositionService{
         Element visualInput =  contract.getInputElements().stream().filter(element -> inputName.equals(element.getName())).findFirst().get();
         
         Map<String,ElementOption> weightLableElement = HipieUtil.getWeightLabelElementOption(visualElement);
-        ElementOption label = weightLableElement.get(Constants.LABEL);
-        ElementOption weight = weightLableElement.get(Constants.WEIGHT);
         
-        FieldInstance labelFieldInstance = label.getParams().get(0);
-        FieldInstance weightFieldInstance = weight.getParams().get(0);
-       
-        List<String> labelWeightNames = new ArrayList<String>();
-        labelWeightNames.add(labelFieldInstance.getName());
-        labelWeightNames.add(weightFieldInstance.getName());
+        List<String> labelWeightNames = HipieUtil.getLabelWeightNames(weightLableElement,visualElement);
+        
         widget.removeInput((InputElement)visualInput,labelWeightNames);
         
         //Removing previous weight and label
@@ -399,6 +397,7 @@ public class CompositionServiceImpl implements CompositionService{
         HipieSingleton.getHipie().saveComposition(user, composition);
     }
 
+
     @Override
     public void deleteCompositionChart(Dashboard dashboard,String userId, String chartName) throws Exception{
         Composition composition = null;
@@ -415,8 +414,10 @@ public class CompositionServiceImpl implements CompositionService{
         LOGGER.debug("Input -->"+visualElement.getBasis().getBase());
         
         if (contract.getVisualElements().iterator().next().getChildElements().size() == 1) {
-            // TODO:delete dud file
-            
+            //delete dud file
+            hipieService.getRepositoryManager().getDefaultRepository().deleteFile(contract.getFileName());
+            hipieService.getRepositoryManager().refreshAll();
+
             // deleting CMP file
             hipieService.deleteComposition(composition);
             hipieService.refreshData();
@@ -432,7 +433,7 @@ public class CompositionServiceImpl implements CompositionService{
                 HipieUtil.removeFieldsAndVisualElement(contractInstance,visualElement);
             }else{
                 //Remove visual element and input Element,output element,instance properties
-               HipieUtil.removeInputOutputAndVisualElement(contractInstance,visualElement);
+               HipieUtil.deleteInputOutputAndVisualElement(contractInstance,visualElement);
                ContractInstance precursor = contractInstance.getPrecursors().get(visualElement.getBasis().getBase());
                LOGGER.debug("precursor -->{}",precursor);
                contractInstance.removePrecursor(precursor, visualElement.getBasis().getBase());

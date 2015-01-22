@@ -115,7 +115,7 @@ public class WidgetConfigurationController extends SelectorComposer<Component> i
         }
         
         this.getSelf().detach();
-        drawChart();
+       drawChart();
     }
 
     /**

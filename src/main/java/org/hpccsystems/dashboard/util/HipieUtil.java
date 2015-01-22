@@ -232,7 +232,7 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         }
     }
 
-    public static void removeInputOutputAndVisualElement(
+    public static void deleteInputOutputAndVisualElement(
             ContractInstance contractInstance, VisualElement visualElement) {
         Contract contract = contractInstance.getContract();      
         
@@ -255,19 +255,14 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         visualization.getChildElements().remove(visualElement);
         
        Map<String,ElementOption> weightLableElement = getWeightLabelElementOption(visualElement);
-       ElementOption label = weightLableElement.get(Constants.LABEL);
-       ElementOption weight = weightLableElement.get(Constants.WEIGHT);
-        
-       LOGGER.debug("label -->"+label);
-       LOGGER.debug("weight -->"+weight);
-        FieldInstance labelFieldInstance = label.getParams().get(0);
-        FieldInstance weightFieldInstance = weight.getParams().get(0);
-        
-        //Removing instance properties
-        contractInstance.getProps().remove(labelFieldInstance.getName());
-        contractInstance.getProps().remove(weightFieldInstance.getName());
-        LOGGER.debug(" contractInstance.getProps()---> {}", contractInstance.getProps());
-        LOGGER.debug("contract -->{}",contract);
+       
+       List<String> labelWeightNames = getLabelWeightNames(weightLableElement,visualElement);
+       
+     //Removing instance properties
+       labelWeightNames.stream().forEach(name -> contractInstance.getProps().remove(name));
+       
+       LOGGER.debug(" contractInstance.getProps()---> {}", contractInstance.getProps());
+       LOGGER.debug("contract -->{}",contract);
     }
 
     public static Map<String, ElementOption> getWeightLabelElementOption(
@@ -316,28 +311,29 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         visualization.getChildElements().remove(visualElement);
         
         Map<String,ElementOption> weightLableElement = getWeightLabelElementOption(visualElement);
-        ElementOption label = weightLableElement.get(Constants.LABEL);
-        ElementOption weight = weightLableElement.get(Constants.WEIGHT);
+        List<String> labelWeightNames = getLabelWeightNames(weightLableElement, visualElement);
         
-        FieldInstance labelFieldInstance = label.getParams().get(0);
-        FieldInstance weightFieldInstance = weight.getParams().get(0);
-       
         //Removing instance properties
-        contractInstance.getProps().remove(labelFieldInstance.getName());
-        contractInstance.getProps().remove(weightFieldInstance.getName());
+        labelWeightNames.stream().forEach(name -> contractInstance.getProps().remove(name));
+       
         LOGGER.debug("contractInstance.getProps()---> {}", contractInstance.getProps());
         
         
         String input = visualElement.getBasis().getBase();
         Element inputElement =  contract.getInputElements().stream().filter(element -> input.equals(element.getName())).findFirst().get();
-
-        //Removing input fields
-        Predicate<Element> labelPredicate = (element) -> element.getName().equals(labelFieldInstance.getName()); 
+        
+       
+        /*Predicate<Element> labelPredicate = (element) -> element.getName().equals(labelFieldInstance.getName()); 
         Predicate<Element> weightPredicate = (element) -> element.getName().equals(weightFieldInstance.getName());
         
         List<Element> fieldsToRemove = new ArrayList<Element>(
         inputElement.getChildElements().stream().filter(labelPredicate.or(weightPredicate))
-        .collect(Collectors.toList()));        
+        .collect(Collectors.toList())); */ 
+        
+        //Removing input fields
+        List<Element> fieldsToRemove = new ArrayList<Element>(
+                inputElement.getChildElements().stream().filter(element ->labelWeightNames.contains(element.getName()))
+                .collect(Collectors.toList()));  
         
         inputElement.getChildElements().removeAll(fieldsToRemove);
         LOGGER.debug("After removing fields -->{}",inputElement.getChildElements());
@@ -371,6 +367,30 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
             visualElement.getOptions().remove(VisualElement.VALUE);
         }
        
+    }
+    
+    public static List<String> getLabelWeightNames(Map<String, ElementOption> weightLableElement,
+            VisualElement visualElement) {
+        
+        List<String> labelWeightNames = new ArrayList<String>();
+        
+        ElementOption label = weightLableElement.get(Constants.LABEL);
+        ElementOption weight = weightLableElement.get(Constants.WEIGHT);
+        
+        Map<String, ChartConfiguration> chartTypes = Constants.CHART_CONFIGURATIONS;
+        ChartConfiguration chartConfig = chartTypes.get(visualElement.getType());
+        
+        if(ChartTypes.TABLE.getChartCode() == chartConfig.getType()){
+            weight.getParams().stream().forEach(fieldInstance ->{
+                labelWeightNames.add(fieldInstance.getName());
+            });
+        }else{
+            FieldInstance labelFieldInstance = label.getParams().get(0);
+            FieldInstance weightFieldInstance = weight.getParams().get(0);
+            labelWeightNames.add(labelFieldInstance.getName());
+            labelWeightNames.add(weightFieldInstance.getName());
+        }
+        return labelWeightNames;
     }
 
 }
