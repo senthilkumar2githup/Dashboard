@@ -149,18 +149,10 @@ function visualizeDDLChart(data) {
 					function(graphDashboard, json) {
 						dashboardViz.graph = graphDashboard;						
 						if(chartData.layout) {
-							var deSerializedString=graphDashboard.deserialize(chartData.layout,[],["layout", "palette"]);
-							console.log(graphDashboard);
-							console.log(deSerializedString);
-							console.log(chartData.layout);
-							
 							graphDashboard.target(target)
 							.layout(layout)
-							//.deserialize(chartData.layout)
-							.renderDashboards();
-							
+							.renderDashboards().deserialize(JSON.parse(chartData.layout),["layout"],["layout", "palette"]);
 						}else{
-							console.log("no chart data");
 							graphDashboard.target(target)
 							.layout(layout).renderDashboards();
 						}
