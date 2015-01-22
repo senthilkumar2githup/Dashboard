@@ -34,8 +34,7 @@ public class Table extends Widget{
 		tableColumns.forEach(column -> {
 			if (column.isNumeric()) {
 				Measure measure = (Measure) column;
-				if (measure.getAggregation() != null
-						&& measure.getAggregation() != AGGREGATION.NONE) {
+				if (measure.getAggregation() != AGGREGATION.NONE) {
 					sql.append(measure.getAggregation()).append("(")
 							.append(getLogicalFile()).append(Constants.DOT)
 							.append(measure.getColumn()).append(")");
@@ -101,8 +100,7 @@ public class Table extends Widget{
 		 for (Field column : tableColumns) {
 			 if (column.isNumeric()) {
 					Measure measure = (Measure) column;
-					if (measure.getAggregation() != null
-							&& measure.getAggregation() != AGGREGATION.NONE) {
+					if (measure.getAggregation() != AGGREGATION.NONE) {
 						sqlColumnList.add(measure.getAggregation().toString()
 								+ "out" + listSize );
 					} else {

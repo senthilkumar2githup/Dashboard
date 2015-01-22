@@ -258,6 +258,8 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
        ElementOption label = weightLableElement.get(Constants.LABEL);
        ElementOption weight = weightLableElement.get(Constants.WEIGHT);
         
+       LOGGER.debug("label -->"+label);
+       LOGGER.debug("weight -->"+weight);
         FieldInstance labelFieldInstance = label.getParams().get(0);
         FieldInstance weightFieldInstance = weight.getParams().get(0);
         
@@ -295,7 +297,9 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
             weight = visualElement.getOption(VisualElement.Y);
 
         }else if(ChartTypes.TABLE.getChartCode() == chartConfig.getType()){
-            //TODO:
+            //TODO:need to check table edit/delete, it will return array of labels/values
+            label = visualElement.getOption(VisualElement.LABEL);
+            weight = visualElement.getOption(VisualElement.VALUE);
         }
         weightLableElement.put(Constants.LABEL, label);
         weightLableElement.put(Constants.WEIGHT, weight);
@@ -363,7 +367,8 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
             visualElement.getOptions().remove(VisualElement.Y);
 
         }else if(ChartTypes.TABLE.getChartCode() == chartConfig.getType()){
-            //TODO:
+            visualElement.getOptions().remove(VisualElement.LABEL);
+            visualElement.getOptions().remove(VisualElement.VALUE);
         }
        
     }

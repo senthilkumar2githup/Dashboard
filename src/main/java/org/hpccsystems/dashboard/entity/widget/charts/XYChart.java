@@ -245,7 +245,7 @@ public class XYChart extends Widget{
         getMeasures().listIterator().forEachRemaining(measure -> {           
                 meaureLabels.append(getPluginMeasure(measure)).append(",");
                 ri.add(new FieldInstance(
-                        (measure.getAggregation() != null && (!AGGREGATION.NONE.equals(measure.getAggregation())) ) ? measure
+                        (!AGGREGATION.NONE.equals(measure.getAggregation()) ) ? measure
                                 .getAggregation().toString() : null,getPluginMeasure(measure) ));
             });
 
