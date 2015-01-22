@@ -17,6 +17,8 @@ public class Dashboard {
     private String hpccId;
     private String compositionName;
     private String layout;
+    private int wssqlPort;
+    private boolean isWssqlPortConfigured;
     
     public int getId() {
         return id;
@@ -61,6 +63,18 @@ public class Dashboard {
         this.layout = layout;
     }
     
+    public int getWssqlPort() {
+        return wssqlPort;
+    }
+    public void setWssqlPort(int wssqlPort) {
+        this.wssqlPort = wssqlPort;
+    }
+    public boolean isWssqlPortConfigured() {
+        return isWssqlPortConfigured;
+    }
+    public void setWssqlPortConfigured(boolean isWssqlPortConfigured) {
+        this.isWssqlPortConfigured = isWssqlPortConfigured;
+    }
     /**
      * @return HPCCConnection corresponding to this.hpccId
      */

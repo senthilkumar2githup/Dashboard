@@ -23,6 +23,7 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.ComboitemRenderer;
+import org.zkoss.zul.Intbox;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Radiogroup;
@@ -49,6 +50,8 @@ public class DashboardConfigurationController extends
     private Combobox connectionList;
     @Wire
     private Label message;
+    @Wire
+    private Intbox wssqlport;
     
     private Dashboard dashboard;
     
@@ -92,7 +95,21 @@ public class DashboardConfigurationController extends
     @Listen("onChange = #connectionList")
     public void onChangeHpccconnection() {
         LOG.debug("onChangeHpccconnection -> label->{}",connectionList.getSelectedItem().getLabel());
-        String wssqlPort=dashboardService.getWssqlport(connectionList.getSelectedItem().getLabel());
+        
+        if(dashboard==null){
+            dashboard = new Dashboard();
+           }
+        
+        int wssqlPort=dashboardService.getWssqlport(connectionList.getSelectedItem().getLabel());
+        
+        if(wssqlPort!=0){
+            getSelf().getFellow("wssqlportdiv").setVisible(false);
+            wssqlport.setValue(wssqlPort);
+            dashboard.setWssqlPortConfigured(true);
+        }else{
+            getSelf().getFellow("wssqlportdiv").setVisible(true);
+            dashboard.setWssqlPortConfigured(false);
+        }
         LOG.debug("wsqlport->{}",wssqlPort);
     }
 
@@ -105,15 +122,18 @@ public class DashboardConfigurationController extends
         }else if(connectionList.getSelectedItem() == null){
             Clients.showNotification(Labels.getLabel("chooseConnection"), "error", connectionList, "end_center", 5000, true);            
             return;
+        }else if(!dashboard.isWssqlPortConfigured() && (wssqlport.getText()== null || wssqlport.getText().isEmpty())){
+            Clients.showNotification(Labels.getLabel("wssqlportisempty"), "error", wssqlport, "end_center", 5000, true);            
+            return;
         }   
         
         //Creating new dashboard
         if(parent instanceof Vbox){
-            Dashboard dashboard = new Dashboard();
             dashboard.setName(nameTextbox.getText());
             dashboard.setApplicationId(authenticationService.getUserCredential().getApplicationId());
             dashboard.setVisiblity(Integer.parseInt(visiblityRadiogroup.getSelectedItem().getValue().toString()));
             dashboard.setHpccId(connectionList.getSelectedItem().getLabel());
+            dashboard.setWssqlPort(wssqlport.getValue());
             //inserts dashboard into DB
             dashboardService.insertDashboard(dashboard, authenticationService.getUserCredential().getId());
             Events.postEvent(Constants.ON_ADD_DASHBOARD, parent, dashboard);            
@@ -126,6 +146,7 @@ public class DashboardConfigurationController extends
         	  dashboard.setName(nameTextbox.getValue());
               dashboard.setVisiblity(Integer.parseInt(visiblityRadiogroup.getSelectedItem().getValue().toString()));
               dashboard.setHpccId(connectionList.getSelectedItem().getLabel());
+              dashboard.setWssqlPort(wssqlport.getValue());
               //updates dashboard into DB
               dashboardService.updateDashboard(dashboard);
         }       

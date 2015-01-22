@@ -49,7 +49,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
     
     @Override
-    public String getWssqlport(String hpccId) {
+    public int getWssqlport(String hpccId) {
         return dashboardDao.getWssqlport(hpccId); 
     }
 }

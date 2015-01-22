@@ -50,6 +50,10 @@ public class DashboardDaoImpl implements DashboardDao {
         parameters.put("visibility", dashboard.getVisiblity());
         parameters.put("hpcc_id", dashboard.getHpccId());
         parameters.put("composition_name", dashboard.getCompositionName());
+        
+        if(!dashboard.isWssqlPortConfigured()){
+            insertWssqlPort(dashboard);
+        }
 
         Number dashboardId = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
                 .withTableName("dashboard")
@@ -97,14 +101,25 @@ public class DashboardDaoImpl implements DashboardDao {
     }
     
     @Override
-    public String getWssqlport(String hpccId) {
+    public int getWssqlport(String hpccId) {
         String sql="select wssqlport from hpccclusterdetails where hpcc_id=?";
         List<Map<String,Object>> result=jdbcTemplate.queryForList(sql, new Object[]{hpccId});
-        String WssqlPort=null;
+        int WssqlPort=0;
         if(!result.isEmpty()){
-            WssqlPort=(String)result.iterator().next().get("wssqlport");
+            WssqlPort=(int)result.iterator().next().get("wssqlport");
         }
         return WssqlPort;
+    }
+    
+    private void insertWssqlPort(Dashboard dashboard) {
+        
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("hpcc_id", dashboard.getHpccId());
+        parameters.put("wssqlport", dashboard.getWssqlPort());
+        
+        new SimpleJdbcInsert(jdbcTemplate.getDataSource())
+        .withTableName("hpccclusterdetails")
+        .execute(parameters);
     }
    
 }

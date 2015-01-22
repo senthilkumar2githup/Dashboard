@@ -25,10 +25,16 @@
 			</hbox>
 		</hlayout>
 		
-		<hlayout>
-			<label value="${labels.hpccConnection}"/>
-			<combobox id="connectionList" placeholder="${labels.chooseConnection}"></combobox>
-		</hlayout>
+		<vlayout>
+			<hbox align="center">
+				<label value="${labels.hpccConnection}"/>
+				<combobox id="connectionList" placeholder="${labels.chooseConnection}"></combobox>
+			</hbox>	
+			<div id="wssqlportdiv" visible="false">
+				<label value="${labels.wssqlport}"></label>
+				<intbox id="wssqlport" zclass="form-control" constraint="no negative,no zero"/>
+			</div>
+		</vlayout>
 	</vbox>
 	
 </window>
