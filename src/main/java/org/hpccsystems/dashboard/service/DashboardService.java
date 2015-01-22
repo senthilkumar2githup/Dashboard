@@ -23,5 +23,5 @@ public interface DashboardService {
     
     void updateLayout(Dashboard dashboard);
 
-	
+    String getWssqlport(String hpccId);
 }

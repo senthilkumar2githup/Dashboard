@@ -4,9 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.sql.DataSource;
-
 import org.hpccsystems.dashboard.dao.DashboardDao;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,6 +94,17 @@ public class DashboardDaoImpl implements DashboardDao {
            dashboard.getId()
         });
         
+    }
+    
+    @Override
+    public String getWssqlport(String hpccId) {
+        String sql="select wssqlport from hpccclusterdetails where hpcc_id=?";
+        List<Map<String,Object>> result=jdbcTemplate.queryForList(sql, new Object[]{hpccId});
+        String WssqlPort=null;
+        if(!result.isEmpty()){
+            WssqlPort=(String)result.iterator().next().get("wssqlport");
+        }
+        return WssqlPort;
     }
    
 }

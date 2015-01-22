@@ -88,6 +88,13 @@ public class DashboardConfigurationController extends
             }
         });
     }
+    
+    @Listen("onChange = #connectionList")
+    public void onChangeHpccconnection() {
+        LOG.debug("onChangeHpccconnection -> label->{}",connectionList.getSelectedItem().getLabel());
+        String wssqlPort=dashboardService.getWssqlport(connectionList.getSelectedItem().getLabel());
+        LOG.debug("wsqlport->{}",wssqlPort);
+    }
 
     @Listen("onClick = #configOkButton")
     public void onClickOkButton() {

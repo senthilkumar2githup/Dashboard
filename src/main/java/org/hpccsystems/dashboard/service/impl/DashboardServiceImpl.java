@@ -47,4 +47,9 @@ public class DashboardServiceImpl implements DashboardService {
     public void updateLayout(Dashboard dashboard) {
         dashboardDao.updateLayout(dashboard);        
     }
+    
+    @Override
+    public String getWssqlport(String hpccId) {
+        return dashboardDao.getWssqlport(hpccId); 
+    }
 }

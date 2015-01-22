@@ -24,5 +24,7 @@ public interface DashboardDao {
     
     void updateLayout(Dashboard dashboard);
     
+    String getWssqlport(String hpccId);
+    
 
 }
