@@ -12,7 +12,7 @@ import org.hpccsystems.dashboard.entity.widget.Widget;
 
 
 public interface WSSQLService {
-    List<String> getDistinctValues(Field field, HPCCConnection connection, String fileName, List<Filter> filters) throws Exception;
-    Map<String, BigDecimal> getMinMax(Field field, HPCCConnection connection, String fileName, List<Filter> filters) throws Exception;
-    ChartdataJSON getChartdata(Widget widget, HPCCConnection connection) throws Exception;
+    List<String> getDistinctValues(Field field, HPCCConnection connection, String fileName, List<Filter> filters,int wssqlPort) throws Exception;
+    Map<String, BigDecimal> getMinMax(Field field, HPCCConnection connection, String fileName, List<Filter> filters,int wssqlPort) throws Exception;
+    ChartdataJSON getChartdata(Widget widget, HPCCConnection connection,int wssqlPort) throws Exception;
 }

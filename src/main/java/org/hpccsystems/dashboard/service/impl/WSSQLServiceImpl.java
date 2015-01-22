@@ -54,7 +54,7 @@ public  class WSSQLServiceImpl implements WSSQLService{
     
     private static final String UNAUTHORIZED = "Unauthorized";  
 	
-	private String executeSQL(HPCCConnection hpccConnection, String sql)
+	private String executeSQL(HPCCConnection hpccConnection, String sql,int wssqlPort)
 			throws Exception {
 
 		String resultString = null;
@@ -66,8 +66,9 @@ public  class WSSQLServiceImpl implements WSSQLService{
 			endpoint.append(HTTP);
 		}
 		
-		// TO DO add the IP and  port number in HIPIE  and then implement
-		endpoint.append("216.19.105.2:18009"); 
+		endpoint.append(hpccConnection.getServerHost()); 
+		endpoint.append(":");
+		endpoint.append(wssqlPort);
 		endpoint.append("/ws_sql?ver_=1");
 
 		if(LOGGER.isDebugEnabled()) {
@@ -155,7 +156,7 @@ public  class WSSQLServiceImpl implements WSSQLService{
     }
     
     @Override
-    public List<String> getDistinctValues(Field field, HPCCConnection connection, String fileName, List<Filter> filters) throws Exception  {
+    public List<String> getDistinctValues(Field field, HPCCConnection connection, String fileName, List<Filter> filters,int wssqlPort) throws Exception  {
     	 List<String> dataList = null;
          try {
              final StringBuilder queryTxt = new StringBuilder(SELECT);
@@ -178,7 +179,7 @@ public  class WSSQLServiceImpl implements WSSQLService{
             	 LOGGER.debug("Query for Distinct values -> " + queryTxt.toString());
              }
 
-             final String resultString = executeSQL(connection, queryTxt.toString());
+             final String resultString = executeSQL(connection, queryTxt.toString(),wssqlPort);
              if (resultString != null && resultString.length() > 0) {
             	 XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
             	 XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(new StringReader(resultString));
@@ -220,7 +221,7 @@ public  class WSSQLServiceImpl implements WSSQLService{
     }
 
     @Override
-    public Map<String, BigDecimal> getMinMax(Field field, HPCCConnection connection, String fileName, List<Filter> filters)
+    public Map<String, BigDecimal> getMinMax(Field field, HPCCConnection connection, String fileName, List<Filter> filters,int wssqlPort)
             throws Exception {
         Map<String, BigDecimal> resultMap = null;
 
@@ -243,7 +244,7 @@ public  class WSSQLServiceImpl implements WSSQLService{
                 queryTxt.append(fileName);
             }
 
-            final String resultString = executeSQL(connection, queryTxt.toString());
+            final String resultString = executeSQL(connection, queryTxt.toString(),wssqlPort);
 
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("queryTxt in fetchFilterMinMax() -->" + queryTxt);
@@ -294,7 +295,7 @@ public  class WSSQLServiceImpl implements WSSQLService{
     }
 
     @Override
-    public ChartdataJSON getChartdata(Widget widget, HPCCConnection connection) throws Exception {
+    public ChartdataJSON getChartdata(Widget widget, HPCCConnection connection,int wssqlPort) throws Exception {
 
         final String queryTxt = widget.generateSQL();
 
@@ -303,7 +304,7 @@ public  class WSSQLServiceImpl implements WSSQLService{
             LOGGER.debug("WS_SQL Query ->" + queryTxt);
         }
 
-        final String resultString = executeSQL(connection, queryTxt);
+        final String resultString = executeSQL(connection, queryTxt,wssqlPort);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("resultString -->" +resultString);
         }

@@ -68,7 +68,7 @@ public class NumericFilterController extends SelectorComposer<Component> {
         map = wssqlService.getMinMax(filter, 
                 widgetconfig.getDashboard().getHpccConnection(), widgetconfig.getWidget().
                 getLogicalFile().toString(), 
-                widgetconfig.getWidget().getFilters());
+                widgetconfig.getWidget().getFilters(),widgetconfig.getDashboard().getWssqlPort());
         	  min = map.get("min");
               max = map.get("max");
               minimumLabel.setValue(min.toString());

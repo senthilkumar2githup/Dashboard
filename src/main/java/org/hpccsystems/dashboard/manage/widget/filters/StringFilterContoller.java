@@ -57,7 +57,7 @@ public class StringFilterContoller extends SelectorComposer<Component> {
         valueList = wssqlService.getDistinctValues(filter, 
                 widgetConfiguration.getDashboard().getHpccConnection(), 
                 widgetConfiguration.getWidget().getLogicalFile(), 
-                widgetConfiguration.getWidget().getFilters());
+                widgetConfiguration.getWidget().getFilters(),widgetConfiguration.getDashboard().getWssqlPort());
         
         ListModelList<String> values =  new ListModelList<String>(valueList);
         values.setMultiple(true);

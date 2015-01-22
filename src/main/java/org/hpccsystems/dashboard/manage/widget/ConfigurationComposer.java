@@ -104,7 +104,7 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
     private EventListener<Event> drawChartListener = event -> {
         try {
             ChartdataJSON chartData;
-            chartData = wssqlService.getChartdata(widget, hpccConnection);
+            chartData = wssqlService.getChartdata(widget, hpccConnection,widgetConfiguration.getDashboard().getWssqlPort());
             chartData.setTitle(widget.getTitle());
             if(LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Div id -{}\nChart - {}\nJSON - {}", 
