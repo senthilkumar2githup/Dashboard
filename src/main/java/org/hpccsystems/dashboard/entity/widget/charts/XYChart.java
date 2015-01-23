@@ -3,7 +3,6 @@ package org.hpccsystems.dashboard.entity.widget.charts;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -237,32 +236,38 @@ public class XYChart extends Widget{
         RecordInstance ri = new RecordInstance();
         visualElement.setBasisQualifier(ri);
 
-        StringBuilder meaureLabels = new StringBuilder();
+       
         // Attribute settings
         ri.add(new FieldInstance(null, getPluginAttribute()));
 
         // Measures settings
-        getMeasures().listIterator().forEachRemaining(measure -> {           
-                meaureLabels.append(getPluginMeasure(measure)).append(",");
+        getMeasures().listIterator().forEachRemaining(measure -> { 
+            StringBuilder meaureLabel = new StringBuilder();
+                meaureLabel.append(getPluginMeasure(measure));
                 ri.add(new FieldInstance(
                         (!AGGREGATION.NONE.equals(measure.getAggregation()) ) ? measure
                                 .getAggregation().toString() : null,getPluginMeasure(measure) ));
+                
+             // TODO:Need to check how behaves for multiple measures
+                if(ChartTypes.LINE.getChartCode().equals(this.getChartConfiguration().getType())){
+                    visualElement.addOption(new ElementOption(VisualElement.Y,
+                            new FieldInstance((!AGGREGATION.NONE.equals(measure.getAggregation()) ) ? measure
+                                    .getAggregation().toString() : null,meaureLabel.toString() )));
+                }else{
+                    visualElement.addOption(new ElementOption(VisualElement.WEIGHT,
+                            new FieldInstance((!AGGREGATION.NONE.equals(measure.getAggregation()) ) ? measure
+                                    .getAggregation().toString() : null,meaureLabel.toString() )));
+                }
             });
-
-        // TODO:Need to check how behaves for multiple measures
-        meaureLabels.deleteCharAt(meaureLabels.length() - 1);
+        
         if(ChartTypes.LINE.getChartCode().equals(this.getChartConfiguration().getType())){
             visualElement.addOption(new ElementOption(VisualElement.X,
                     new FieldInstance(null, getPluginAttribute())));
-            visualElement.addOption(new ElementOption(VisualElement.Y,
-                    new FieldInstance(null, meaureLabels.toString())));
-        }else{
+         }else{
             visualElement.addOption(new ElementOption(VisualElement.LABEL,
                     new FieldInstance(null, getPluginAttribute())));
-            visualElement.addOption(new ElementOption(VisualElement.WEIGHT,
-                    new FieldInstance(null, meaureLabels.toString())));
         }
-       
+
     }
 
 }

@@ -210,7 +210,9 @@ public class Table extends Widget{
         // Columns settings
         tableColumns.forEach(column -> {
             if (column.isNumeric()) {
+                //For Numeric field
                 Measure measure = (Measure) column;
+                //creates label as 'SUM(buyprice)'
                 labellist.add((!AGGREGATION.NONE.equals(measure.getAggregation())) ? (measure
                         .getAggregation().toString()
                         + "("
@@ -220,12 +222,20 @@ public class Table extends Widget{
                         (!AGGREGATION.NONE.equals(measure.getAggregation())) ? measure
                                 .getAggregation().toString() : null,
                         createInputName(measure)));
+                //creates Value as 'SUM(Column1_Tablewidget)'
+                valueList.add((!AGGREGATION.NONE.equals(measure.getAggregation())) ? (measure
+                        .getAggregation().toString()
+                        + "("
+                        + createInputName(column) + ")") : createInputName(column));
             } else {
+                //For String field
+                //creates label as 'buyprice'
                 Attribute attribute = new Attribute(column);
                 labellist.add(attribute.getDisplayName());
                 ri.add(new FieldInstance(null, createInputName(attribute)));
+                //creates value as Column2_Tablewidget
+                valueList.add(createInputName(column));
             }
-            valueList.add(createInputName(column));
         });
         
         visualElement.addOption(new ElementOption(VisualElement.LABEL, labellist.toArray(labelArray)));

@@ -206,7 +206,8 @@ public class USMap extends Widget{
                 .getAggregation().toString() : null, getPluginMeasure()));
 
         visualElement.addOption(new ElementOption(VisualElement.WEIGHT,
-                new FieldInstance(null, getPluginMeasure())));
+                new FieldInstance((!AGGREGATION.NONE.equals(getMeasure().getAggregation()) ) ? getMeasure()
+                        .getAggregation().toString() : null,getPluginMeasure())));
 
       //Setting color
         visualElement.addOption(new ElementOption(VisualElement.COLOR,

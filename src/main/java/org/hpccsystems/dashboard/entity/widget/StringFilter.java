@@ -64,7 +64,7 @@ public class StringFilter extends Filter {
        sql.append("%");
        sql.append(getFilterName(filter,index,chartName));
        sql.append("%");
-       sql.append(" IN (");
+       sql.append(" IN [");
 
         Iterator<String> valueIterator = ((StringFilter) filter).getValues()
                 .iterator();
@@ -76,7 +76,7 @@ public class StringFilter extends Filter {
                 sql.append("' ");
             }
         }
-        sql.append(")");
+        sql.append("]");
         if(LOGGER.isDebugEnabled()){
             LOGGER.debug("Hipie filter query -->"+sql);
         }

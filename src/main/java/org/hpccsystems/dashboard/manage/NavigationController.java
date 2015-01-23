@@ -90,25 +90,22 @@ public class NavigationController extends SelectorComposer<Component> {
             Dashboard dashboard = (Dashboard) event.getData();
             
            
-            try{
-                Composition compositionToDelete = hipieService.
-                        getComposition(authenticationService.getUserCredential().getId(),dashboard.getName());
-                
-              //Deleting Contract/DUD file
-                ContractInstance contractInstance = compositionToDelete.getContractInstanceByName(compositionToDelete.getName());
-                Contract contract = contractInstance.getContract();
-                hipieService.getRepositoryManager().getDefaultRepository().deleteFile(contract.getFileName());
-                hipieService.getRepositoryManager().refreshAll();
-
-                 //Deleting composition file            	  
+            try{                
+                Composition compositionToDelete = hipieService.getComposition(authenticationService.getUserCredential().getId(), dashboard.getCompositionName());
                 if(compositionToDelete != null){
+                    //Deleting Contract/DUD file
+                    ContractInstance contractInstance = compositionToDelete.getContractInstanceByName(compositionToDelete.getName());
+                    Contract contract = contractInstance.getContract();
+                    hipieService.getRepositoryManager().getDefaultRepository().deleteFile(contract.getFileName());
+                    hipieService.getRepositoryManager().refreshAll();
+
+                    //Deleting composition file         	  
             	  	hipieService.deleteComposition(compositionToDelete);
             	    hipieService.refreshData();
             	   }
             	
             }catch(Exception e){
             	 LOGGER.error(Constants.EXCEPTION, e);
-            	 
             }
             // Removing the composition from DB
             int index = dashboardModel.indexOf(dashboard);

@@ -53,11 +53,7 @@ public class HipieUtil {
            ( (Pie) widget).setLabel(createAttribute(visualElement.getOption(VisualElement.LABEL),contractInstance));
            
        } else if (chartConfig.getType() == ChartTypes.BAR.getChartCode()
-               || chartConfig.getType() == ChartTypes.COLUMN.getChartCode()
-               || chartConfig.getType() == ChartTypes.LINE.getChartCode()
-               || chartConfig.getType() == ChartTypes.SCATTER.getChartCode()
-               || chartConfig.getType() == ChartTypes.STEP.getChartCode()
-               || chartConfig.getType() == ChartTypes.AREA.getChartCode()) {
+               || chartConfig.getType() == ChartTypes.COLUMN.getChartCode() ) {
            widget = new XYChart();
          //TODO: once the issue #21 closed iterate over the element option and prepare the measure list.
            List<Measure> measures=new ArrayList<Measure>();
@@ -68,6 +64,14 @@ public class HipieUtil {
            LOGGER.debug("visualElement --->{}",visualElement.getOptionValues());
            
            ( (XYChart) widget).setAttribute(createAttribute(visualElement.getOption(VisualElement.LABEL),contractInstance));
+           
+       } else if(ChartTypes.LINE.getChartCode() == chartConfig.getType()){
+           widget = new XYChart();
+           List<Measure> measures=new ArrayList<Measure>();
+           measures.add(createMeasre(visualElement.getOption(VisualElement.Y),contractInstance));
+           ( (XYChart) widget).setMeasure(measures);
+           
+           ( (XYChart) widget).setAttribute(createAttribute(visualElement.getOption(VisualElement.X),contractInstance));
            
        } else if (chartConfig.getType() == ChartTypes.US_MAP.getChartCode()) {
            widget = new USMap();

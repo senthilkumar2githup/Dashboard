@@ -333,8 +333,7 @@ public class CompositionServiceImpl implements CompositionService{
                 user,
                 dashboard.getCompositionName());
         if(composition != null) {
-            latestInstance = composition.getMostRecentInstance(
-                    user, true);
+            latestInstance = composition.getMostRecentInstance(user, true);
             //Compare last updated date
             LOGGER.debug("composition last updated date -->{}", new Date(composition.getLastModified()));
             
