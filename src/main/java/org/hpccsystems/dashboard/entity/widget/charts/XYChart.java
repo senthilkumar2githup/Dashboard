@@ -129,7 +129,7 @@ public class XYChart extends Widget{
         VisualElement visualElement = new VisualElement();
         
         visualElement.setType(this.getChartConfiguration().getType());
-        visualElement.addCustomOption(new ElementOption("_chartType",
+        visualElement.addCustomOption(new ElementOption("_charttype",
                 new FieldInstance(null, this.getChartConfiguration()
                         .getHipieChartName())));
 
