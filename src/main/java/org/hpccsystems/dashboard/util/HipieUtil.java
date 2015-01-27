@@ -112,8 +112,9 @@ public class HipieUtil {
        LOGGER.debug("Ri -->"+visualElement.getBasisQualifier().toString());
        LOGGER.debug("filter -->"+visualElement.getBasisFilter());
        //Recreating filters with applied values
-       widget.setFilters(getFilters(contractInstance,visualElement)) ;
-      
+       if(visualElement.getBasisFilter() != null && !visualElement.getBasisFilter().isEmpty()){
+           widget.setFilters(getFilters(contractInstance,visualElement)) ;
+       }
        LOGGER.debug("widget -->"+widget);
        
        return widget;

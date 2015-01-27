@@ -141,6 +141,7 @@ public class CompositionServiceImpl implements CompositionService{
         input.setName("dsInput"+(contract.getInputElements().size()+1));
         input.setType(InputElement.TYPE_DATASET);
         input.addOption(new ElementOption(Element.MAPBYNAME));
+        input.addOption(new ElementOption(Element.OPTIONAL));
         contract.getInputElements().add(input);        
         
         widget.generateInputElement().stream().forEach(inputElement->
@@ -154,6 +155,7 @@ public class CompositionServiceImpl implements CompositionService{
         output.setType(OutputElement.TYPE_DATASET);
         output.setBase(input.getName());
         output.addOption(new ElementOption("WUID"));
+        output.setParentContainer(contract);
         contract.getOutputElements().add(output);
         
         VisualElement visualElement = widget.generateVisualElement();
@@ -283,6 +285,7 @@ public class CompositionServiceImpl implements CompositionService{
         //TODO:need to change for roxie query
         input.setType(InputElement.TYPE_DATASET);   
         input.addOption(new ElementOption(Element.MAPBYNAME));
+        input.addOption(new ElementOption(Element.OPTIONAL));
         
         widget.generateInputElement().stream().forEach(inputElement->
             input.addChildElement(inputElement)
@@ -437,10 +440,11 @@ public class CompositionServiceImpl implements CompositionService{
                 HipieUtil.removeFieldsAndVisualElement(contractInstance,visualElement);
             }else{
                 //Remove visual element and input Element,output element,instance properties
+                ContractInstance precursor = contractInstance.getPrecursors().get(visualElement.getBasis().getBase());
+                contractInstance.removePrecursor(precursor, visualElement.getBasis().getBase());
                HipieUtil.deleteInputOutputAndVisualElement(contractInstance,visualElement);
-               ContractInstance precursor = contractInstance.getPrecursors().get(visualElement.getBasis().getBase());
-               LOGGER.debug("precursor -->{}",precursor);
-               contractInstance.removePrecursor(precursor, visualElement.getBasis().getBase());
+               //LOGGER.debug("precursor -->{}",precursor);
+               
             }
             contract.setRepository(hipieService.getRepositoryManager().getDefaultRepository());
             hipieService.saveContract(userId, contract);
