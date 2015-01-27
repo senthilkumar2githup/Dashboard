@@ -110,7 +110,7 @@ public class HipieUtil {
        LOGGER.debug("Title -->"+visualElement.getOption(VisualElement.TITLE).getParams().get(0).getName());
        LOGGER.debug("Ri -->"+visualElement.getBasisQualifier().toString());
        LOGGER.debug("filter -->"+visualElement.getBasisFilter());
-       List<Filter> filters = getFilters(visualElement) ;
+       //List<Filter> filters = getFilters(visualElement) ;
       
        LOGGER.debug("widget -->"+widget);
        
