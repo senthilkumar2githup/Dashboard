@@ -84,4 +84,11 @@ public class StringFilter extends Filter {
         return sql.toString();
 
     }
+
+    @Override
+    public String toString() {
+        return "StringFilter [values=" + values + "]";
+    }
+    
+    
 }

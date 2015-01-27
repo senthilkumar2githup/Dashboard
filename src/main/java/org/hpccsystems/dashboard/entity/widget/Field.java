@@ -62,4 +62,10 @@ public class Field {
         return hash;
     }
 
+    @Override
+    public String toString() {
+        return "Field [column=" + column + ", dataType=" + dataType + "]";
+    }
+
+    
 }

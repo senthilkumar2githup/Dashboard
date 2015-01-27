@@ -77,4 +77,12 @@ public class NumericFilter extends Filter {
         
         return sql.toString();
     }
+
+    @Override
+    public String toString() {
+        return "NumericFilter [minValue=" + minValue + ", maxValue=" + maxValue
+                + "]";
+    }
+    
+    
 }

@@ -1,11 +1,11 @@
 package org.hpccsystems.dashboard.util;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
@@ -39,6 +39,17 @@ public class HipieUtil {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(HipieUtil.class);
     private static final String AND = "AND";
+    private static final String UNSIGNED ="unsigned";
+    private static final String STRING ="string";
+    private static final String PERCENATGE ="%";
+    private static final String SQUARE_OPEN ="[";
+    private static final String SQUARE_CLOSE ="]";
+    private static final String LESS_THAN ="<=";
+    private static final String GREATER_THAN =">=";
+    private static final String IN ="IN";
+    private static final String QUOTE = "'";
+    private static final String COMMA =",";
+    private static final String SPACE = " ";
     
     public static Widget getVisualElementWidget(ContractInstance contractInstance,String chartName,Dashboard dashboard) throws Exception{
        
@@ -99,7 +110,7 @@ public class HipieUtil {
        LOGGER.debug("Title -->"+visualElement.getOption(VisualElement.TITLE).getParams().get(0).getName());
        LOGGER.debug("Ri -->"+visualElement.getBasisQualifier().toString());
        LOGGER.debug("filter -->"+visualElement.getBasisFilter());
-       //List<Filter> filters = getFilters(visualElement) ;
+       List<Filter> filters = getFilters(visualElement) ;
       
        LOGGER.debug("widget -->"+widget);
        
@@ -111,27 +122,65 @@ public class HipieUtil {
     private static List<Filter> getFilters(VisualElement visualElement) {
         String hipieFilter = visualElement.getBasisFilter();
         List<String> filterStr = Arrays.asList(StringUtils.splitByWholeSeparator(hipieFilter, AND));
+        List<Filter> filters = new ArrayList<Filter>();
         
-        Pattern minPattern = Pattern.compile("%*%*<=*");
-        Pattern maxPattern = Pattern.compile("%*%*>=*");
-        Pattern strPattern = Pattern.compile("%*%*IN*[*]");
        
         filterStr.stream().forEach(filterLabel->{
             Filter filter = null;
             LOGGER.debug("filterLabel -->{}",filterLabel);
-            if(filterLabel.contains("<=")/*minPattern.matcher(filterLabel).matches()*/){
-                LOGGER.debug("min-->");
-                filter = new NumericFilter();
-            }else if(filterLabel.contains(">=")/*maxPattern.matcher(filterLabel).matches()*/){
+            if(filterLabel.contains(LESS_THAN)){
                 LOGGER.debug("Max-->");
+                String[] strArray = StringUtils.splitByWholeSeparator(filterLabel, SPACE);
+                BigDecimal maxValue = new BigDecimal(strArray[strArray.length-1].trim());
+                filter = new NumericFilter();
+                String columnName = strArray[0];
+                columnName = StringUtils.removeStart(columnName, PERCENATGE);
+                columnName = StringUtils.removeEnd(columnName, PERCENATGE);
+                filter.setColumn(columnName);
+                filter.setDataType(UNSIGNED);
+                filter.setColumn(strArray[0]);
+                ((NumericFilter)filter).setMaxValue(maxValue);
                 
-            }else if(filterLabel.contains("IN") && filterLabel.contains("[") && filterLabel.contains("]")/*strPattern.matcher(filterLabel).matches()*/){
+            }else if(filterLabel.contains(GREATER_THAN)){
+                LOGGER.debug("Min-->");
+                String[] strArray = StringUtils.splitByWholeSeparator(filterLabel, SPACE);
+                BigDecimal minValue = new BigDecimal(strArray[strArray.length-1].trim());
+                ((NumericFilter)filter).setMinValue(minValue);
+                filters.add(filter);
+            }else if(filterLabel.contains(IN) && filterLabel.contains(SQUARE_OPEN) && filterLabel.contains(SQUARE_CLOSE)){
                 LOGGER.debug("str-->");
                 filter = new StringFilter();
-                
+                String[] strArray = StringUtils.splitByWholeSeparator(filterLabel, " ");
+                String columnName = strArray[0];
+                columnName = StringUtils.removeStart(columnName, PERCENATGE);
+                columnName = StringUtils.removeEnd(columnName,PERCENATGE);
+                filter.setColumn(columnName);
+                filter.setDataType(STRING);
+                ((StringFilter)filter).setValues(getStrFilterValues(strArray[strArray.length-1].trim(),filter));
+                filters.add(filter);
             }
+            LOGGER.debug("filter-->{}",filter);
         });
-        return null;
+        return filters;
+    }
+
+
+    private static List<String> getStrFilterValues(String valueStr,Filter filter) {
+        List<String> values = new ArrayList<String>();
+       
+        valueStr = StringUtils.removeStart(valueStr, SQUARE_OPEN);
+        valueStr = StringUtils.removeEnd(valueStr, SQUARE_CLOSE);
+        
+        List<String> valueList = Arrays.asList(StringUtils.splitByWholeSeparator(valueStr, COMMA));
+        valueList.stream().forEach(vlaue ->{
+            vlaue = vlaue.trim();
+            vlaue = StringUtils.removeStart(vlaue, QUOTE);
+            vlaue = StringUtils.removeEnd(vlaue,  QUOTE);
+            values.add(vlaue);
+        });
+       
+        LOGGER.debug("values -->{}",values);
+        return values;
     }
 
 
