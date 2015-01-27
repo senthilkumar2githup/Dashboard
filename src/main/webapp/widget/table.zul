@@ -36,7 +36,7 @@
 		</vbox>
 
 		<div vflex="1" hflex="1"
-			style="border: 1px solid; border-color: rgb(184, 177, 177);"
+			style="border: 1px solid; border-color: rgb(184, 177, 177);overflow:scroll;"
 			id="chart">
 
 		</div>
