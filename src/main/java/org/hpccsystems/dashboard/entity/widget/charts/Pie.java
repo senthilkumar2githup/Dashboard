@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.hpcc.HIPIE.dude.Element;
 import org.hpcc.HIPIE.dude.ElementOption;
 import org.hpcc.HIPIE.dude.FieldInstance;
@@ -99,7 +98,7 @@ public class Pie extends Widget {
         VisualElement visualElement = new VisualElement();
         // TODO:Need to set chart type using Hipie's 'Element' class
         visualElement.setType(this.getChartConfiguration().getType());
-        visualElement.addCustomOption(ElementOption.CreateElementOption("_chartType",
+        visualElement.addCustomOption(ElementOption.CreateElementOption("_charttype",
                 new FieldInstance(null, this.getChartConfiguration()
                         .getHipieChartName())));
         visualElement.setName(DashboardUtil.removeSpaceSplChar(this.getName()));
@@ -150,8 +149,8 @@ public class Pie extends Widget {
                         filter.getFilterName(filter,
                                 getFilters().indexOf(filter), this.getName()),
                         filter.getColumn());
-        	 });
-        	
+             });
+            
         }
         return fieldNames;
     }
@@ -178,12 +177,12 @@ public class Pie extends Widget {
        
         if(this.getFilters() != null){
             this.getFilters().forEach(filter->{
-            	 InputElement filterElement = new InputElement();
-            	 filterElement.setName(filter.getFilterName(filter,
+                 InputElement filterElement = new InputElement();
+                 filterElement.setName(filter.getFilterName(filter,
                          getFilters().indexOf(filter), this.getName()));
-            	 filterElement.addOption(ElementOption.CreateElementOption(Element.LABEL,
-            	         new FieldInstance(null,filter.getColumn())));
-            	 filterElement.setType(InputElement.TYPE_FIELD);
+                 filterElement.addOption(ElementOption.CreateElementOption(Element.LABEL,
+                         new FieldInstance(null,filter.getColumn())));
+                 filterElement.setType(InputElement.TYPE_FIELD);
                  inputs.add(filterElement);
             });
         }
