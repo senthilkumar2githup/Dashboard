@@ -156,6 +156,8 @@ function visualizeDDLChart(data) {
 							graphDashboard.target(target)
 							.layout(layout).renderDashboards();
 						}
+						
+						console.log(dashboardViz.graph._data);
 		                dashboardViz.graph._data
 		                	.vertices
 		                	.forEach(function(multiChartSurface) {
@@ -170,6 +172,7 @@ function visualizeDDLChart(data) {
 		                				var wid = document.getElementById(this._id).parentNode.id;
 		                                if (confirm("Are you sure want to delete the widget?") == true) {
 		                                     document.getElementById(wid).style.display = 'none';
+		                                     clearChart(multiChartSurface['_content']['_chart']['_id']);
 		                                     zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onDeleteChart', payload, {toServer:true}));
 		                                } 
 		                				
@@ -203,7 +206,7 @@ function injectPreviewChart(flowType) {
 	                .size({ width: 210, height: 210 })
 	                .content(new ChoroplethStates().data(previewData.data.data));					
 					
-				}else{
+				}else{					
 					var newGraph=new MultiChartSurface()
 					.columns(previewData.data.columns)
                     .data(previewData.data.data)
@@ -214,11 +217,15 @@ function injectPreviewChart(flowType) {
 				}
 				for(var d in oldData.vertices){						
 					if(oldData.vertices[d]['_title'] == previewData.title){
-						//document.getElementById(oldData.vertices[d]['_id']).style.display = 'none';
+						document.getElementById(oldData.vertices[d]['_id']).style.display = 'none';
                         document.getElementById(oldData.vertices[d]['_content']['_id']).style.display = 'none';
+						//console.log(oldData.vertices[d]['_parentWidget']['_id']);
+						//clearChart(oldData.vertices[d]['_parentWidget']['_id']);
+						clearChart(oldData.vertices[d]['_content']['_chart']['_id']);
 						oldData.vertices[d]=newGraph;													
 					}						
 				}				
+				
 			}else{			
 				if (previewData.type == "CHORO") {				
 						  oldData.vertices.push(  new MultiChartSurface()
@@ -242,7 +249,7 @@ function injectPreviewChart(flowType) {
 			
 			console.log(oldData);
 			
-			dashboardViz.graph
+			 dashboardViz.graph
 			 ._data
         	.vertices
         	.forEach(function(multiChartSurface) {
@@ -262,7 +269,8 @@ function injectPreviewChart(flowType) {
                         if (confirm("Are you sure want to delete the widget?") == true) {
                         	 console.log(multiChartSurface);
                              document.getElementById(multiChartSurface['_id']).style.display = 'none';                            
-                             document.getElementById(multiChartSurface['_content']['_chart']['_id']).style.display = 'none';                        	
+                             document.getElementById(multiChartSurface['_content']['_chart']['_id']).style.display = 'none'; 
+                             clearChart(multiChartSurface['_content']['_chart']['_id']);
                              zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onDeleteChart', payload, {toServer:true}));
                         } 
         				
@@ -270,7 +278,7 @@ function injectPreviewChart(flowType) {
         		}
         	});
 			
-			 dashboardViz.graph
+			dashboardViz.graph
          	.data(oldData)         	
          	.render();
 			 
