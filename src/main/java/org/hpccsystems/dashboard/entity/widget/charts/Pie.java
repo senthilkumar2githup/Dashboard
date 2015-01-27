@@ -3,7 +3,6 @@ package org.hpccsystems.dashboard.entity.widget.charts;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -136,6 +135,7 @@ public class Pie extends Widget {
                 new FieldInstance((!AGGREGATION.NONE.equals(getWeight().getAggregation()) ) ? getWeight()
                         .getAggregation().toString() : null,getPluginMeasure())));
         
+               
     }
 
     @Override

@@ -1,12 +1,14 @@
 package org.hpccsystems.dashboard.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.hpcc.HIPIE.Contract;
 import org.hpcc.HIPIE.ContractInstance;
 import org.hpcc.HIPIE.dude.Element;
@@ -21,7 +23,10 @@ import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
 import org.hpccsystems.dashboard.entity.widget.ChartConfiguration;
 import org.hpccsystems.dashboard.entity.widget.Field;
+import org.hpccsystems.dashboard.entity.widget.Filter;
 import org.hpccsystems.dashboard.entity.widget.Measure;
+import org.hpccsystems.dashboard.entity.widget.NumericFilter;
+import org.hpccsystems.dashboard.entity.widget.StringFilter;
 import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.hpccsystems.dashboard.entity.widget.charts.Pie;
 import org.hpccsystems.dashboard.entity.widget.charts.Table;
@@ -33,6 +38,7 @@ import org.slf4j.LoggerFactory;
 public class HipieUtil {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(HipieUtil.class);
+    private static final String AND = "AND";
     
     public static Widget getVisualElementWidget(ContractInstance contractInstance,String chartName,Dashboard dashboard) throws Exception{
        
@@ -92,12 +98,40 @@ public class HipieUtil {
        LOGGER.debug("file --->"+hookedRawdataset.getProperty("LogicalFilename").substring(1));
        LOGGER.debug("Title -->"+visualElement.getOption(VisualElement.TITLE).getParams().get(0).getName());
        LOGGER.debug("Ri -->"+visualElement.getBasisQualifier().toString());
-       LOGGER.debug("filter -->"+visualElement.getBasisQualifier().getFieldList());
-       
+       LOGGER.debug("filter -->"+visualElement.getBasisFilter());
+       //List<Filter> filters = getFilters(visualElement) ;
       
        LOGGER.debug("widget -->"+widget);
        
        return widget;
+    }
+
+
+
+    private static List<Filter> getFilters(VisualElement visualElement) {
+        String hipieFilter = visualElement.getBasisFilter();
+        List<String> filterStr = Arrays.asList(StringUtils.splitByWholeSeparator(hipieFilter, AND));
+        
+        Pattern minPattern = Pattern.compile("%*%*<=*");
+        Pattern maxPattern = Pattern.compile("%*%*>=*");
+        Pattern strPattern = Pattern.compile("%*%*IN*[*]");
+       
+        filterStr.stream().forEach(filterLabel->{
+            Filter filter = null;
+            LOGGER.debug("filterLabel -->{}",filterLabel);
+            if(filterLabel.contains("<=")/*minPattern.matcher(filterLabel).matches()*/){
+                LOGGER.debug("min-->");
+                filter = new NumericFilter();
+            }else if(filterLabel.contains(">=")/*maxPattern.matcher(filterLabel).matches()*/){
+                LOGGER.debug("Max-->");
+                
+            }else if(filterLabel.contains("IN") && filterLabel.contains("[") && filterLabel.contains("]")/*strPattern.matcher(filterLabel).matches()*/){
+                LOGGER.debug("str-->");
+                filter = new StringFilter();
+                
+            }
+        });
+        return null;
     }
 
 
@@ -325,14 +359,6 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         
         String input = visualElement.getBasis().getBase();
         Element inputElement =  contract.getInputElements().stream().filter(element -> input.equals(element.getName())).findFirst().get();
-        
-       
-        /*Predicate<Element> labelPredicate = (element) -> element.getName().equals(labelFieldInstance.getName()); 
-        Predicate<Element> weightPredicate = (element) -> element.getName().equals(weightFieldInstance.getName());
-        
-        List<Element> fieldsToRemove = new ArrayList<Element>(
-        inputElement.getChildElements().stream().filter(labelPredicate.or(weightPredicate))
-        .collect(Collectors.toList())); */ 
         
         //Removing input fields
         List<Element> fieldsToRemove = new ArrayList<Element>(
