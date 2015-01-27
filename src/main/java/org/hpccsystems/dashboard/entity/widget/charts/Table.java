@@ -123,7 +123,7 @@ public class Table extends Widget{
         VisualElement visualElement = new VisualElement();
         // TODO:Need to set chart type using Hipie's 'Element' class
         visualElement.setType(this.getChartConfiguration().getType());
-        visualElement.addCustomOption(new ElementOption("_chartType",
+        visualElement.addCustomOption(ElementOption.CreateElementOption("_chartType",
                 new FieldInstance(null, this.getChartConfiguration()
                         .getHipieChartName())));
         visualElement.setName(DashboardUtil.removeSpaceSplChar(this.getName()));
@@ -131,7 +131,7 @@ public class Table extends Widget{
         generateVisualOption(visualElement);
         
         // Setting Title for chart
-        visualElement.addOption(new ElementOption(VisualElement.TITLE,
+        visualElement.addOption(ElementOption.CreateElementOption(VisualElement.TITLE,
                 new FieldInstance(null, this.getTitle())));
         
         return visualElement;
@@ -143,7 +143,7 @@ public class Table extends Widget{
 		  tableColumns.forEach(column -> {
 		  InputElement columnInput = new InputElement();
 		  columnInput.setName(createInputName(column));
-		  columnInput.addOption(new ElementOption(Element.LABEL,new FieldInstance(null,column.getColumn())));
+		  columnInput.addOption(ElementOption.CreateElementOption(Element.LABEL,new FieldInstance(null,column.getColumn())));
 		  columnInput.setType(InputElement.TYPE_FIELD);
 		  inputs.add(columnInput);
 		});
@@ -238,8 +238,8 @@ public class Table extends Widget{
             }
         });
         
-        visualElement.addOption(new ElementOption(VisualElement.LABEL, labellist.toArray(labelArray)));
-        visualElement.addOption(new ElementOption(VisualElement.VALUE, valueList.toArray(valueArray)));
+        visualElement.addOption(ElementOption.CreateElementOption(VisualElement.LABEL, labellist.toArray(labelArray)));
+        visualElement.addOption(ElementOption.CreateElementOption(VisualElement.VALUE, valueList.toArray(valueArray)));
         
     }
 }

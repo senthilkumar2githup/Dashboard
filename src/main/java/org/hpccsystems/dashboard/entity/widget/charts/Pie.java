@@ -99,7 +99,7 @@ public class Pie extends Widget {
         VisualElement visualElement = new VisualElement();
         // TODO:Need to set chart type using Hipie's 'Element' class
         visualElement.setType(this.getChartConfiguration().getType());
-        visualElement.addCustomOption(new ElementOption("_chartType",
+        visualElement.addCustomOption(ElementOption.CreateElementOption("_chartType",
                 new FieldInstance(null, this.getChartConfiguration()
                         .getHipieChartName())));
         visualElement.setName(DashboardUtil.removeSpaceSplChar(this.getName()));
@@ -107,7 +107,7 @@ public class Pie extends Widget {
         generateVisualOption(visualElement);
 
         // Setting Tittle for chart
-        visualElement.addOption(new ElementOption(VisualElement.TITLE,
+        visualElement.addOption(ElementOption.CreateElementOption(VisualElement.TITLE,
                 new FieldInstance(null, this.getTitle())));
         return visualElement;
         
@@ -124,14 +124,14 @@ public class Pie extends Widget {
         
         // Attribute settings       
         ri.add(new FieldInstance(null, getPluginAttribute()));
-        visualElement.addOption(new ElementOption(VisualElement.LABEL,
+        visualElement.addOption(ElementOption.CreateElementOption(VisualElement.LABEL,
                 new FieldInstance(null, getPluginAttribute())));
 
         // Measures settings
         ri.add(new FieldInstance((!AGGREGATION.NONE.equals(getWeight().getAggregation())) ? getWeight()
                 .getAggregation().toString() : null, getPluginMeasure()));
 
-        visualElement.addOption(new ElementOption(VisualElement.WEIGHT,
+        visualElement.addOption(ElementOption.CreateElementOption(VisualElement.WEIGHT,
                 new FieldInstance((!AGGREGATION.NONE.equals(getWeight().getAggregation()) ) ? getWeight()
                         .getAggregation().toString() : null,getPluginMeasure())));
         
@@ -163,14 +163,14 @@ public class Pie extends Widget {
 
         InputElement attributeInput = new InputElement();
         attributeInput.setName(getPluginAttribute());
-        attributeInput.addOption(new ElementOption(Element.LABEL,
+        attributeInput.addOption(ElementOption.CreateElementOption(Element.LABEL,
                 new FieldInstance(null,getLabel().getColumn())));
         attributeInput.setType(InputElement.TYPE_FIELD);
         inputs.add(attributeInput);
 
         InputElement measureInput = new InputElement();
         measureInput.setName(getPluginMeasure());
-        measureInput.addOption(new ElementOption(Element.LABEL,
+        measureInput.addOption(ElementOption.CreateElementOption(Element.LABEL,
                 new FieldInstance(null,getWeight().getColumn())));
         measureInput.setType(InputElement.TYPE_FIELD);
         inputs.add(measureInput);
@@ -181,7 +181,8 @@ public class Pie extends Widget {
             	 InputElement filterElement = new InputElement();
             	 filterElement.setName(filter.getFilterName(filter,
                          getFilters().indexOf(filter), this.getName()));
-            	 filterElement.addOption(new ElementOption(Element.LABEL,new FieldInstance(null,filter.getColumn())));
+            	 filterElement.addOption(ElementOption.CreateElementOption(Element.LABEL,
+            	         new FieldInstance(null,filter.getColumn())));
             	 filterElement.setType(InputElement.TYPE_FIELD);
                  inputs.add(filterElement);
             });

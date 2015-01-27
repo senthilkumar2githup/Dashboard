@@ -105,7 +105,7 @@ public class USMap extends Widget{
         generateVisualOption(visualElement);
         
         // Setting Tittle for chart
-        visualElement.addOption(new ElementOption(VisualElement.TITLE,
+        visualElement.addOption(ElementOption.CreateElementOption(VisualElement.TITLE,
                 new FieldInstance(null, this.getTitle())));
         
         return visualElement;
@@ -127,14 +127,14 @@ public class USMap extends Widget{
 
         InputElement attributeInput = new InputElement();
         attributeInput.setName(getPluginAttribute());
-        attributeInput.addOption(new ElementOption(Element.LABEL,
+        attributeInput.addOption(ElementOption.CreateElementOption(Element.LABEL,
                 new FieldInstance(null, getState().getColumn())));
         attributeInput.setType(InputElement.TYPE_FIELD);
         inputs.add(attributeInput);
 
         InputElement measureInput = new InputElement();
         measureInput.setName(getPluginMeasure());
-        measureInput.addOption(new ElementOption(Element.LABEL,
+        measureInput.addOption(ElementOption.CreateElementOption(Element.LABEL,
                 new FieldInstance(null, getMeasure().getColumn())));
         measureInput.setType(InputElement.TYPE_FIELD);
         inputs.add(measureInput);
@@ -198,19 +198,19 @@ public class USMap extends Widget{
         
         // Attribute settings
         ri.add(new FieldInstance(null,getPluginAttribute()));
-        visualElement.addOption(new ElementOption(VisualElement.STATE,
+        visualElement.addOption(ElementOption.CreateElementOption(VisualElement.STATE,
                 new FieldInstance(null, getPluginAttribute())));
 
         // Measures settings
         ri.add(new FieldInstance((!AGGREGATION.NONE.equals(getMeasure().getAggregation())) ? getMeasure()
                 .getAggregation().toString() : null, getPluginMeasure()));
 
-        visualElement.addOption(new ElementOption(VisualElement.WEIGHT,
+        visualElement.addOption(ElementOption.CreateElementOption(VisualElement.WEIGHT,
                 new FieldInstance((!AGGREGATION.NONE.equals(getMeasure().getAggregation()) ) ? getMeasure()
                         .getAggregation().toString() : null,getPluginMeasure())));
 
       //Setting color
-        visualElement.addOption(new ElementOption(VisualElement.COLOR,
+        visualElement.addOption(ElementOption.CreateElementOption(VisualElement.COLOR,
                 new FieldInstance(null, new String("Red_Yellow_Blue"))));
             
     }

@@ -129,7 +129,7 @@ public class XYChart extends Widget{
         VisualElement visualElement = new VisualElement();
         
         visualElement.setType(this.getChartConfiguration().getType());
-        visualElement.addCustomOption(new ElementOption("_charttype",
+        visualElement.addCustomOption(ElementOption.CreateElementOption("_charttype",
                 new FieldInstance(null, this.getChartConfiguration()
                         .getHipieChartName())));
 
@@ -138,7 +138,7 @@ public class XYChart extends Widget{
         generateVisualOption(visualElement);
         
         // Setting Tittle for chart
-        visualElement.addOption(new ElementOption(VisualElement.TITLE,
+        visualElement.addOption(ElementOption.CreateElementOption(VisualElement.TITLE,
                 new FieldInstance(null, this.getTitle())));
 
         return visualElement;
@@ -162,7 +162,7 @@ public class XYChart extends Widget{
         
         InputElement attributeInput = new InputElement();
         attributeInput.setName(getPluginAttribute());
-        attributeInput.addOption(new ElementOption(Element.LABEL,
+        attributeInput.addOption(ElementOption.CreateElementOption(Element.LABEL,
                 new FieldInstance(null, getAttribute().getColumn())));
         attributeInput.setType(InputElement.TYPE_FIELD);
         inputs.add(attributeInput);
@@ -170,7 +170,7 @@ public class XYChart extends Widget{
         getMeasures().listIterator().forEachRemaining(measure -> {
                 InputElement measureInput = new InputElement();
                 measureInput.setName(getPluginMeasure(measure));
-                measureInput.addOption(new ElementOption(Element.LABEL,
+                measureInput.addOption(ElementOption.CreateElementOption(Element.LABEL,
                         new FieldInstance(null, measure.getColumn())));
                 measureInput.setType(InputElement.TYPE_FIELD);
                 inputs.add(measureInput);
@@ -250,21 +250,21 @@ public class XYChart extends Widget{
                 
              // TODO:Need to check how behaves for multiple measures
                 if(ChartTypes.LINE.getChartCode().equals(this.getChartConfiguration().getType())){
-                    visualElement.addOption(new ElementOption(VisualElement.Y,
+                    visualElement.addOption(ElementOption.CreateElementOption(VisualElement.Y,
                             new FieldInstance((!AGGREGATION.NONE.equals(measure.getAggregation()) ) ? measure
                                     .getAggregation().toString() : null,meaureLabel.toString() )));
                 }else{
-                    visualElement.addOption(new ElementOption(VisualElement.WEIGHT,
+                    visualElement.addOption(ElementOption.CreateElementOption(VisualElement.WEIGHT,
                             new FieldInstance((!AGGREGATION.NONE.equals(measure.getAggregation()) ) ? measure
                                     .getAggregation().toString() : null,meaureLabel.toString() )));
                 }
             });
         
         if(ChartTypes.LINE.getChartCode().equals(this.getChartConfiguration().getType())){
-            visualElement.addOption(new ElementOption(VisualElement.X,
+            visualElement.addOption(ElementOption.CreateElementOption(VisualElement.X,
                     new FieldInstance(null, getPluginAttribute())));
          }else{
-            visualElement.addOption(new ElementOption(VisualElement.LABEL,
+            visualElement.addOption(ElementOption.CreateElementOption(VisualElement.LABEL,
                     new FieldInstance(null, getPluginAttribute())));
         }
 
