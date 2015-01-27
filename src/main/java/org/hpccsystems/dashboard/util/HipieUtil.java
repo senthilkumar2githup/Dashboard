@@ -259,7 +259,7 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         attributeField.setDataType("string");
 
         Attribute attribute = new Attribute(attributeField);
-        attribute.setDisplayName(fieldInstance.getFieldLabel());
+        attribute.setDisplayName(contractInstance.getProperty(fieldInstance.getName()));
 
         return attribute;
     }
@@ -286,7 +286,7 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
             measure.setAggregation(AGGREGATION.NONE);
         }
 
-        measure.setDisplayName(fieldInstance.getFieldLabel());
+        measure.setDisplayName(contractInstance.getProperty(fieldInstance.getName()));
 
         return measure;
     }
