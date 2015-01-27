@@ -1,13 +1,11 @@
 package org.hpccsystems.dashboard.service.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.hpcc.HIPIE.Composition;
 import org.hpcc.HIPIE.CompositionInstance;
 import org.hpcc.HIPIE.Contract;
@@ -15,16 +13,13 @@ import org.hpcc.HIPIE.ContractInstance;
 import org.hpcc.HIPIE.HIPIEService;
 import org.hpcc.HIPIE.dude.Element;
 import org.hpcc.HIPIE.dude.ElementOption;
-import org.hpcc.HIPIE.dude.FieldInstance;
 import org.hpcc.HIPIE.dude.InputElement;
 import org.hpcc.HIPIE.dude.OutputElement;
 import org.hpcc.HIPIE.dude.RecordInstance;
 import org.hpcc.HIPIE.dude.VisualElement;
 import org.hpcc.HIPIE.utils.HPCCConnection;
-import org.hpccsystems.dashboard.ChartTypes;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.Dashboard;
-import org.hpccsystems.dashboard.entity.widget.ChartConfiguration;
 import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.hpccsystems.dashboard.manage.Interactivity;
 import org.hpccsystems.dashboard.manage.LiveWidget;
