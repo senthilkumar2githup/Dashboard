@@ -166,10 +166,6 @@ public  class WSSQLServiceImpl implements WSSQLService{
              queryTxt.append(" from ");
              queryTxt.append(fileName);
 
-             if (filters != null && !filters.isEmpty()) {            	 
-                queryTxt.append(constructWhereClause(filters ,fileName));
-             }
-
              queryTxt.append(" group by ");
              queryTxt.append(fileName);
              queryTxt.append(".");
@@ -236,13 +232,7 @@ public  class WSSQLServiceImpl implements WSSQLService{
                     .append(".")
                     .append(field.getColumn())
                     .append(") from ");
-
-            if (!filters.isEmpty()) {
-                queryTxt.append(fileName);
-                queryTxt.append(constructWhereClause(filters, fileName));
-            } else {
-                queryTxt.append(fileName);
-            }
+            queryTxt.append(fileName);
 
             final String resultString = executeSQL(connection, queryTxt.toString(),wssqlPort);
 
@@ -291,6 +281,7 @@ public  class WSSQLServiceImpl implements WSSQLService{
             LOGGER.error(Constants.EXCEPTION, ex);
             throw new HpccConnectionException();
         }
+        LOGGER.debug("resultMap -->{}",resultMap);
         return resultMap;
     }
 

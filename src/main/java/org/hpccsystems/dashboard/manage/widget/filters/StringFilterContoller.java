@@ -62,6 +62,11 @@ public class StringFilterContoller extends SelectorComposer<Component> {
         ListModelList<String> values =  new ListModelList<String>(valueList);
         values.setMultiple(true);
         filterListBox.setModel(values);
+        
+        //To select the applied values
+        if(filter.getValues() != null){
+            values.setSelection(filter.getValues());
+        }
      
     }
 

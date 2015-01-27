@@ -71,9 +71,9 @@ public class StringFilter extends Filter {
         while (valueIterator.hasNext()) {
             sql.append("'").append(valueIterator.next());
             if (valueIterator.hasNext()) {
-                sql.append("', ");
+                sql.append("',");
             } else {
-                sql.append("' ");
+                sql.append("'");
             }
         }
         sql.append("]");

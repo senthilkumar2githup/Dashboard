@@ -50,6 +50,7 @@ public class HipieUtil {
     private static final String QUOTE = "'";
     private static final String COMMA =",";
     private static final String SPACE = " ";
+    private static final String LOGICAL_FILE_NAME = "LogicalFilename";
     
     public static Widget getVisualElementWidget(ContractInstance contractInstance,String chartName,Dashboard dashboard) throws Exception{
        
@@ -104,63 +105,58 @@ public class HipieUtil {
                 .getParams().get(0).getName());
        //getting used logical file
        ContractInstance hookedRawdataset = contractInstance.getPrecursors().get(visualElement.getBasis().getBase());
-       widget.setLogicalFile(hookedRawdataset.getProperty("LogicalFilename").substring(1));
+       widget.setLogicalFile(hookedRawdataset.getProperty(LOGICAL_FILE_NAME).substring(1));
        
-       LOGGER.debug("file --->"+hookedRawdataset.getProperty("LogicalFilename").substring(1));
+       LOGGER.debug("file --->"+hookedRawdataset.getProperty(LOGICAL_FILE_NAME).substring(1));
        LOGGER.debug("Title -->"+visualElement.getOption(VisualElement.TITLE).getParams().get(0).getName());
        LOGGER.debug("Ri -->"+visualElement.getBasisQualifier().toString());
        LOGGER.debug("filter -->"+visualElement.getBasisFilter());
-       //List<Filter> filters = getFilters(visualElement) ;
+       //Recreating filters with applied values
+       widget.setFilters(getFilters(contractInstance,visualElement)) ;
       
        LOGGER.debug("widget -->"+widget);
        
        return widget;
     }
 
-
-
-    private static List<Filter> getFilters(VisualElement visualElement) {
+    private static List<Filter> getFilters(ContractInstance contractInstance, VisualElement visualElement) {
+        
         String hipieFilter = visualElement.getBasisFilter();
         List<String> filterStr = Arrays.asList(StringUtils.splitByWholeSeparator(hipieFilter, AND));
         List<Filter> filters = new ArrayList<Filter>();
         
-       
-        filterStr.stream().forEach(filterLabel->{
-            Filter filter = null;
-            LOGGER.debug("filterLabel -->{}",filterLabel);
-            if(filterLabel.contains(LESS_THAN)){
-                LOGGER.debug("Max-->");
-                String[] strArray = StringUtils.splitByWholeSeparator(filterLabel, SPACE);
-                BigDecimal maxValue = new BigDecimal(strArray[strArray.length-1].trim());
-                filter = new NumericFilter();
-                String columnName = strArray[0];
-                columnName = StringUtils.removeStart(columnName, PERCENATGE);
-                columnName = StringUtils.removeEnd(columnName, PERCENATGE);
-                filter.setColumn(columnName);
-                filter.setDataType(UNSIGNED);
-                filter.setColumn(strArray[0]);
-                ((NumericFilter)filter).setMaxValue(maxValue);
-                
-            }else if(filterLabel.contains(GREATER_THAN)){
-                LOGGER.debug("Min-->");
-                String[] strArray = StringUtils.splitByWholeSeparator(filterLabel, SPACE);
-                BigDecimal minValue = new BigDecimal(strArray[strArray.length-1].trim());
-                ((NumericFilter)filter).setMinValue(minValue);
-                filters.add(filter);
-            }else if(filterLabel.contains(IN) && filterLabel.contains(SQUARE_OPEN) && filterLabel.contains(SQUARE_CLOSE)){
-                LOGGER.debug("str-->");
-                filter = new StringFilter();
-                String[] strArray = StringUtils.splitByWholeSeparator(filterLabel, " ");
-                String columnName = strArray[0];
-                columnName = StringUtils.removeStart(columnName, PERCENATGE);
-                columnName = StringUtils.removeEnd(columnName,PERCENATGE);
-                filter.setColumn(columnName);
-                filter.setDataType(STRING);
-                ((StringFilter)filter).setValues(getStrFilterValues(strArray[strArray.length-1].trim(),filter));
-                filters.add(filter);
+        Filter filter = null;
+            for(String filterLabel :filterStr ){
+                if(filterLabel.contains(LESS_THAN)){
+                    String[] strArray = filterLabel.split(SPACE);
+                    BigDecimal maxValue = new BigDecimal(strArray[strArray.length-1].trim());
+                    filter = new NumericFilter();
+                    String columnName = strArray[0].trim();
+                    columnName = StringUtils.removeStart(columnName, PERCENATGE);
+                    columnName = StringUtils.removeEnd(columnName, PERCENATGE);
+                    filter.setColumn(contractInstance.getProperty(columnName));
+                    filter.setDataType(UNSIGNED);
+                    ((NumericFilter)filter).setMaxValue(maxValue);
+                    
+                }else if(filterLabel.contains(GREATER_THAN)){
+                    String[] strArray = filterLabel.split(SPACE);
+                    BigDecimal minValue = new BigDecimal(strArray[strArray.length-1].trim());
+                    ((NumericFilter)filter).setMinValue(minValue);
+                    filters.add(filter);
+                }else if(filterLabel.contains(IN) && filterLabel.contains(SQUARE_OPEN) && filterLabel.contains(SQUARE_CLOSE)){
+                    filter = new StringFilter();
+                    String[] strArray = filterLabel.trim().split(SPACE);
+                    
+                    String columnName = strArray[0].trim();
+                    columnName = StringUtils.removeStart(columnName, PERCENATGE);
+                    columnName = StringUtils.removeEnd(columnName,PERCENATGE);
+                    filter.setColumn(contractInstance.getProperty(columnName));
+                    filter.setDataType(STRING);
+                    ((StringFilter)filter).setValues(getStrFilterValues(strArray[strArray.length-1].trim(),filter));
+                    filters.add(filter);
+                }
             }
-            LOGGER.debug("filter-->{}",filter);
-        });
+            LOGGER.debug("filters-->{}",filters);
         return filters;
     }
 
@@ -171,7 +167,8 @@ public class HipieUtil {
         valueStr = StringUtils.removeStart(valueStr, SQUARE_OPEN);
         valueStr = StringUtils.removeEnd(valueStr, SQUARE_CLOSE);
         
-        List<String> valueList = Arrays.asList(StringUtils.splitByWholeSeparator(valueStr, COMMA));
+        List<String> valueList = Arrays.asList(valueStr.split(COMMA));
+        LOGGER.debug("valueList -->{}",valueList);
         valueList.stream().forEach(vlaue ->{
             vlaue = vlaue.trim();
             vlaue = StringUtils.removeStart(vlaue, QUOTE);
@@ -189,13 +186,13 @@ public class HipieUtil {
             ContractInstance contractInstance,Dashboard dashboard) throws Exception {
         String filename = contractInstance.getPrecursors()
                 .get(visualElement.getBasis().getBase())
-                .getProperty("LogicalFilename").substring(1);
+                .getProperty(LOGICAL_FILE_NAME).substring(1);
         RecordInstance recordInstance = dashboard.getHpccConnection().getDatasetFields(filename, null);
         String structure=recordInstance.toString();
         String[] filecolumns = structure.split(","), dataType = null;
         HashMap<String, String> columnMap = new HashMap<String, String>();
         for (String property : filecolumns) {
-            dataType = property.split(" ");
+            dataType = property.split(SPACE);
             columnMap.put(dataType[1], dataType[0]);
         }
         List<Field> tableColumns=new ArrayList<Field>();
@@ -208,7 +205,7 @@ public class HipieUtil {
                             tableField.setColumn(contractInstance
                                     .getProperty(fieldInstance.getName()));
                             if (fieldInstance.getType() != null) {
-                                tableField.setDataType("unsigned");
+                                tableField.setDataType(UNSIGNED);
                                 Measure measure = new Measure(tableField);
                                 measure.setAggregation(AGGREGATION
                                         .valueOf(fieldInstance.getType()));
@@ -218,14 +215,14 @@ public class HipieUtil {
                             } else {
                                 if ("STRING".equalsIgnoreCase(columnMap
                                         .get(tableField.getColumn()))) {
-                                    tableField.setDataType("string");
+                                    tableField.setDataType(STRING);
                                     Attribute attribute = new Attribute(
                                             tableField);
                                     attribute.setDisplayName(fieldInstance
                                             .getFieldLabel());
                                     tableColumns.add(attribute);
                                 } else {
-                                    tableField.setDataType("unsigned");
+                                    tableField.setDataType(UNSIGNED);
                                     Measure measure = new Measure(tableField);
                                     measure.setAggregation(AGGREGATION.NONE);
                                     measure.setDisplayName(fieldInstance
@@ -280,7 +277,7 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         //contractInstance.getProperty("Measure_piechart2")
         Field measureField = new Field();
         measureField.setColumn(contractInstance.getProperty(fieldInstance.getName()));
-        measureField.setDataType("unsigned");
+        measureField.setDataType(UNSIGNED);
         
         Measure measure = new Measure(measureField);
         if (fieldInstance.getType() != null) {
@@ -341,9 +338,8 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         VisualElement visualization = contract.getVisualElements().iterator().next();
         visualization.getChildElements().remove(visualElement);
         
-       Map<String,ElementOption> weightLableElement = getWeightLabelElementOption(visualElement);
+        List<String> labelWeightNames = getWeightLabelFilterNames(visualElement);
        
-       List<String> labelWeightNames = getLabelWeightNames(weightLableElement,visualElement);
        
      //Removing instance properties
        labelWeightNames.stream().forEach(name -> contractInstance.getProps().remove(name));
@@ -352,7 +348,7 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
        LOGGER.debug("contract -->{}",contract);
     }
 
-    public static Map<String, ElementOption> getWeightLabelElementOption(
+    public static  List<String> getWeightLabelFilterNames(
             VisualElement visualElement) {
         
         Map<String,ElementOption> weightLableElement = new HashMap<String, ElementOption>();
@@ -379,15 +375,66 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
             weight = visualElement.getOption(VisualElement.Y);
 
         }else if(ChartTypes.TABLE.getChartCode() == chartConfig.getType()){
-            //TODO:need to check table edit/delete, it will return array of labels/values
             label = visualElement.getOption(VisualElement.LABEL);
             weight = visualElement.getOption(VisualElement.VALUE);
         }
         weightLableElement.put(Constants.LABEL, label);
         weightLableElement.put(Constants.WEIGHT, weight);
         
-        return weightLableElement;
+        List<String> labelWeightNames = new ArrayList<String>();
+        
+        //getting Attribute/Measure field names
+        if(ChartTypes.TABLE.getChartCode() == chartConfig.getType()){
+            weight.getParams().stream().forEach(fieldInstance ->{
+                labelWeightNames.add(fieldInstance.getName());
+            });
+        }else{
+            FieldInstance labelFieldInstance = label.getParams().get(0);
+            FieldInstance weightFieldInstance = weight.getParams().get(0);
+            labelWeightNames.add(labelFieldInstance.getName());
+            labelWeightNames.add(weightFieldInstance.getName());
+        }
+        //getting filter field names
+        if(visualElement.getBasisFilter() != null && !visualElement.getBasisFilter().isEmpty()){
+            labelWeightNames.addAll(getFilterNames(visualElement.getBasisFilter()));
+        }
+       
+        return labelWeightNames;
+        
     }
+
+    /**
+     * Gets the filter name from DUD file like 'Filter1_filterchart'
+     * @param hipieFilterStr
+     * @return 
+     */
+    private static List<String> getFilterNames(
+            String hipieFilterStr) {
+        List<String> filterStr = Arrays.asList(StringUtils.splitByWholeSeparator(hipieFilterStr, AND));
+        List<String> filterNames = new ArrayList<String>();
+        
+        filterStr.stream().forEach(filterLabel ->{
+            String fieldName = null;
+            if(filterLabel.contains(LESS_THAN)){
+                String[] strArray = filterLabel.split(SPACE);
+                fieldName = strArray[0].trim();
+                fieldName = StringUtils.removeStart(fieldName, PERCENATGE);
+                fieldName = StringUtils.removeEnd(fieldName, PERCENATGE);      
+                filterNames.add(fieldName);
+            }else if(filterLabel.contains(IN) && filterLabel.contains(SQUARE_OPEN) && filterLabel.contains(SQUARE_CLOSE)){
+                String[] strArray = filterLabel.trim().split(SPACE);                
+                fieldName = strArray[0].trim();
+                fieldName = StringUtils.removeStart(fieldName, PERCENATGE);
+                fieldName = StringUtils.removeEnd(fieldName,PERCENATGE);
+                filterNames.add(fieldName);
+            }
+        
+        });
+        LOGGER.debug("filterNames -->{}",filterNames);
+        return filterNames;
+    }
+
+
 
     public static void removeFieldsAndVisualElement(
             ContractInstance contractInstance, VisualElement visualElement) {
@@ -397,11 +444,10 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         VisualElement visualization = contract.getVisualElements().iterator().next();
         visualization.getChildElements().remove(visualElement);
         
-        Map<String,ElementOption> weightLableElement = getWeightLabelElementOption(visualElement);
-        List<String> labelWeightNames = getLabelWeightNames(weightLableElement, visualElement);
+        List<String> labelWeightFilterNames = getWeightLabelFilterNames(visualElement);
         
         //Removing instance properties
-        labelWeightNames.stream().forEach(name -> contractInstance.getProps().remove(name));
+        labelWeightFilterNames.stream().forEach(name -> contractInstance.getProps().remove(name));
        
         LOGGER.debug("contractInstance.getProps()---> {}", contractInstance.getProps());
         
@@ -411,7 +457,7 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         
         //Removing input fields
         List<Element> fieldsToRemove = new ArrayList<Element>(
-                inputElement.getChildElements().stream().filter(element ->labelWeightNames.contains(element.getName()))
+                inputElement.getChildElements().stream().filter(element ->labelWeightFilterNames.contains(element.getName()))
                 .collect(Collectors.toList()));  
         
         inputElement.getChildElements().removeAll(fieldsToRemove);
@@ -448,28 +494,5 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
        
     }
     
-    public static List<String> getLabelWeightNames(Map<String, ElementOption> weightLableElement,
-            VisualElement visualElement) {
-        
-        List<String> labelWeightNames = new ArrayList<String>();
-        
-        ElementOption label = weightLableElement.get(Constants.LABEL);
-        ElementOption weight = weightLableElement.get(Constants.WEIGHT);
-        
-        Map<String, ChartConfiguration> chartTypes = Constants.CHART_CONFIGURATIONS;
-        ChartConfiguration chartConfig = chartTypes.get(visualElement.getType());
-        
-        if(ChartTypes.TABLE.getChartCode() == chartConfig.getType()){
-            weight.getParams().stream().forEach(fieldInstance ->{
-                labelWeightNames.add(fieldInstance.getName());
-            });
-        }else{
-            FieldInstance labelFieldInstance = label.getParams().get(0);
-            FieldInstance weightFieldInstance = weight.getParams().get(0);
-            labelWeightNames.add(labelFieldInstance.getName());
-            labelWeightNames.add(weightFieldInstance.getName());
-        }
-        return labelWeightNames;
-    }
-
+   
 }

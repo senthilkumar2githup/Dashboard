@@ -333,9 +333,9 @@ public class CompositionServiceImpl implements CompositionService{
             LOGGER.debug("composition last updated date -->{}", new Date(composition.getLastModified()));
             
             if (latestInstance == null
-                    || latestInstance.getDate(latestInstance
+                   /* || latestInstance.getDate(latestInstance
                                     .getWorkunitId()).before(
-                            new Date(composition.getLastModified()))) {
+                            new Date(composition.getLastModified()))*/) {
                 latestInstance = runComposition(dashboard, user);
             } 
             
@@ -363,17 +363,16 @@ public class CompositionServiceImpl implements CompositionService{
         String inputName = visualElement.getBasis().getBase();
         Element visualInput =  contract.getInputElements().stream().filter(element -> inputName.equals(element.getName())).findFirst().get();
         
-        Map<String,ElementOption> weightLableElement = HipieUtil.getWeightLabelElementOption(visualElement);
+        List<String> labelWeighFiltertNames = HipieUtil.getWeightLabelFilterNames(visualElement);
         
-        List<String> labelWeightNames = HipieUtil.getLabelWeightNames(weightLableElement,visualElement);
         
-        widget.removeInput((InputElement)visualInput,labelWeightNames);
+        widget.removeInput((InputElement)visualInput,labelWeighFiltertNames);
         
         //Removing previous weight and label
         HipieUtil.removeWeightAndLabel(visualElement);
                
         //Removing instance properties
-        widget.removeInstanceProperty(contractInstance.getProps(),labelWeightNames);
+        widget.removeInstanceProperty(contractInstance.getProps(),labelWeighFiltertNames);
         
         //Adding present input
         Element input=contract.getInputElements().iterator().next();
