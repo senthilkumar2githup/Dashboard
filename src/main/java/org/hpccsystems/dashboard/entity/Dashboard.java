@@ -2,6 +2,8 @@ package org.hpccsystems.dashboard.entity;
 
 import org.apache.commons.lang.StringUtils;
 import org.hpcc.HIPIE.Composition;
+import org.hpcc.HIPIE.Contract;
+import org.hpcc.HIPIE.ContractInstance;
 import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.hpccsystems.dashboard.service.CompositionService;

@@ -112,9 +112,12 @@ public class HipieUtil {
        LOGGER.debug("Ri -->"+visualElement.getBasisQualifier().toString());
        LOGGER.debug("filter -->"+visualElement.getBasisFilter());
        //Recreating filters with applied values
+       //getting filters
        if(visualElement.getBasisFilter() != null && !visualElement.getBasisFilter().isEmpty()){
            widget.setFilters(getFilters(contractInstance,visualElement)) ;
        }
+      
+      
        LOGGER.debug("widget -->"+widget);
        
        return widget;
@@ -267,7 +270,7 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
 
     private static Measure createMeasre(ElementOption option,
             ContractInstance contractInstance) {
-
+        //TODO:Need to change for multiple measures
         FieldInstance fieldInstance = option.getParams().get(0);
 
         LOGGER.debug("field -->" + fieldInstance.getCanonicalName());

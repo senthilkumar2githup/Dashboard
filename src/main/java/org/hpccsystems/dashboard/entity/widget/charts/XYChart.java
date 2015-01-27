@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+
 import org.hpcc.HIPIE.dude.Element;
 import org.hpcc.HIPIE.dude.ElementOption;
 import org.hpcc.HIPIE.dude.FieldInstance;
@@ -128,9 +130,16 @@ public class XYChart extends Widget{
         VisualElement visualElement = new VisualElement();
         
         visualElement.setType(this.getChartConfiguration().getType());
-        visualElement.addCustomOption(ElementOption.CreateElementOption(Constants.HIPIE._CHARTTYPE,
-                new FieldInstance(null, this.getChartConfiguration()
-                        .getHipieChartName())));
+        if(!ChartTypes.COLUMN.getChartCode().endsWith(this.getChartConfiguration().getType())){
+            visualElement.addCustomOption(ElementOption.CreateElementOption("_charttype",
+                    new FieldInstance(null, this.getChartConfiguration()
+                            .getHipieChartName())));
+        }else{
+            visualElement.addCustomOption(ElementOption.CreateElementOption("_chartType",
+                    new FieldInstance(null, this.getChartConfiguration()
+                            .getHipieChartName())));
+        }
+        
 
         visualElement.setName(DashboardUtil.removeSpaceSplChar(this.getName()));
 
@@ -238,35 +247,58 @@ public class XYChart extends Widget{
        
         // Attribute settings
         ri.add(new FieldInstance(null, getPluginAttribute()));
-
-        // Measures settings
-        getMeasures().listIterator().forEachRemaining(measure -> { 
-            StringBuilder meaureLabel = new StringBuilder();
-                meaureLabel.append(getPluginMeasure(measure));
-                ri.add(new FieldInstance(
-                        (!AGGREGATION.NONE.equals(measure.getAggregation()) ) ? measure
-                                .getAggregation().toString() : null,getPluginMeasure(measure) ));
-                
-             // TODO:Need to check how behaves for multiple measures
-                if(ChartTypes.LINE.getChartCode().equals(this.getChartConfiguration().getType())){
-                    visualElement.addOption(ElementOption.CreateElementOption(VisualElement.Y,
-                            new FieldInstance((!AGGREGATION.NONE.equals(measure.getAggregation()) ) ? measure
-                                    .getAggregation().toString() : null,meaureLabel.toString() )));
-                }else{
-                    visualElement.addOption(ElementOption.CreateElementOption(VisualElement.WEIGHT,
-                            new FieldInstance((!AGGREGATION.NONE.equals(measure.getAggregation()) ) ? measure
-                                    .getAggregation().toString() : null,meaureLabel.toString() )));
-                }
-            });
         
-        if(ChartTypes.LINE.getChartCode().equals(this.getChartConfiguration().getType())){
-            visualElement.addOption(ElementOption.CreateElementOption(VisualElement.X,
-                    new FieldInstance(null, getPluginAttribute())));
-         }else{
+        if(ChartTypes.LINE.getChartCode().equals(this.getChartConfiguration().getType())
+                || this.getMeasures().size() > 1){
+           
+            ListIterator<Measure> listItr =  getMeasures().listIterator();
+            Measure measure = null;
+                while(listItr.hasNext()){
+                    measure = listItr.next();
+                    StringBuilder meaureLabel = new StringBuilder();
+                    meaureLabel.append(getPluginMeasure(measure));
+                    ri.add(new FieldInstance(
+                            (!AGGREGATION.NONE.equals(measure.getAggregation()) ) ? measure
+                                    .getAggregation().toString() : null,getPluginMeasure(measure) ));
+                    
+                        if(listItr.nextIndex() > 1){
+                            // Measures settings
+                            ElementOption yElement = visualElement.getOption(VisualElement.Y);
+                            yElement.addParam(new FieldInstance((!AGGREGATION.NONE.equals(measure.getAggregation()) ) ? measure
+                                            .getAggregation().toString() : null,meaureLabel.toString() ));
+                            // Attribute settings
+                            ElementOption xElement = visualElement.getOption(VisualElement.X);
+                            xElement.addParam(new FieldInstance(null, getPluginAttribute()));
+                           
+                        }else{
+                            // Measures settings
+                            visualElement.addOption(ElementOption.CreateElementOption(VisualElement.Y,
+                                    new FieldInstance((!AGGREGATION.NONE.equals(measure.getAggregation()) ) ? measure
+                                            .getAggregation().toString() : null,meaureLabel.toString() )));
+                            // Attribute settings
+                            visualElement.addOption(ElementOption.CreateElementOption(VisualElement.X,
+                                    new FieldInstance(null, getPluginAttribute())));
+                        }
+                        
+                }
+                
+        }else{
+            Measure measure = this.getMeasures().get(0);
+            ri.add(new FieldInstance(
+                    (!AGGREGATION.NONE.equals(measure.getAggregation()) ) ? measure
+                            .getAggregation().toString() : null,getPluginMeasure(measure) ));
+            StringBuilder meaureLabel = new StringBuilder();
+            meaureLabel.append(getPluginMeasure(measure));
+            // Measures settings
+            visualElement.addOption(ElementOption.CreateElementOption(VisualElement.WEIGHT,
+                    new FieldInstance((!AGGREGATION.NONE.equals(measure.getAggregation()) ) ? measure
+                            .getAggregation().toString() : null,meaureLabel.toString() )));
+            // Attribute settings
             visualElement.addOption(ElementOption.CreateElementOption(VisualElement.LABEL,
                     new FieldInstance(null, getPluginAttribute())));
         }
-
+        
     }
+
 
 }

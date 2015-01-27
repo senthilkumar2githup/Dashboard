@@ -334,6 +334,7 @@ public class CompositionServiceImpl implements CompositionService{
         composition =  HipieSingleton.getHipie().getComposition(
                 user,
                 dashboard.getCompositionName());
+      
         if(composition != null) {
             latestInstance = composition.getMostRecentInstance(user, true);
             //Compare last updated date
@@ -356,6 +357,10 @@ public class CompositionServiceImpl implements CompositionService{
             } else {
                 latestInstance = runComposition(dashboard, user);
             }
+            if(latestInstance.getWorkunitStatus().contains("failed")) {
+                return null;
+             }
+            
         }
         
         return latestInstance.getWorkunitId();
