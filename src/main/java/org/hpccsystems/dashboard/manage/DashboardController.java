@@ -69,7 +69,7 @@ public class DashboardController extends SelectorComposer<Component> {
             editChart(json.get("chartId").toString());
         });
 		
-     // OnDeleteChart 
+        // OnDeleteChart 
         comp.addEventListener("onDeleteChart", event -> {
             JSONObject json = (JSONObject) new JSONParser().parse(event.getData().toString()); 
             LOGGER.debug("Deleting chart -->{}",json.get("chartId").toString());

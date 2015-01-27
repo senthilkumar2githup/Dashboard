@@ -91,7 +91,12 @@ public class Constants {
          }
     }
     
- // Style class names
+    //HIPIE Constants
+    public class HIPIE {
+        public static final String _CHARTTYPE = "_charttype";
+    }
+    
+    // Style class names
     public static final String STYLE_POPUP = "popup";
 
     public static final String URL = "url";

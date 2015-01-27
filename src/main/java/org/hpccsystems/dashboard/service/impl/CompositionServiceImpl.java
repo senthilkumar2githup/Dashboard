@@ -1,5 +1,9 @@
 package org.hpccsystems.dashboard.service.impl;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -332,15 +336,22 @@ public class CompositionServiceImpl implements CompositionService{
             //Compare last updated date
             LOGGER.debug("composition last updated date -->{}", new Date(composition.getLastModified()));
             
-            if (latestInstance == null
-                   /* || latestInstance.getDate(latestInstance
-                                    .getWorkunitId()).before(
-                            new Date(composition.getLastModified()))*/) {
+            if (latestInstance != null) {
+                // TODO : Get the Zone Id from HIPIE insted of hard coding '-0500'
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss").withZone(ZoneId.of("-0500"));
+                ZonedDateTime lastRun = ZonedDateTime.parse(latestInstance.getWorkunitId().substring(1), formatter);
+                
+                ZonedDateTime lastModified = ZonedDateTime.ofInstant(Instant.ofEpochMilli(composition.getLastModified()), ZoneId.systemDefault());
+                
+                if(LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Last run instance - {} date - {}, \n Modified date -{} ", latestInstance.getDate(latestInstance.getWorkunitId()).getTime(), lastRun, lastModified);
+                }
+                
+                if(lastRun.isBefore(lastModified)) {
+                    latestInstance = runComposition(dashboard, user);
+                }
+            } else {
                 latestInstance = runComposition(dashboard, user);
-            } 
-            
-            if(latestInstance.getWorkunitStatus().contains("failed")) {
-               return null;
             }
         }
         
