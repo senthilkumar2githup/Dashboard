@@ -100,9 +100,13 @@ public class WidgetConfigurationController extends SelectorComposer<Component> i
         Runnable runComposition = () -> {
             try {
                 compositionService.runComposition(configuration.getDashboard(), userId);
-                Executions.schedule(desktop, this, new Event("OnRunCompositionCompleted",null,configuration.getDashboard().getCompositionName()));
+                if(desktop.isAlive()){
+                    Executions.schedule(desktop, this, new Event("OnRunCompositionCompleted",null,configuration.getDashboard().getCompositionName()));
+                }
             } catch (Exception e) {
-                Executions.schedule(desktop, this, new Event("OnRunCompositionFailed", null, configuration.getDashboard().getCompositionName()));
+                if(desktop.isAlive()){
+                    Executions.schedule(desktop, this, new Event("OnRunCompositionFailed", null, configuration.getDashboard().getCompositionName()));
+                }
                 LOGGER.error(Constants.EXCEPTION, e);
             }
         };
