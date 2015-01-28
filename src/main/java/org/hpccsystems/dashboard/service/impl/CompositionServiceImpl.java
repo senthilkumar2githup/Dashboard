@@ -185,7 +185,12 @@ public class CompositionServiceImpl implements CompositionService{
 
     private ContractInstance cloneRawdataset(Composition composition,
             String fileName, HPCCConnection hpcc) throws Exception {
-        ContractInstance datasource1 = composition.getContractInstanceByName(HIPIE_RAW_DATASET);
+        //gets any Rawdataset which is used in the composition
+        ContractInstance contractInstance  = composition.getContractInstanceByName(composition.getName());        
+        Contract contract = contractInstance.getContract();
+        VisualElement visualElement = (VisualElement)contract.getVisualElements().iterator().next().getChildElement(0);
+        ContractInstance datasource1 = contractInstance.getPrecursors().get(visualElement.getBasis().getBase());
+        
         ContractInstance datasource2 = new ContractInstance(datasource1.getContract());
         datasource2.setFileName("");
         Map<String,String[]> paramMap = new HashMap<String, String[]>();
@@ -345,13 +350,14 @@ public class CompositionServiceImpl implements CompositionService{
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss").withZone(ZoneId.of("-0500"));
                 ZonedDateTime lastRun = ZonedDateTime.parse(latestInstance.getWorkunitId().substring(1), formatter);
                 
-                ZonedDateTime lastModified = ZonedDateTime.ofInstant(Instant.ofEpochMilli(composition.getLastModified()), ZoneId.systemDefault());
+                ZonedDateTime lastModified = ZonedDateTime.ofInstant(Instant.ofEpochMilli(composition.getLastModified()), ZoneId.of("-0500"));
                 
                 if(LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Last run instance - {} date - {}, \n Modified date -{} ", latestInstance.getDate(latestInstance.getWorkunitId()).getTime(), lastRun, lastModified);
                 }
+                LOGGER.debug("Date - compared result-->{}",lastRun.compareTo(lastModified));
                 
-                if(lastRun.isBefore(lastModified)) {
+                if(lastRun.compareTo(lastModified) < 0) {
                     latestInstance = runComposition(dashboard, user);
                 }
             } else {
@@ -447,6 +453,8 @@ public class CompositionServiceImpl implements CompositionService{
                 //Remove visual element and input Element,output element,instance properties
                 ContractInstance precursor = contractInstance.getPrecursors().get(visualElement.getBasis().getBase());
                 contractInstance.removePrecursor(precursor, visualElement.getBasis().getBase());
+                //Removing unused Rawdataset
+                composition.removeContractInstance(precursor);
                 HipieUtil.deleteInputOutputAndVisualElement(contractInstance,visualElement);
                 LOGGER.debug("precursor -->{}",precursor);
                

@@ -2,7 +2,7 @@ package org.hpccsystems.dashboard;
 
 public enum ChartTypes {
 
-    PIE("PIE"), DONUT("DONUT"), LINE("LINE"), BAR("BAR"), COLUMN("COLUMN"), US_MAP(
+    PIE("PIE"), DONUT("DONUT"), LINE("LINE"), BAR("BAR"), COLUMN("BAR"), US_MAP(
             "CHORO"), TABLE("TABLE"), STEP("STEP"), SCATTER("SCATTER"), AREA(
             "AREA");
 

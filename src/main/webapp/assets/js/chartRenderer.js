@@ -171,9 +171,9 @@ function visualizeDDLChart(data) {
 		                			} else if (option == 'Delete') {
 		                				var wid = document.getElementById(this._id).parentNode.id;
 		                                if (confirm("Are you sure want to delete the widget?") == true) {
+		                                	zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onDeleteChart', payload, {toServer:true}));
 		                                     document.getElementById(wid).style.display = 'none';
-		                                     clearChart(multiChartSurface['_content']['_chart']['_id']);
-		                                     zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onDeleteChart', payload, {toServer:true}));
+		                                     clearChart(multiChartSurface['_content']['_chart']['_id']);		                                     
 		                                } 
 		                				
 		                			}

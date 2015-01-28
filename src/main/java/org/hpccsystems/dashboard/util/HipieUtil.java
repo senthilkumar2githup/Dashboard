@@ -73,20 +73,19 @@ public class HipieUtil {
        } else if (chartConfig.getType() == ChartTypes.BAR.getChartCode()
                || chartConfig.getType() == ChartTypes.COLUMN.getChartCode() ) {
            widget = new XYChart();
-         //TODO: once the issue #21 closed iterate over the element option and prepare the measure list.
-           List<Measure> measures=new ArrayList<Measure>();
-           measures.add(createMeasres(visualElement.getOption(VisualElement.WEIGHT),contractInstance).get(0));
-           ( (XYChart) widget).setMeasure(measures);
-           
-           LOGGER.debug("visualElement --->{}",visualElement.getOptions());
-           LOGGER.debug("visualElement --->{}",visualElement.getOptionValues());
-           
-           ( (XYChart) widget).setAttribute(createAttribute(visualElement.getOption(VisualElement.LABEL),contractInstance));
+           ElementOption weight = visualElement.getOption(VisualElement.WEIGHT);
+           //Chart has single measure
+           if(weight != null){
+               ((XYChart) widget).setMeasure(createMeasres(visualElement.getOption(VisualElement.WEIGHT),contractInstance));
+               ((XYChart) widget).setAttribute(createAttribute(visualElement.getOption(VisualElement.LABEL),contractInstance));
+           }else{//Chart has multiple measures
+               ( (XYChart) widget).setMeasure(createMeasres(visualElement.getOption(VisualElement.Y),contractInstance));
+               ( (XYChart) widget).setAttribute(createAttribute(visualElement.getOption(VisualElement.X),contractInstance));
+           }
            
        } else if(ChartTypes.LINE.getChartCode() == chartConfig.getType()){
            widget = new XYChart();
            ( (XYChart) widget).setMeasure(createMeasres(visualElement.getOption(VisualElement.Y),contractInstance));
-           
            ( (XYChart) widget).setAttribute(createAttribute(visualElement.getOption(VisualElement.X),contractInstance));
            
        } else if (chartConfig.getType() == ChartTypes.US_MAP.getChartCode()) {
@@ -248,6 +247,7 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
     private static Attribute createAttribute(ElementOption option,
             ContractInstance contractInstance) {
 
+        //All the charts can have only one Attribute
         FieldInstance fieldInstance = option.getParams().get(0);
 
         LOGGER.debug("field -->" + fieldInstance.getCanonicalName());

@@ -130,16 +130,10 @@ public class XYChart extends Widget{
         VisualElement visualElement = new VisualElement();
         
         visualElement.setType(this.getChartConfiguration().getType());
-        if(!ChartTypes.COLUMN.getChartCode().endsWith(this.getChartConfiguration().getType())){
-            visualElement.addCustomOption(ElementOption.CreateElementOption("_charttype",
-                    new FieldInstance(null, this.getChartConfiguration()
-                            .getHipieChartName())));
-        }else{
-            visualElement.addCustomOption(ElementOption.CreateElementOption("_chartType",
-                    new FieldInstance(null, this.getChartConfiguration()
-                            .getHipieChartName())));
-        }
         
+        visualElement.addCustomOption(ElementOption.CreateElementOption(Constants.HIPIE._CHARTTYPE,
+                new FieldInstance(null, this.getChartConfiguration()
+                        .getHipieChartName())));
 
         visualElement.setName(DashboardUtil.removeSpaceSplChar(this.getName()));
 
