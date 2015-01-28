@@ -67,7 +67,7 @@ public class HipieUtil {
        if (chartConfig.getType() == ChartTypes.PIE.getChartCode()
                || chartConfig.getType() == ChartTypes.DONUT.getChartCode()) {
            widget = new Pie();
-           ( (Pie) widget).setWeight(createMeasre(visualElement.getOption(VisualElement.WEIGHT),contractInstance));
+           ( (Pie) widget).setWeight(createMeasres(visualElement.getOption(VisualElement.WEIGHT),contractInstance).get(0));
            ( (Pie) widget).setLabel(createAttribute(visualElement.getOption(VisualElement.LABEL),contractInstance));
            
        } else if (chartConfig.getType() == ChartTypes.BAR.getChartCode()
@@ -75,7 +75,7 @@ public class HipieUtil {
            widget = new XYChart();
          //TODO: once the issue #21 closed iterate over the element option and prepare the measure list.
            List<Measure> measures=new ArrayList<Measure>();
-           measures.add(createMeasre(visualElement.getOption(VisualElement.WEIGHT),contractInstance));
+           measures.add(createMeasres(visualElement.getOption(VisualElement.WEIGHT),contractInstance).get(0));
            ( (XYChart) widget).setMeasure(measures);
            
            LOGGER.debug("visualElement --->{}",visualElement.getOptions());
@@ -85,15 +85,13 @@ public class HipieUtil {
            
        } else if(ChartTypes.LINE.getChartCode() == chartConfig.getType()){
            widget = new XYChart();
-           List<Measure> measures=new ArrayList<Measure>();
-           measures.add(createMeasre(visualElement.getOption(VisualElement.Y),contractInstance));
-           ( (XYChart) widget).setMeasure(measures);
+           ( (XYChart) widget).setMeasure(createMeasres(visualElement.getOption(VisualElement.Y),contractInstance));
            
            ( (XYChart) widget).setAttribute(createAttribute(visualElement.getOption(VisualElement.X),contractInstance));
            
        } else if (chartConfig.getType() == ChartTypes.US_MAP.getChartCode()) {
            widget = new USMap();
-           ( (USMap) widget).setMeasure(createMeasre(visualElement.getOption(VisualElement.WEIGHT),contractInstance));
+           ( (USMap) widget).setMeasure(createMeasres(visualElement.getOption(VisualElement.WEIGHT),contractInstance).get(0));
            ( (USMap) widget).setState(createAttribute(visualElement.getOption(VisualElement.STATE),contractInstance));
        }else if (chartConfig.getType() == ChartTypes.TABLE.getChartCode()) {
            widget = new Table();
@@ -268,31 +266,34 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         return attribute;
     }
 
-    private static Measure createMeasre(ElementOption option,
+    private static List<Measure> createMeasres(ElementOption option,
             ContractInstance contractInstance) {
-        //TODO:Need to change for multiple measures
-        FieldInstance fieldInstance = option.getParams().get(0);
-
-        LOGGER.debug("field -->" + fieldInstance.getCanonicalName());
-        LOGGER.debug("field -->" + fieldInstance.getName());
-        LOGGER.debug("field -->" + fieldInstance.getType());
-
-        // getting actual column name like 'productline' from instance property as
-        //contractInstance.getProperty("Measure_piechart2")
-        Field measureField = new Field();
-        measureField.setColumn(contractInstance.getProperty(fieldInstance.getName()));
-        measureField.setDataType(UNSIGNED);
         
-        Measure measure = new Measure(measureField);
-        if (fieldInstance.getType() != null) {
-            measure.setAggregation(AGGREGATION.valueOf(fieldInstance.getType()));
-        } else {
-            measure.setAggregation(AGGREGATION.NONE);
-        }
+        //TODO:Need to validate for multiple measures
+        List<Measure> measures=new ArrayList<Measure>();
+        option.getParams().stream().forEach(fieldInstance ->{
+            LOGGER.debug("field -->" + fieldInstance.getCanonicalName());
+            LOGGER.debug("field -->" + fieldInstance.getName());
+            LOGGER.debug("field -->" + fieldInstance.getType());
 
-        measure.setDisplayName(contractInstance.getProperty(fieldInstance.getName()));
+            // getting actual column name like 'productline' from instance property as
+            //contractInstance.getProperty("Measure_piechart2")
+            Field measureField = new Field();
+            measureField.setColumn(contractInstance.getProperty(fieldInstance.getName()));
+            measureField.setDataType(UNSIGNED);
+            
+            Measure measure = new Measure(measureField);
+            if (fieldInstance.getType() != null) {
+                measure.setAggregation(AGGREGATION.valueOf(fieldInstance.getType()));
+            } else {
+                measure.setAggregation(AGGREGATION.NONE);
+            }
 
-        return measure;
+            measure.setDisplayName(contractInstance.getProperty(fieldInstance.getName()));
+            measures.add(measure);
+        });
+
+        return measures;
     }
 
     public static boolean checkOutputExists(Contract contract, String output,
@@ -355,18 +356,14 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
     public static  List<String> getWeightLabelFilterNames(
             VisualElement visualElement) {
         
-        Map<String,ElementOption> weightLableElement = new HashMap<String, ElementOption>();
-        
         ElementOption label = null;
         ElementOption weight = null;
+        List<String> labelWeightNames = new ArrayList<String>();
         
         Map<String, ChartConfiguration> chartTypes = Constants.CHART_CONFIGURATIONS;
         ChartConfiguration chartConfig = chartTypes.get(visualElement.getType());
         if (ChartTypes.PIE.getChartCode() == chartConfig.getType()
-                || ChartTypes.DONUT.getChartCode() == chartConfig.getType()
-                || ChartTypes.BAR.getChartCode() == chartConfig.getType()
-                || ChartTypes.COLUMN.getChartCode() == chartConfig.getType()) {
-
+                || ChartTypes.DONUT.getChartCode() == chartConfig.getType()) {
             label = visualElement.getOption(VisualElement.LABEL);
             weight = visualElement.getOption(VisualElement.WEIGHT);
 
@@ -381,22 +378,27 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         }else if(ChartTypes.TABLE.getChartCode() == chartConfig.getType()){
             label = visualElement.getOption(VisualElement.LABEL);
             weight = visualElement.getOption(VisualElement.VALUE);
+            
+        }else if(ChartTypes.BAR.getChartCode() == chartConfig.getType()
+                || ChartTypes.COLUMN.getChartCode() == chartConfig.getType()){
+            //chart has single measure
+            label = visualElement.getOption(VisualElement.LABEL);
+            weight = visualElement.getOption(VisualElement.WEIGHT);
+            //chart has multiple measures
+            if(weight == null){
+                label = visualElement.getOption(VisualElement.X);
+                weight = visualElement.getOption(VisualElement.Y);
+            }
         }
-        weightLableElement.put(Constants.LABEL, label);
-        weightLableElement.put(Constants.WEIGHT, weight);
-        
-        List<String> labelWeightNames = new ArrayList<String>();
         
         //getting Attribute/Measure field names
-        if(ChartTypes.TABLE.getChartCode() == chartConfig.getType()){
-            weight.getParams().stream().forEach(fieldInstance ->{
+        weight.getParams().stream().forEach(fieldInstance ->{
+            labelWeightNames.add(fieldInstance.getName());
+        });
+        if(ChartTypes.TABLE.getChartCode() != chartConfig.getType()){
+            label.getParams().stream().forEach(fieldInstance ->{
                 labelWeightNames.add(fieldInstance.getName());
             });
-        }else{
-            FieldInstance labelFieldInstance = label.getParams().get(0);
-            FieldInstance weightFieldInstance = weight.getParams().get(0);
-            labelWeightNames.add(labelFieldInstance.getName());
-            labelWeightNames.add(weightFieldInstance.getName());
         }
         //getting filter field names
         if(visualElement.getBasisFilter() != null && !visualElement.getBasisFilter().isEmpty()){
@@ -476,9 +478,7 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         ChartConfiguration chartConfig = chartTypes.get(visualElement.getType());
         
         if (ChartTypes.PIE.getChartCode() == chartConfig.getType()
-                || ChartTypes.DONUT.getChartCode() == chartConfig.getType()
-                || ChartTypes.BAR.getChartCode() == chartConfig.getType()
-                || ChartTypes.COLUMN.getChartCode() == chartConfig.getType()) {
+                || ChartTypes.DONUT.getChartCode() == chartConfig.getType()) {
 
             visualElement.getOptions().remove(VisualElement.LABEL);
             visualElement.getOptions().remove(VisualElement.WEIGHT);
@@ -494,8 +494,20 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
         }else if(ChartTypes.TABLE.getChartCode() == chartConfig.getType()){
             visualElement.getOptions().remove(VisualElement.LABEL);
             visualElement.getOptions().remove(VisualElement.VALUE);
+            
+        }else if(ChartTypes.BAR.getChartCode() == chartConfig.getType()
+                || ChartTypes.COLUMN.getChartCode() == chartConfig.getType()){
+            //chart has single measure
+            ElementOption weight = visualElement.getOption(VisualElement.WEIGHT);
+            //chart has multiple measures
+            if(weight == null){
+                visualElement.getOptions().remove(VisualElement.X);
+                visualElement.getOptions().remove(VisualElement.Y);
+            }else{ //chart has single measure
+                visualElement.getOptions().remove(VisualElement.LABEL);
+                visualElement.getOptions().remove(VisualElement.WEIGHT);
+            }
         }
-       
     }
     
    

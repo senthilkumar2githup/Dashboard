@@ -447,8 +447,8 @@ public class CompositionServiceImpl implements CompositionService{
                 //Remove visual element and input Element,output element,instance properties
                 ContractInstance precursor = contractInstance.getPrecursors().get(visualElement.getBasis().getBase());
                 contractInstance.removePrecursor(precursor, visualElement.getBasis().getBase());
-               HipieUtil.deleteInputOutputAndVisualElement(contractInstance,visualElement);
-               //LOGGER.debug("precursor -->{}",precursor);
+                HipieUtil.deleteInputOutputAndVisualElement(contractInstance,visualElement);
+                LOGGER.debug("precursor -->{}",precursor);
                
             }
             contract.setRepository(hipieService.getRepositoryManager().getDefaultRepository());
