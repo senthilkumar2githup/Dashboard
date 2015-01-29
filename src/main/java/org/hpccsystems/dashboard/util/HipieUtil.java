@@ -101,7 +101,10 @@ public class HipieUtil {
         List<String> labelWeightNames = new ArrayList<String>();
         
         Map<String, ChartConfiguration> chartTypes = Constants.CHART_CONFIGURATIONS;
-        ChartConfiguration chartConfig = chartTypes.get(visualElement.getType());
+        String _chartType = visualElement.getCustomOption(Constants.HIPIE._CHARTTYPE).getParam(0);
+        LOGGER.debug("_chartType -->{}",_chartType);
+        ChartConfiguration chartConfig = chartTypes.get(_chartType);
+        
         if (ChartTypes.PIE.getChartCode() == chartConfig.getType()
                 || ChartTypes.DONUT.getChartCode() == chartConfig.getType()) {
             label = visualElement.getOption(VisualElement.LABEL);
@@ -215,7 +218,9 @@ public class HipieUtil {
     public static void removeWeightAndLabel(VisualElement visualElement) {
         
         Map<String, ChartConfiguration> chartTypes = Constants.CHART_CONFIGURATIONS;
-        ChartConfiguration chartConfig = chartTypes.get(visualElement.getType());
+        String _chartType = visualElement.getCustomOption(Constants.HIPIE._CHARTTYPE).getParam(0);
+        LOGGER.debug("_chartType -->{}",_chartType);
+        ChartConfiguration chartConfig = chartTypes.get(_chartType);
         
         if (ChartTypes.PIE.getChartCode() == chartConfig.getType()
                 || ChartTypes.DONUT.getChartCode() == chartConfig.getType()) {

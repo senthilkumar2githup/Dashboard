@@ -153,6 +153,16 @@ public class XYChart extends Widget{
                     fieldNames.put(this.getPluginMeasure(measure),
                             measure.getColumn());
                 });
+        
+        if(this.getFilters() != null){
+            this.getFilters().forEach(filter->{
+                fieldNames.put(
+                        filter.getFilterName(filter,
+                                getFilters().indexOf(filter), this.getName()),
+                        filter.getColumn());
+             });
+            
+        }
         return fieldNames;
     }
 
@@ -175,6 +185,18 @@ public class XYChart extends Widget{
                 measureInput.setType(InputElement.TYPE_FIELD);
                 inputs.add(measureInput);
             });
+        
+        if(this.getFilters() != null){
+            this.getFilters().forEach(filter->{
+                 InputElement filterElement = new InputElement();
+                 filterElement.setName(filter.getFilterName(filter,
+                         getFilters().indexOf(filter), this.getName()));
+                 filterElement.addOption(ElementOption.CreateElementOption(Element.LABEL,
+                         new FieldInstance(null,filter.getColumn())));
+                 filterElement.setType(InputElement.TYPE_FIELD);
+                 inputs.add(filterElement);
+            });
+        }
 
         return inputs;
     }

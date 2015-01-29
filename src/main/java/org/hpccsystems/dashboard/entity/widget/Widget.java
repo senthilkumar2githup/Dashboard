@@ -291,7 +291,7 @@ public abstract class Widget {
         Filter filter = null;
             for(String filterLabel :filterStr ){
                 if(filterLabel.contains(LESS_THAN)){
-                    String[] strArray = filterLabel.split(SPACE);
+                    String[] strArray = filterLabel.trim().split(SPACE);
                     BigDecimal maxValue = new BigDecimal(strArray[strArray.length-1].trim());
                     filter = new NumericFilter();
                     String columnName = strArray[0].trim();
@@ -302,12 +302,13 @@ public abstract class Widget {
                     ((NumericFilter)filter).setMaxValue(maxValue);
                     
                 }else if(filterLabel.contains(GREATER_THAN)){
-                    String[] strArray = filterLabel.split(SPACE);
+                    String[] strArray = filterLabel.trim().split(SPACE);
                     BigDecimal minValue = new BigDecimal(strArray[strArray.length-1].trim());
                     ((NumericFilter)filter).setMinValue(minValue);
                     filters.add(filter);
                 }else if(filterLabel.contains(IN) && filterLabel.contains(SQUARE_OPEN) && filterLabel.contains(SQUARE_CLOSE)){
                     filter = new StringFilter();
+                    filterLabel = filterLabel.trim();
                     LOGGER.debug("filterLabel -->{}",filterLabel);
                     LOGGER.debug("column label -->{}", StringUtils.substringBefore(filterLabel, IN).trim());
                     LOGGER.debug("Value label -->{}", StringUtils.substringAfter(filterLabel, IN).trim());

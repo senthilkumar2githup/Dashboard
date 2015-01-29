@@ -121,6 +121,16 @@ public class USMap extends Widget{
         Map<String, String> fieldNames = new HashMap<String, String>();
         fieldNames.put(getPluginAttribute(), this.getState().getColumn());
         fieldNames.put(getPluginMeasure(), this.getMeasure().getColumn());
+        
+        if(this.getFilters() != null){
+            this.getFilters().forEach(filter->{
+                fieldNames.put(
+                        filter.getFilterName(filter,
+                                getFilters().indexOf(filter), this.getName()),
+                        filter.getColumn());
+             });
+            
+        }
         return fieldNames;
     }
 
@@ -142,6 +152,18 @@ public class USMap extends Widget{
                 new FieldInstance(null, getMeasure().getColumn())));
         measureInput.setType(InputElement.TYPE_FIELD);
         inputs.add(measureInput);
+        
+        if(this.getFilters() != null){
+            this.getFilters().forEach(filter->{
+                 InputElement filterElement = new InputElement();
+                 filterElement.setName(filter.getFilterName(filter,
+                         getFilters().indexOf(filter), this.getName()));
+                 filterElement.addOption(ElementOption.CreateElementOption(Element.LABEL,
+                         new FieldInstance(null,filter.getColumn())));
+                 filterElement.setType(InputElement.TYPE_FIELD);
+                 inputs.add(filterElement);
+            });
+        }
 
         return inputs;
 
