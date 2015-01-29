@@ -170,14 +170,6 @@ public class Table extends Widget{
         return builder.toString();
     }
     
-    public String getFilterName(Filter filter) {
-        StringBuilder filterName = new StringBuilder();
-        filterName.append("Filter")
-                .append(getFilters().indexOf(filter) + 1).append("_")
-                .append(this.getName());
-        return filterName.toString();
-    }
-    
     public String getFilterQuery(StringBuilder sql){
    	 Iterator<Filter> filters=this.getFilters().iterator();
         while(filters.hasNext()){
@@ -200,6 +192,11 @@ public class Table extends Widget{
         
         RecordInstance ri = new RecordInstance();
         visualElement.setBasisQualifier(ri);
+
+        visualElement.setBasisFilter(null);
+        if(this.getFilters() != null && !this.getFilters().isEmpty()){
+            visualElement.setBasisFilter(getHipieFilterQuery());
+        }
 
         String[] labelArray = new String[tableColumns.size()];
         String[] valueArray = new String[tableColumns.size()];

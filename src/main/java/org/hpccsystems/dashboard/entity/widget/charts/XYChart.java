@@ -245,7 +245,10 @@ public class XYChart extends Widget{
         RecordInstance ri = new RecordInstance();
         visualElement.setBasisQualifier(ri);
 
-       
+        visualElement.setBasisFilter(null);
+        if(this.getFilters() != null && !this.getFilters().isEmpty()){
+            visualElement.setBasisFilter(getHipieFilterQuery());
+        }
         // Attribute settings
         ri.add(new FieldInstance(null, getPluginAttribute()));
         

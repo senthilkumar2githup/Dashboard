@@ -191,6 +191,7 @@ public class USMap extends Widget{
         RecordInstance ri = new RecordInstance();
         visualElement.setBasisQualifier(ri);
         
+        visualElement.setBasisFilter(null);
         if(this.getFilters() != null && !this.getFilters().isEmpty()){
             visualElement.setBasisFilter(getHipieFilterQuery());
         }

@@ -309,7 +309,6 @@ public class CompositionServiceImpl implements CompositionService{
         visualization.setName(compName);
         visualization.setType(VisualElement.VISUALIZE);
         
-        //TODO:set title for visualization
         VisualElement ve = widget.generateVisualElement();
         ve.setBasis(output);
         visualization.addChildElement(ve);
@@ -352,7 +351,7 @@ public class CompositionServiceImpl implements CompositionService{
             LOGGER.debug("composition last updated date -->{}", new Date(composition.getLastModified()));
             
             if (latestInstance != null) {
-                // TODO : Get the Zone Id from HIPIE insted of hard coding '-0500'
+                // TODO : Get the Zone Id from HIPIE instead of hard coding '-0500'
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss").withZone(ZoneId.of("-0500"));
                 ZonedDateTime lastRun = ZonedDateTime.parse(latestInstance.getWorkunitId().substring(1), formatter);
                 
@@ -433,7 +432,6 @@ public class CompositionServiceImpl implements CompositionService{
             LOGGER.error(Constants.EXCEPTION,herror);
             throw new Exception(herror.getErrorString());
         }
-       
         HIPIEService hipieService = HipieSingleton.getHipie(); 
         
         contract.setRepository(hipieService.getRepositoryManager().getDefaultRepository());
