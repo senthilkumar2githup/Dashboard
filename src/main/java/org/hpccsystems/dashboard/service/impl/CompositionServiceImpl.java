@@ -406,9 +406,8 @@ public class CompositionServiceImpl implements CompositionService{
         widget.removeInstanceProperty(contractInstance.getProps(),labelWeighFiltertNames);
         
         //Adding present input
-        Element input=contract.getInputElements().iterator().next();
         widget.generateInputElement().stream().forEach(inputElement->
-            input.addChildElement(inputElement)
+            ((InputElement)visualInput).addChildElement(inputElement)
         );
         widget.editVisualElement(visualElement);
         
