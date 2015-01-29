@@ -42,17 +42,17 @@ public class Constants {
     public static final Map<String, ChartConfiguration> CHART_CONFIGURATIONS = new LinkedHashMap<String, ChartConfiguration>(){
         private static final long serialVersionUID = 1L;
         {
-            put(ChartTypes.PIE.getChartCode(), new ChartConfiguration(ChartTypes.PIE.getChartCode(), "Pie Chart", "assets/img/charts/pie.png", "widget/pie.zul" ,"C3_PIE"));
-          //put(ChartTypes.DONUT.getChartCode(), new ChartConfiguration(ChartTypes.DONUT.getChartCode(), "Donut Chart", "assets/img/charts/donut.png", "widget/pie.zul" , "C3_DONUT"));
-            put(ChartTypes.LINE.getChartCode(), new ChartConfiguration(ChartTypes.LINE.getChartCode(), "Line Chart", "assets/img/charts/line.png", "widget/xyChart.zul", "C3_LINE"));
-            put(ChartTypes.BAR.getChartCode(), new ChartConfiguration(ChartTypes.BAR.getChartCode(), "Bar Chart", "assets/img/charts/bar.png", "widget/xyChart.zul","C3_BAR"));
+            put(HipieChartNames.PIE.getChartName(), new ChartConfiguration(ChartTypes.PIE.getChartCode(), "Pie Chart", "assets/img/charts/pie.png", "widget/pie.zul" ,HipieChartNames.PIE.getChartName()));
+          //put(HipieChartNames.DONUT.getChartName(), new ChartConfiguration(ChartTypes.DONUT.getChartCode(), "Donut Chart", "assets/img/charts/donut.png", "widget/pie.zul" , HipieChartNames.DONUT.getChartName()));
+            put(HipieChartNames.LINE.getChartName(), new ChartConfiguration(ChartTypes.LINE.getChartCode(), "Line Chart", "assets/img/charts/line.png", "widget/xyChart.zul", HipieChartNames.LINE.getChartName()));
+            put(HipieChartNames.BAR.getChartName(), new ChartConfiguration(ChartTypes.BAR.getChartCode(), "Bar Chart", "assets/img/charts/bar.png", "widget/xyChart.zul",HipieChartNames.BAR.getChartName()));
             //Keep chart type as 'BAR' for column chart as per Hipie requirement
-            put(ChartTypes.COLUMN.getChartCode(), new ChartConfiguration(ChartTypes.BAR.getChartCode(), "Column Chart", "assets/img/charts/column.png", "widget/xyChart.zul","C3_COLUMN"));
-            put(ChartTypes.US_MAP.getChartCode(), new ChartConfiguration(ChartTypes.US_MAP.getChartCode(), "US_Map", "assets/img/charts/geo.png", "widget/usMap.zul","CHORO"));
-            put(ChartTypes.TABLE.getChartCode(), new ChartConfiguration(ChartTypes.TABLE.getChartCode(), "Table Widget", "assets/img/charts/table.png", "widget/table.zul", "TABLE"));
-          //put(ChartTypes.STEP.getChartCode(), new ChartConfiguration(ChartTypes.STEP.getChartCode(), "Step Chart", "assets/img/charts/step.png", "widget/xyChart.zul", "C3_STEP"));
-          //put(ChartTypes.SCATTER.getChartCode(), new ChartConfiguration(ChartTypes.SCATTER.getChartCode(), "Scatter Chart", "assets/img/charts/scatter.png", "widget/xyChart.zul", "C3_SCATTER"));
-          //put(ChartTypes.AREA.getChartCode(), new ChartConfiguration(ChartTypes.AREA.getChartCode(), "Area Chart", "assets/img/charts/area.png", "widget/xyChart.zul","C3_AREA"));
+            put(HipieChartNames.COLUMN.getChartName(), new ChartConfiguration(ChartTypes.BAR.getChartCode(), "Column Chart", "assets/img/charts/column.png", "widget/xyChart.zul",HipieChartNames.COLUMN.getChartName()));
+            put(HipieChartNames.US_MAP.getChartName(), new ChartConfiguration(ChartTypes.US_MAP.getChartCode(), "US_Map", "assets/img/charts/geo.png", "widget/usMap.zul",HipieChartNames.US_MAP.getChartName()));
+            put(HipieChartNames.TABLE.getChartName(), new ChartConfiguration(ChartTypes.TABLE.getChartCode(), "Table Widget", "assets/img/charts/table.png", "widget/table.zul", HipieChartNames.TABLE.getChartName()));
+          //put(HipieChartNames.STEP.getChartName(), new ChartConfiguration(ChartTypes.STEP.getChartCode(), "Step Chart", "assets/img/charts/step.png", "widget/xyChart.zul", HipieChartNames.STEP.getChartName()));
+          //put(HipieChartNames.SCATTER.getChartName(), new ChartConfiguration(ChartTypes.SCATTER.getChartCode(), "Scatter Chart", "assets/img/charts/scatter.png", "widget/xyChart.zul", HipieChartNames.SCATTER.getChartName()));
+          //put(HipieChartNames.AREA.getChartName(), new ChartConfiguration(ChartTypes.AREA.getChartCode(), "Area Chart", "assets/img/charts/area.png", "widget/xyChart.zul",HipieChartNames.AREA.getChartName()));
         }
     };
     public static final String ACTIVE_DASHBOARD = "ActiveDashboard";
@@ -103,6 +103,8 @@ public class Constants {
     public static final String URL = "url";
 
     public static final String TARGET = "target";
+
+    public static final String ON_UPDATE_COMPOSITION = "onUpdateComposition";
 
     
     

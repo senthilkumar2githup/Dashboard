@@ -104,6 +104,12 @@ public class DashboardController extends SelectorComposer<Component> {
                         5000, true);
 		    }
         });
+		
+		chartDiv.addEventListener(Constants.ON_UPDATE_COMPOSITION, event -> {
+		    Clients.showNotification( Labels.getLabel("compUpdateFailed"), 
+                    Clients.NOTIFICATION_TYPE_ERROR, chartDiv, "middle_center",
+                    5000, true);
+		});
 
 	}
 

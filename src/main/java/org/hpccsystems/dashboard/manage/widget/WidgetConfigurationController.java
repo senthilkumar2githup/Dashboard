@@ -86,40 +86,47 @@ public class WidgetConfigurationController extends SelectorComposer<Component> i
         }
         
         String userId = authenticationService.getUserCredential().getId();
-       
-        if (configuration.getDashboard().getCompositionName() == null) { //Dashboard with no chart
-            compositionService.createComposition(configuration.getDashboard(), configuration.getWidget(), userId);
-        } else if(FLOW.NEW.equals(configuration.getFlowType())) { //Dashboard with charts,and user adding new chart
-            compositionService.addCompositionChart(configuration.getDashboard(), configuration.getWidget(), userId);
-        } else if(FLOW.EDIT.equals(configuration.getFlowType())){//Dashboard with charts,and user edits existing chart
-            compositionService.editCompositionChart(configuration.getDashboard(), configuration.getWidget(), userId);
-        }
-        
-     // Run composition in separate thread
-        desktop.enableServerPush(true);
-        Runnable runComposition = () -> {
-            try {
-                compositionService.runComposition(configuration.getDashboard(), userId);
-                if(desktop.isAlive()){
-                    Executions.schedule(desktop, this, new Event("OnRunCompositionCompleted",null,configuration.getDashboard().getCompositionName()));
-                }
-            } catch (Exception e) {
-                if(desktop.isAlive()){
-                    Executions.schedule(desktop, this, new Event("OnRunCompositionFailed", null, configuration.getDashboard().getCompositionName()));
-                }
-                LOGGER.error(Constants.EXCEPTION, e);
+        try {
+            if (configuration.getDashboard().getCompositionName() == null) { //Dashboard with no chart
+                compositionService.createComposition(configuration.getDashboard(), configuration.getWidget(), userId);
+            } else if(FLOW.NEW.equals(configuration.getFlowType())) { //Dashboard with charts,and user adding new chart
+                compositionService.addCompositionChart(configuration.getDashboard(), configuration.getWidget(), userId);
+            } else if(FLOW.EDIT.equals(configuration.getFlowType())){//Dashboard with charts,and user edits existing chart
+                compositionService.editCompositionChart(configuration.getDashboard(), configuration.getWidget(), userId);
             }
-        };
-        DashboardExecutorHolder.getExecutor().execute(runComposition);
-        
-        dashboardService.updateDashboard(configuration.getDashboard());
-        
-        if(LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Composition {}, being Run in the background", configuration.getDashboard().getCompositionName());
+            
+            // Run composition in separate thread
+            desktop.enableServerPush(true);
+            Runnable runComposition = () -> {
+                try {
+                    compositionService.runComposition(configuration.getDashboard(), userId);
+                    if(desktop.isAlive()){
+                        Executions.schedule(desktop, this, new Event("OnRunCompositionCompleted",null,configuration.getDashboard().getCompositionName()));
+                    }
+                } catch (Exception e) {
+                    if(desktop.isAlive()){
+                        Executions.schedule(desktop, this, new Event("OnRunCompositionFailed", null, configuration.getDashboard().getCompositionName()));
+                    }
+                    LOGGER.error(Constants.EXCEPTION, e);
+                }
+            };
+            DashboardExecutorHolder.getExecutor().execute(runComposition);
+            
+            dashboardService.updateDashboard(configuration.getDashboard());
+            
+            if(LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Composition {}, being Run in the background", configuration.getDashboard().getCompositionName());
+            }
+            
+            this.getSelf().detach();
+            drawChart();
+           
+        } catch (Exception e) {
+            this.getSelf().detach();
+            LOGGER.error(Constants.EXCEPTION,e);
+            Events.postEvent(Constants.ON_UPDATE_COMPOSITION, configuration.getChartDiv(), null);
         }
         
-        this.getSelf().detach();
-       drawChart();
     }
 
     /**
