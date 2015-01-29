@@ -38,11 +38,17 @@ import com.google.gson.JsonObject;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class DashboardController extends SelectorComposer<Component> {
-	private static final String LAYOUT = "layout";
+	
+    private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(DashboardController.class);
+    
+    private static final String ON_SAVE = "onSave";
+    private static final String LAYOUT = "layout";
     private static final String WS_ECL = "WsEcl";
     private static final String WS_WORKUNITS = "WsWorkunits";
-    private static final long serialVersionUID = 1L;
-	private static final Logger LOGGER = LoggerFactory.getLogger(DashboardController.class);
+    private static final String ON_DELETE_CHART = "onDeleteChart";
+    private static final String ON_EDIT_CHART = "onEditChart";
+	
 
 	@WireVariable
 	private AuthenticationService authenticationService;
@@ -62,14 +68,14 @@ public class DashboardController extends SelectorComposer<Component> {
 				Constants.ACTIVE_DASHBOARD);
 		
 		// OnEditChart 
-        comp.addEventListener("onEditChart", event -> {
+        comp.addEventListener(ON_EDIT_CHART, event -> {
             JSONObject json = (JSONObject) new JSONParser().parse(event.getData().toString()); 
             LOGGER.debug("Editing chart -->{}",json.get("chartId").toString());
             editChart(json.get("chartId").toString());
         });
 		
         // OnDeleteChart 
-        comp.addEventListener("onDeleteChart", event -> {
+        comp.addEventListener(ON_DELETE_CHART, event -> {
             JSONObject json = (JSONObject) new JSONParser().parse(event.getData().toString()); 
             LOGGER.debug("Deleting chart -->{}",json.get("chartId").toString());
             deleteChart(json.get("chartId").toString());
@@ -81,7 +87,7 @@ public class DashboardController extends SelectorComposer<Component> {
             drawChart(false);
         }
 		
-		chartDiv.addEventListener("onSave", event->{		   
+		chartDiv.addEventListener(ON_SAVE, event->{		   
 		   dashboard.setLayout(event.getData().toString());
 		   dashboardService.updateLayout(dashboard);
 		});
@@ -111,6 +117,7 @@ public class DashboardController extends SelectorComposer<Component> {
 			 String viaualizationURL = isLive ? dashboard.generateVisualizationURL() : "[]";
             if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("viaualizationURL -->" + viaualizationURL);
+				LOGGER.debug(" dashboard.getLayout() -->{}", dashboard.getLayout());
 			}
 			JsonObject chartObj = new JsonObject();
 			chartObj.addProperty(Constants.URL, viaualizationURL);

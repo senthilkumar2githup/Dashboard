@@ -1,8 +1,6 @@
 package org.hpccsystems.dashboard.manage.widget;
 
 
-import java.util.Map.Entry;
-
 import org.hpccsystems.dashboard.ChartTypes;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.ChartConfiguration;
