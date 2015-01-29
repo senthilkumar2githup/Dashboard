@@ -170,7 +170,6 @@ public abstract class Widget {
         
         VisualElement visualElement = HipieUtil.getVisualElement(contract,chartName);
         
-        LOGGER.debug("logical file -->"+contractInstance.getPrecursors().get(visualElement.getBasis().getBase()).getProperty("LogicalFilename"));
         Map<String, ChartConfiguration> chartTypes = Constants.CHART_CONFIGURATIONS;
 
         ChartConfiguration chartConfig = chartTypes.get(visualElement.getType());
@@ -308,14 +307,15 @@ public abstract class Widget {
                     filters.add(filter);
                 }else if(filterLabel.contains(IN) && filterLabel.contains(SQUARE_OPEN) && filterLabel.contains(SQUARE_CLOSE)){
                     filter = new StringFilter();
-                    String[] strArray = filterLabel.trim().split(SPACE);
-                    
-                    String columnName = strArray[0].trim();
+                    LOGGER.debug("filterLabel -->{}",filterLabel);
+                    LOGGER.debug("column label -->{}", StringUtils.substringBefore(filterLabel, IN).trim());
+                    LOGGER.debug("Value label -->{}", StringUtils.substringAfter(filterLabel, IN).trim());
+                    String columnName =  StringUtils.substringBefore(filterLabel, IN).trim();
                     columnName = StringUtils.removeStart(columnName, PERCENATGE);
                     columnName = StringUtils.removeEnd(columnName,PERCENATGE);
                     filter.setColumn(contractInstance.getProperty(columnName));
                     filter.setDataType(STRING);
-                    ((StringFilter)filter).setValues(getStrFilterValues(strArray[strArray.length-1].trim(),filter));
+                    ((StringFilter)filter).setValues(getStrFilterValues(StringUtils.substringAfter(filterLabel, IN).trim(),filter));
                     filters.add(filter);
                 }
             }
@@ -353,7 +353,7 @@ public abstract class Widget {
        
         valueStr = StringUtils.removeStart(valueStr, SQUARE_OPEN);
         valueStr = StringUtils.removeEnd(valueStr, SQUARE_CLOSE);
-        
+        LOGGER.debug("valueStr -->{}",valueStr);
         List<String> valueList = Arrays.asList(valueStr.split(COMMA));
         LOGGER.debug("valueList -->{}",valueList);
         valueList.stream().forEach(vlaue ->{

@@ -104,7 +104,7 @@ public class Pie extends Widget {
                         .getHipieChartName())));
         visualElement.setName(DashboardUtil.removeSpaceSplChar(this.getName()));
 
-        visualElement.addOption(generateVisualOption(visualElement));
+        generateVisualOption(visualElement);
 
         // Setting Tittle for chart
         visualElement.addOption(ElementOption.CreateElementOption(VisualElement.TITLE,
@@ -112,7 +112,7 @@ public class Pie extends Widget {
         return visualElement;
     }
 
-    private ElementOption generateVisualOption(VisualElement visualElement) {
+    private void generateVisualOption(VisualElement visualElement) {
         RecordInstance ri = new RecordInstance();
         visualElement.setBasisQualifier(ri);
         
@@ -129,9 +129,9 @@ public class Pie extends Widget {
         ri.add(new FieldInstance((!AGGREGATION.NONE.equals(getWeight().getAggregation())) ? getWeight()
                 .getAggregation().toString() : null, getPluginMeasure()));
 
-        return ElementOption.CreateElementOption(VisualElement.WEIGHT,
+        visualElement.addOption(ElementOption.CreateElementOption(VisualElement.WEIGHT,
                 new FieldInstance((!AGGREGATION.NONE.equals(getWeight().getAggregation()) ) ? getWeight()
-                        .getAggregation().toString() : null,getPluginMeasure()));
+                        .getAggregation().toString() : null,getPluginMeasure())));
                
     }
 
