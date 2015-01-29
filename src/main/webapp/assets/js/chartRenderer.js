@@ -222,7 +222,10 @@ function injectPreviewChart(flowType) {
 						//console.log(oldData.vertices[d]['_parentWidget']['_id']);
 						//clearChart(oldData.vertices[d]['_parentWidget']['_id']);
 						clearChart(oldData.vertices[d]['_content']['_chart']['_id']);
-						oldData.vertices[d]=newGraph;													
+						console.log(oldData.vertices[d]['_pos']);						
+						newGraph['_pos']=oldData.vertices[d]['_pos'];						
+						newGraph['_size']=oldData.vertices[d]['_size'];					
+						oldData.vertices[d]=newGraph;						
 					}						
 				}				
 				
