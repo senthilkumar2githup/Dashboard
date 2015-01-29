@@ -14,7 +14,7 @@ function createPreview(target, chartType, data) {
 			jq('#'+target).append("<div id=\"NoChart\">Unable to render chart</div>");
 		}
 		var actualData = JSON.parse(data);
-		console.log(actualData);		
+		console.log(actualData);
 		
 		previewData.data = actualData;
 		previewData.type = chartType;

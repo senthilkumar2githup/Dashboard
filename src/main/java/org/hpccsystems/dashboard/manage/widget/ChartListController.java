@@ -48,26 +48,23 @@ public class ChartListController extends SelectorComposer<Component>{
         
         widgetConfiguration = (WidgetConfiguration) Executions.getCurrent().getArg().get(Constants.WIDGET_CONFIG);
         
-      
-        for (Entry<String, ChartConfiguration> entry : Constants.CHART_CONFIGURATIONS.entrySet()) {
-        	
-        	Anchorchildren anchorChildren = new Anchorchildren();
-        	Vbox vbox = new Vbox();
-        	Label label = new Label();
-        	label.setValue(entry.getValue().getName()+" Chart");
-        	Image img = new Image();
-        	img.setAttribute("config", entry.getValue());
-        	img.setSrc(entry.getValue().getStaticImage());
-        	img.setHeight("100px");
-        	img.setWidth("200px");
-        	img.setStyle("cursor:pointer");
-			img.addEventListener(Events.ON_CLICK, editChartPanel);
-        	anchorChildren.setParent(chartList);
-        	label.setParent(vbox);
-        	img.setParent(vbox);
-        	vbox.setParent(anchorChildren);
-        	
-        }
+        Constants.CHART_CONFIGURATIONS.values().stream().forEach(value ->{
+            Anchorchildren anchorChildren = new Anchorchildren();
+            Vbox vbox = new Vbox();
+            Label label = new Label();
+            label.setValue(value.getName());
+            Image img = new Image();
+            img.setAttribute("config", value);
+            img.setSrc(value.getStaticImage());
+            img.setHeight("100px");
+            img.setWidth("200px");
+            img.setStyle("cursor:pointer");
+            img.addEventListener(Events.ON_CLICK, editChartPanel);
+            anchorChildren.setParent(chartList);
+            label.setParent(vbox);
+            img.setParent(vbox);
+            vbox.setParent(anchorChildren);
+        });        
     }
     
     EventListener<Event> editChartPanel = new EventListener<Event>() {
@@ -81,7 +78,7 @@ public class ChartListController extends SelectorComposer<Component>{
                     || configuration.getType() == ChartTypes.DONUT .getChartCode()) {
                 widgetConfiguration.setWidget(new Pie());
             } else if (configuration.getType() == ChartTypes.BAR.getChartCode()
-                    || configuration.getType() == ChartTypes.COLUMN .getChartCode()
+                    || configuration.getType() == ChartTypes.COLUMN.getChartCode()
                     || configuration.getType() == ChartTypes.LINE.getChartCode()
                     || configuration.getType() == ChartTypes.SCATTER.getChartCode()
                     || configuration.getType() == ChartTypes.STEP.getChartCode()

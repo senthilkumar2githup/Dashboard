@@ -42,16 +42,17 @@ public class Constants {
     public static final Map<String, ChartConfiguration> CHART_CONFIGURATIONS = new LinkedHashMap<String, ChartConfiguration>(){
         private static final long serialVersionUID = 1L;
         {
-            put(ChartTypes.PIE.getChartCode(), new ChartConfiguration(ChartTypes.PIE.getChartCode(), "Pie", "assets/img/charts/pie.png", "widget/pie.zul" ,"C3_PIE"));
-          //put(ChartTypes.DONUT.getChartCode(), new ChartConfiguration(ChartTypes.DONUT.getChartCode(), "Donut", "assets/img/charts/donut.png", "widget/pie.zul" , "C3_DONUT"));
-            put(ChartTypes.LINE.getChartCode(), new ChartConfiguration(ChartTypes.LINE.getChartCode(), "Line", "assets/img/charts/line.png", "widget/xyChart.zul", "C3_LINE"));
-            put(ChartTypes.BAR.getChartCode(), new ChartConfiguration(ChartTypes.BAR.getChartCode(), "Bar", "assets/img/charts/bar.png", "widget/xyChart.zul","C3_BAR"));
-            put(ChartTypes.COLUMN.getChartCode(), new ChartConfiguration(ChartTypes.COLUMN.getChartCode(), "Column", "assets/img/charts/column.png", "widget/xyChart.zul","C3_COLUMN"));
+            put(ChartTypes.PIE.getChartCode(), new ChartConfiguration(ChartTypes.PIE.getChartCode(), "Pie Chart", "assets/img/charts/pie.png", "widget/pie.zul" ,"C3_PIE"));
+          //put(ChartTypes.DONUT.getChartCode(), new ChartConfiguration(ChartTypes.DONUT.getChartCode(), "Donut Chart", "assets/img/charts/donut.png", "widget/pie.zul" , "C3_DONUT"));
+            put(ChartTypes.LINE.getChartCode(), new ChartConfiguration(ChartTypes.LINE.getChartCode(), "Line Chart", "assets/img/charts/line.png", "widget/xyChart.zul", "C3_LINE"));
+            put(ChartTypes.BAR.getChartCode(), new ChartConfiguration(ChartTypes.BAR.getChartCode(), "Bar Chart", "assets/img/charts/bar.png", "widget/xyChart.zul","C3_BAR"));
+            //Keep chart type as 'BAR' for column chart as per Hipie requirement
+            put(ChartTypes.COLUMN.getChartCode(), new ChartConfiguration(ChartTypes.BAR.getChartCode(), "Column Chart", "assets/img/charts/column.png", "widget/xyChart.zul","C3_COLUMN"));
             put(ChartTypes.US_MAP.getChartCode(), new ChartConfiguration(ChartTypes.US_MAP.getChartCode(), "US_Map", "assets/img/charts/geo.png", "widget/usMap.zul","CHORO"));
-            put(ChartTypes.TABLE.getChartCode(), new ChartConfiguration(ChartTypes.TABLE.getChartCode(), "Table", "assets/img/charts/table.png", "widget/table.zul", "TABLE"));
-          //put(ChartTypes.STEP.getChartCode(), new ChartConfiguration(ChartTypes.STEP.getChartCode(), "Step", "assets/img/charts/step.png", "widget/xyChart.zul", "C3_STEP"));
-          //put(ChartTypes.SCATTER.getChartCode(), new ChartConfiguration(ChartTypes.SCATTER.getChartCode(), "Scatter", "assets/img/charts/scatter.png", "widget/xyChart.zul", "C3_SCATTER"));
-          //put(ChartTypes.AREA.getChartCode(), new ChartConfiguration(ChartTypes.AREA.getChartCode(), "Area", "assets/img/charts/area.png", "widget/xyChart.zul","C3_AREA"));
+            put(ChartTypes.TABLE.getChartCode(), new ChartConfiguration(ChartTypes.TABLE.getChartCode(), "Table Widget", "assets/img/charts/table.png", "widget/table.zul", "TABLE"));
+          //put(ChartTypes.STEP.getChartCode(), new ChartConfiguration(ChartTypes.STEP.getChartCode(), "Step Chart", "assets/img/charts/step.png", "widget/xyChart.zul", "C3_STEP"));
+          //put(ChartTypes.SCATTER.getChartCode(), new ChartConfiguration(ChartTypes.SCATTER.getChartCode(), "Scatter Chart", "assets/img/charts/scatter.png", "widget/xyChart.zul", "C3_SCATTER"));
+          //put(ChartTypes.AREA.getChartCode(), new ChartConfiguration(ChartTypes.AREA.getChartCode(), "Area Chart", "assets/img/charts/area.png", "widget/xyChart.zul","C3_AREA"));
         }
     };
     public static final String ACTIVE_DASHBOARD = "ActiveDashboard";

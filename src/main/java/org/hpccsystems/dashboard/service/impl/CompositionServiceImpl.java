@@ -21,6 +21,8 @@ import org.hpcc.HIPIE.dude.InputElement;
 import org.hpcc.HIPIE.dude.OutputElement;
 import org.hpcc.HIPIE.dude.RecordInstance;
 import org.hpcc.HIPIE.dude.VisualElement;
+import org.hpcc.HIPIE.utils.ErrorBlock;
+import org.hpcc.HIPIE.utils.HError;
 import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.Dashboard;
@@ -39,6 +41,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import org.zkoss.zkplus.spring.SpringUtil;
+
 
 @Service("compositionService") 
 @Scope(value = "singleton", proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -72,8 +75,14 @@ public class CompositionServiceImpl implements CompositionService{
         //refreshes the plugins
         hipieService.refreshData();
         ContractInstance datasource=composition.getContractInstanceByName(HIPIE_RAW_DATASET);
-        contractInstance.addPrecursor(datasource); 
+        contractInstance.addPrecursor(datasource);
         
+        //validates composition, if valid saves it
+        ErrorBlock errorBlock = composition.validate();
+        for(HError error : errorBlock){
+            LOGGER.error(Constants.EXCEPTION,error);
+            throw new Exception(error.getErrorString());
+        }
         composition = HipieSingleton.getHipie().saveCompositionAs(user, composition,compName + ".cmp");
         dashboard.setCompositionName(composition.getCanonicalName());   
     } catch (Exception e) {
@@ -83,20 +92,22 @@ public class CompositionServiceImpl implements CompositionService{
     }
     
     @Override
-    public void addCompositionChart(Dashboard dashboard, Widget widget,String user) {
+    public void addCompositionChart(Dashboard dashboard, Widget widget,String user) throws Exception {
         HIPIEService hipieService = HipieSingleton.getHipie();
         Composition composition;
         try {           
             composition = hipieService.getComposition(user, dashboard.getCompositionName());
+            Contract contract = composition.getContractInstanceByName(composition.getName()).getContract();
+            
             if(checkFileExistence(composition,widget.getLogicalFile())){
                 appendOnVisualElement(composition,widget,user); 
             }else{
                 addOnRawdataset(composition,"~" + widget.getLogicalFile(),widget,dashboard.getHpccConnection(),user);
             }
-            
-            HipieSingleton.getHipie().saveComposition(user, composition);
+            validateSaveCompositionContract(composition,contract,user);
         } catch (Exception e) {
             LOGGER.error(Constants.EXCEPTION, e);
+            throw e;
         }
     }
     
@@ -133,7 +144,6 @@ public class CompositionServiceImpl implements CompositionService{
     private void addOnRawdataset(Composition composition, String fileName,Widget widget,HPCCConnection hpcc,String user) throws Exception {
         
         Contract contract = composition.getContractInstanceByName(composition.getName()).getContract();
-        HIPIEService hipieService=HipieSingleton.getHipie();
         
         //Adding additional input
         InputElement input=new InputElement();
@@ -164,12 +174,6 @@ public class CompositionServiceImpl implements CompositionService{
         VisualElement visualization=contract.getVisualElements().iterator().next();
         visualization.addChildElement(visualElement);
         
-        contract.setRepository(hipieService.getRepositoryManager().getDefaultRepository());
-        hipieService.saveContract(user, contract);
-        
-        hipieService.refreshData();
-        
-        
         ContractInstance contractInstance = composition.getContractInstanceByName(composition.getName());
         
         widget.getInstanceProperties().forEach((propertyName,propertyValue)->
@@ -185,7 +189,7 @@ public class CompositionServiceImpl implements CompositionService{
 
     private ContractInstance cloneRawdataset(Composition composition,
             String fileName, HPCCConnection hpcc) throws Exception {
-        //gets any Rawdataset which is used in the composition
+        //gets any of the Rawdataset which is used in the composition
         ContractInstance contractInstance  = composition.getContractInstanceByName(composition.getName());        
         Contract contract = contractInstance.getContract();
         VisualElement visualElement = (VisualElement)contract.getVisualElements().iterator().next().getChildElement(0);
@@ -243,7 +247,6 @@ public class CompositionServiceImpl implements CompositionService{
      */
     private void appendOnVisualElement(Composition composition,Widget widget,String user) throws Exception {
         
-        HIPIEService hipieService=HipieSingleton.getHipie();
         Contract contract = composition.getContractInstanceByName(composition.getName()).getContract();
         
         Element input=contract.getInputElements().iterator().next();
@@ -260,14 +263,11 @@ public class CompositionServiceImpl implements CompositionService{
         visualization.getChildElements().stream().forEach(visual ->{
             LOGGER.debug("visual -->{}",visual);
         });
-        contract.setRepository(hipieService.getRepositoryManager().getDefaultRepository());
-        hipieService.saveContract(user, contract);
-        
+               
         ContractInstance contractInstance = composition.getContractInstanceByName(composition.getName());
         
         widget.getInstanceProperties().forEach((propertyName,propertyValue)->
         contractInstance.setProperty(propertyName,propertyValue) );
-        
       
     }
     
@@ -315,6 +315,12 @@ public class CompositionServiceImpl implements CompositionService{
         visualization.addChildElement(ve);
         contract.getVisualElements().add(visualization);
         
+        //validates contract, if valid saves it
+        ErrorBlock errorBlock = contract.validate();
+        for(HError error : errorBlock){
+            LOGGER.error(Constants.EXCEPTION,error);
+            throw new Exception(error.getErrorString());
+        }
         contract = hipieService.saveContractAs(authenticationService.getUserCredential().getId(), contract,contract.getName());
         
         ContractInstance contractInstance = contract.createContractInstance();
@@ -406,15 +412,38 @@ public class CompositionServiceImpl implements CompositionService{
         );
         widget.editVisualElement(visualElement);
         
-        contract.setRepository(hipieService.getRepositoryManager().getDefaultRepository());
-        hipieService.saveContract(user, contract);
-        
         widget.getInstanceProperties().forEach((propertyName,propertyValue)->
         contractInstance.setProperty(propertyName,propertyValue) );
         
-        HipieSingleton.getHipie().saveComposition(user, composition);
+        validateSaveCompositionContract(composition,contract,user);
+        
     }
 
+
+    private void validateSaveCompositionContract(Composition composition,
+            Contract contract,String userId) throws Exception{
+        
+        ErrorBlock errorBlock = contract.validate();
+        for (HError error : errorBlock) {
+            LOGGER.error(Constants.EXCEPTION,error);
+            throw new Exception(error.getErrorString());
+        }
+       
+        ErrorBlock error = composition.validate();
+        for (HError herror : error) {
+            LOGGER.error(Constants.EXCEPTION,herror);
+            throw new Exception(herror.getErrorString());
+        }
+       
+        HIPIEService hipieService = HipieSingleton.getHipie(); 
+        
+        contract.setRepository(hipieService.getRepositoryManager().getDefaultRepository());
+        hipieService.saveContract(userId, contract);
+        hipieService.refreshData();
+        
+        HipieSingleton.getHipie().saveComposition(userId, composition);  
+        hipieService.refreshData();
+    }
 
     @Override
     public void deleteCompositionChart(Dashboard dashboard,String userId, String chartName) throws Exception{

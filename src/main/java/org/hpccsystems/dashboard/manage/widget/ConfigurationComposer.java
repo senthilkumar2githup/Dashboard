@@ -200,8 +200,8 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
     
     public void drawChart() {
         if(widget.isConfigured()) {
-            Clients.showBusy(getSelf(), "Retriving data");
-            Events.echoEvent(Constants.ON_DRAW_CHART, chart, null);
+           Clients.showBusy(getSelf(), "Retriving data");
+           Events.echoEvent(Constants.ON_DRAW_CHART, chart, null);
         }
     }
     

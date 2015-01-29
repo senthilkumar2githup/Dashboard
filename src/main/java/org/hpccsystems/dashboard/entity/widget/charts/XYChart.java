@@ -129,7 +129,14 @@ public class XYChart extends Widget{
         
         VisualElement visualElement = new VisualElement();
         
-        visualElement.setType(this.getChartConfiguration().getType());
+        //Setting chart Type as 'LINE' for Bar/column chart, while multiple measures used
+        if((ChartTypes.BAR.getChartCode().equals(this.getChartConfiguration().getType())
+                || ChartTypes.COLUMN.getChartCode().equals(this.getChartConfiguration().getType()))
+                && this.getMeasures().size() >1){
+            visualElement.setType(ChartTypes.LINE.getChartCode());
+        }else{
+            visualElement.setType(this.getChartConfiguration().getType());
+        }
         
         visualElement.addCustomOption(ElementOption.CreateElementOption(Constants.HIPIE._CHARTTYPE,
                 new FieldInstance(null, this.getChartConfiguration()
