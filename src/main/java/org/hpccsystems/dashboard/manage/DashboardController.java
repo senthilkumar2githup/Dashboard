@@ -14,7 +14,6 @@ import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.hpccsystems.dashboard.service.CompositionService;
 import org.hpccsystems.dashboard.service.DashboardService;
 import org.hpccsystems.dashboard.util.HipieSingleton;
-import org.hpccsystems.dashboard.util.HipieUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.json.JSONObject;
@@ -88,7 +87,7 @@ public class DashboardController extends SelectorComposer<Component> {
 		});
 		
 		chartDiv.addEventListener(Constants.ON_RUN_COMPOSITION, event -> {
-            HashMap<String,String> paramMap=(HashMap<String,String>)event.getData();
+            HashMap<String,String> paramMap=(HashMap<String,String>) event.getData();
 		    if(paramMap.get(Constants.SUCCESS)!=null){
 		        Clients.showNotification(paramMap.get(Constants.SUCCESS),
 	                    Clients.NOTIFICATION_TYPE_INFO, chartDiv, "top_right",
@@ -191,7 +190,7 @@ public class DashboardController extends SelectorComposer<Component> {
 	            composition = hipieService.getComposition(userId, dashboard.getCompositionName());
 	            contractInstance = composition.getContractInstanceByName(composition.getName());
 	          
-	         Widget widget =  HipieUtil.getVisualElementWidget(contractInstance,chartName,dashboard);
+	         Widget widget =  Widget.create(contractInstance,chartName,dashboard);
 	         WidgetConfiguration widgetConfiguration = new WidgetConfiguration(dashboard, chartDiv);
 	         widgetConfiguration.setWidget(widget);
 	         widgetConfiguration.setFlowType(FLOW.EDIT);
