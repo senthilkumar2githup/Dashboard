@@ -12,8 +12,8 @@ import org.hpcc.HIPIE.ContractInstance;
 import org.hpcc.HIPIE.dude.Element;
 import org.hpcc.HIPIE.dude.ElementOption;
 import org.hpcc.HIPIE.dude.VisualElement;
-import org.hpccsystems.dashboard.ChartTypes;
 import org.hpccsystems.dashboard.Constants;
+import org.hpccsystems.dashboard.Constants.ChartTypes;
 import org.hpccsystems.dashboard.entity.widget.ChartConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,25 +105,25 @@ public class HipieUtil {
         LOGGER.debug("_chartType -->{}",_chartType);
         ChartConfiguration chartConfig = chartTypes.get(_chartType);
         
-        if (ChartTypes.PIE.getChartCode() == chartConfig.getType()
-                || ChartTypes.DONUT.getChartCode() == chartConfig.getType()) {
+        if (ChartTypes.PIE.equals(chartConfig.getType())
+                || ChartTypes.DONUT.equals(chartConfig.getType())) {
             label = visualElement.getOption(VisualElement.LABEL);
             weight = visualElement.getOption(VisualElement.WEIGHT);
 
-        } else if (ChartTypes.US_MAP.getChartCode() == chartConfig.getType()) {
+        } else if (ChartTypes.US_MAP.equals(chartConfig.getType())) {
             label = visualElement.getOption(VisualElement.STATE);
             weight = visualElement.getOption(VisualElement.WEIGHT);
 
-        } else if (ChartTypes.LINE.getChartCode().equals(chartConfig.getType())) {
+        } else if (ChartTypes.LINE.equals(chartConfig.getType())) {
             label = visualElement.getOption(VisualElement.X);
             weight = visualElement.getOption(VisualElement.Y);
 
-        }else if(ChartTypes.TABLE.getChartCode() == chartConfig.getType()){
+        }else if(ChartTypes.TABLE.equals(chartConfig.getType())){
             label = visualElement.getOption(VisualElement.LABEL);
             weight = visualElement.getOption(VisualElement.VALUE);
             
-        }else if(ChartTypes.BAR.getChartCode() == chartConfig.getType()
-                || ChartTypes.COLUMN.getChartCode() == chartConfig.getType()){
+        }else if(ChartTypes.BAR.equals(chartConfig.getType())
+                || ChartTypes.COLUMN.equals(chartConfig.getType())){
             //chart has single measure
             label = visualElement.getOption(VisualElement.LABEL);
             weight = visualElement.getOption(VisualElement.WEIGHT);
@@ -138,7 +138,7 @@ public class HipieUtil {
         weight.getParams().stream().forEach(fieldInstance ->{
             labelWeightNames.add(fieldInstance.getName());
         });
-        if(ChartTypes.TABLE.getChartCode() != chartConfig.getType()){
+        if(!ChartTypes.TABLE.equals(chartConfig.getType())){
             label.getParams().stream().forEach(fieldInstance ->{
                 labelWeightNames.add(fieldInstance.getName());
             });
@@ -222,26 +222,26 @@ public class HipieUtil {
         LOGGER.debug("_chartType -->{}",_chartType);
         ChartConfiguration chartConfig = chartTypes.get(_chartType);
         
-        if (ChartTypes.PIE.getChartCode() == chartConfig.getType()
-                || ChartTypes.DONUT.getChartCode() == chartConfig.getType()) {
+        if (ChartTypes.PIE.equals(chartConfig.getType())
+                || ChartTypes.DONUT.equals(chartConfig.getType())) {
 
             visualElement.getOptions().remove(VisualElement.LABEL);
             visualElement.getOptions().remove(VisualElement.WEIGHT);
 
-        } else if (ChartTypes.US_MAP.getChartCode() == chartConfig.getType()) {
+        } else if (ChartTypes.US_MAP.equals(chartConfig.getType())) {
             visualElement.getOptions().remove(VisualElement.STATE);
             visualElement.getOptions().remove(VisualElement.WEIGHT);
 
-        } else if (ChartTypes.LINE.getChartCode().equals(chartConfig.getType())) {
+        } else if (ChartTypes.LINE.equals(chartConfig.getType())) {
             visualElement.getOptions().remove(VisualElement.X);
             visualElement.getOptions().remove(VisualElement.Y);
 
-        }else if(ChartTypes.TABLE.getChartCode() == chartConfig.getType()){
+        }else if(ChartTypes.TABLE.equals(chartConfig.getType())){
             visualElement.getOptions().remove(VisualElement.LABEL);
             visualElement.getOptions().remove(VisualElement.VALUE);
             
-        }else if(ChartTypes.BAR.getChartCode() == chartConfig.getType()
-                || ChartTypes.COLUMN.getChartCode() == chartConfig.getType()){
+        }else if(ChartTypes.BAR.equals(chartConfig.getType())
+                || ChartTypes.COLUMN.equals(chartConfig.getType())){
             //chart has single measure
             ElementOption weight = visualElement.getOption(VisualElement.WEIGHT);
             //chart has multiple measures

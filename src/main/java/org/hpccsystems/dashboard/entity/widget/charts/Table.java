@@ -121,7 +121,7 @@ public class Table extends Widget{
 
         VisualElement visualElement = new VisualElement();
         // TODO:Need to set chart type using Hipie's 'Element' class
-        visualElement.setType(this.getChartConfiguration().getType());
+        visualElement.setType(this.getChartConfiguration().getType().toString());
         visualElement.addCustomOption(ElementOption.CreateElementOption(Constants.HIPIE._CHARTTYPE,
                 new FieldInstance(null, this.getChartConfiguration()
                         .getHipieChartName())));

@@ -98,7 +98,7 @@ public class USMap extends Widget{
     public VisualElement generateVisualElement() {
 
         VisualElement visualElement = new VisualElement();
-        visualElement.setType(this.getChartConfiguration().getType());
+        visualElement.setType(this.getChartConfiguration().getType().toString());
         
         visualElement.addCustomOption(ElementOption.CreateElementOption(Constants.HIPIE._CHARTTYPE,
                 new FieldInstance(null, this.getChartConfiguration()

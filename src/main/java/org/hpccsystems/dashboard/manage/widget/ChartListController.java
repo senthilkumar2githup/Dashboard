@@ -1,8 +1,8 @@
 package org.hpccsystems.dashboard.manage.widget;
 
 
-import org.hpccsystems.dashboard.ChartTypes;
 import org.hpccsystems.dashboard.Constants;
+import org.hpccsystems.dashboard.Constants.ChartTypes;
 import org.hpccsystems.dashboard.entity.widget.ChartConfiguration;
 import org.hpccsystems.dashboard.entity.widget.charts.Pie;
 import org.hpccsystems.dashboard.entity.widget.charts.Table;
@@ -72,19 +72,19 @@ public class ChartListController extends SelectorComposer<Component>{
             Image img = (Image) event.getTarget();
             ChartConfiguration configuration = (ChartConfiguration) img.getAttribute("config");
             
-            if (configuration.getType() == ChartTypes.PIE.getChartCode()
-                    || configuration.getType() == ChartTypes.DONUT .getChartCode()) {
+            if (configuration.getType() == ChartTypes.PIE
+                    || configuration.getType().equals(ChartTypes.DONUT)) {
                 widgetConfiguration.setWidget(new Pie());
-            } else if (configuration.getType() == ChartTypes.BAR.getChartCode()
-                    || configuration.getType() == ChartTypes.COLUMN.getChartCode()
-                    || configuration.getType() == ChartTypes.LINE.getChartCode()
-                    || configuration.getType() == ChartTypes.SCATTER.getChartCode()
-                    || configuration.getType() == ChartTypes.STEP.getChartCode()
-                    || configuration.getType() == ChartTypes.AREA.getChartCode()) {
+            } else if (configuration.getType().equals(ChartTypes.BAR)
+                    || configuration.getType().equals(ChartTypes.COLUMN)
+                    || configuration.getType().equals(ChartTypes.LINE)
+                    || configuration.getType().equals(ChartTypes.SCATTER)
+                    || configuration.getType().equals(ChartTypes.STEP)
+                    || configuration.getType().equals(ChartTypes.AREA)) {
                 widgetConfiguration.setWidget(new XYChart());
-            } else if (configuration.getType() == ChartTypes.US_MAP.getChartCode()) {
+            } else if (configuration.getType().equals(ChartTypes.US_MAP)) {
                 widgetConfiguration.setWidget(new USMap());
-            }  else if (configuration.getType() == ChartTypes.TABLE.getChartCode()) {
+            }  else if (configuration.getType().equals(ChartTypes.TABLE)) {
                 widgetConfiguration.setWidget(new Table());
             }
             widgetConfiguration.getWidget()

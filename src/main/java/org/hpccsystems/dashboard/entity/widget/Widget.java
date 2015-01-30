@@ -17,7 +17,7 @@ import org.hpcc.HIPIE.dude.ElementOption;
 import org.hpcc.HIPIE.dude.FieldInstance;
 import org.hpcc.HIPIE.dude.InputElement;
 import org.hpcc.HIPIE.dude.VisualElement;
-import org.hpccsystems.dashboard.ChartTypes;
+import org.hpccsystems.dashboard.Constants.ChartTypes;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.Constants.AGGREGATION;
 import org.hpccsystems.dashboard.entity.Dashboard;
@@ -176,14 +176,14 @@ public abstract class Widget {
         ChartConfiguration chartConfig = chartTypes.get(_chartType);
         Widget widget = null;
         
-        if (chartConfig.getType() == ChartTypes.PIE.getChartCode()
-                || chartConfig.getType() == ChartTypes.DONUT.getChartCode()) {
+        if (chartConfig.getType().equals(ChartTypes.PIE)
+                || chartConfig.getType().equals(ChartTypes.DONUT)) {
             widget = new Pie();
             ( (Pie) widget).setWeight(createMeasures(visualElement.getOption(VisualElement.WEIGHT),contractInstance).get(0));
             ( (Pie) widget).setLabel(createAttribute(visualElement.getOption(VisualElement.LABEL),contractInstance));
             
-        } else if (chartConfig.getType() == ChartTypes.BAR.getChartCode()
-                || chartConfig.getType() == ChartTypes.COLUMN.getChartCode() ) {
+        } else if (chartConfig.getType().equals(ChartTypes.BAR)
+                || chartConfig.getType().equals(ChartTypes.COLUMN )) {
             widget = new XYChart();
             ElementOption weight = visualElement.getOption(VisualElement.WEIGHT);
             //Chart has single measure
@@ -195,16 +195,16 @@ public abstract class Widget {
                 ( (XYChart) widget).setAttribute(createAttribute(visualElement.getOption(VisualElement.X),contractInstance));
             }
             
-        } else if(ChartTypes.LINE.getChartCode() == chartConfig.getType()){
+        } else if(ChartTypes.LINE.equals(chartConfig.getType())){
             widget = new XYChart();
             ( (XYChart) widget).setMeasure(createMeasures(visualElement.getOption(VisualElement.Y),contractInstance));
             ( (XYChart) widget).setAttribute(createAttribute(visualElement.getOption(VisualElement.X),contractInstance));
             
-        } else if (chartConfig.getType() == ChartTypes.US_MAP.getChartCode()) {
+        } else if (chartConfig.getType().equals(ChartTypes.US_MAP)) {
             widget = new USMap();
             ( (USMap) widget).setMeasure(createMeasures(visualElement.getOption(VisualElement.WEIGHT),contractInstance).get(0));
             ( (USMap) widget).setState(createAttribute(visualElement.getOption(VisualElement.STATE),contractInstance));
-        }else if (chartConfig.getType() == ChartTypes.TABLE.getChartCode()) {
+        }else if (chartConfig.getType().equals(ChartTypes.TABLE)) {
             widget = new Table();
             ( (Table) widget).setTableColumns(createTableFields(visualElement,contractInstance,dashboard));
         }

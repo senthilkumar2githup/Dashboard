@@ -13,9 +13,9 @@ import org.hpcc.HIPIE.dude.FieldInstance;
 import org.hpcc.HIPIE.dude.InputElement;
 import org.hpcc.HIPIE.dude.RecordInstance;
 import org.hpcc.HIPIE.dude.VisualElement;
-import org.hpccsystems.dashboard.ChartTypes;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.Constants.AGGREGATION;
+import org.hpccsystems.dashboard.Constants.ChartTypes;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
 import org.hpccsystems.dashboard.entity.widget.Filter;
 import org.hpccsystems.dashboard.entity.widget.Measure;
@@ -256,12 +256,12 @@ public class XYChart extends Widget{
     private void generateVisualOption(VisualElement visualElement) {
         
         //Setting chart Type as 'LINE' for Bar/column chart, while multiple measures used
-        if((ChartTypes.BAR.getChartCode().equals(this.getChartConfiguration().getType())
-                || ChartTypes.COLUMN.getChartCode().equals(this.getChartConfiguration().getType()))
+        if((ChartTypes.BAR.equals(this.getChartConfiguration().getType())
+                || ChartTypes.COLUMN.equals(this.getChartConfiguration().getType()))
                 && this.getMeasures().size() >1){
-            visualElement.setType(ChartTypes.LINE.getChartCode());
+            visualElement.setType(ChartTypes.LINE.toString());
         }else{
-            visualElement.setType(this.getChartConfiguration().getType());
+            visualElement.setType(this.getChartConfiguration().getType().toString());
         }
         
         RecordInstance ri = new RecordInstance();
@@ -274,7 +274,7 @@ public class XYChart extends Widget{
         // Attribute settings
         ri.add(new FieldInstance(null, getPluginAttribute()));
         
-        if(ChartTypes.LINE.getChartCode().equals(this.getChartConfiguration().getType())
+        if(ChartTypes.LINE.equals(this.getChartConfiguration().getType())
                 || this.getMeasures().size() > 1){
            
             ListIterator<Measure> listItr =  getMeasures().listIterator();
