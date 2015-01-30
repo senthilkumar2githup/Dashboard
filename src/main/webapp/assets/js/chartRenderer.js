@@ -221,7 +221,9 @@ function injectPreviewChart(flowType) {
                         document.getElementById(oldData.vertices[d]['_content']['_id']).style.display = 'none';
 						//console.log(oldData.vertices[d]['_parentWidget']['_id']);
 						//clearChart(oldData.vertices[d]['_parentWidget']['_id']);
-						clearChart(oldData.vertices[d]['_content']['_chart']['_id']);
+                        if(oldData.vertices[d]['_content']['_chart']){
+                        	clearChart(oldData.vertices[d]['_content']['_chart']['_id']);
+                        }
 						console.log(oldData.vertices[d]['_pos']);						
 						newGraph['_pos']=oldData.vertices[d]['_pos'];						
 						newGraph['_size']=oldData.vertices[d]['_size'];					
