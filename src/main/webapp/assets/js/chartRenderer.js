@@ -173,7 +173,10 @@ function visualizeDDLChart(data) {
 		                                if (confirm("Are you sure want to delete the widget?") == true) {
 		                                	zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onDeleteChart', payload, {toServer:true}));
 		                                     document.getElementById(wid).style.display = 'none';
-		                                     clearChart(multiChartSurface['_content']['_chart']['_id']);		                                     
+		                                     if(multiChartSurface['_content']['_chart']){
+		                                    	 clearChart(multiChartSurface['_content']['_chart']['_id']);		                                    	 
+		                                     }
+		                                     		                                     
 		                                } 
 		                				
 		                			}
@@ -276,7 +279,9 @@ function injectPreviewChart(flowType) {
                         	 console.log(multiChartSurface);
                              document.getElementById(multiChartSurface['_id']).style.display = 'none';                            
                              document.getElementById(multiChartSurface['_content']['_chart']['_id']).style.display = 'none'; 
-                             clearChart(multiChartSurface['_content']['_chart']['_id']);
+                             if(multiChartSurface['_content']['_chart']){
+                            	 clearChart(multiChartSurface['_content']['_chart']['_id']);
+                             }                            
                         } 
         				
         			}

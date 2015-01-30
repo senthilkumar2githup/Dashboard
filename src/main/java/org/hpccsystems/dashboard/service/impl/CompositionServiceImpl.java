@@ -423,13 +423,13 @@ public class CompositionServiceImpl implements CompositionService{
         
         ErrorBlock errorBlock = contract.validate();
         for (HError error : errorBlock) {
-            LOGGER.error(Constants.EXCEPTION,error);
+            LOGGER.error(Constants.EXCEPTION,error.toString());
             throw new Exception(error.getErrorString());
         }
        
         ErrorBlock error = composition.validate();
         for (HError herror : error) {
-            LOGGER.error(Constants.EXCEPTION,herror);
+            LOGGER.error(Constants.EXCEPTION,herror.toString());
             throw new Exception(herror.getErrorString());
         }
         HIPIEService hipieService = HipieSingleton.getHipie(); 
