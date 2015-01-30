@@ -338,12 +338,12 @@ public abstract class Widget {
                                 tableField.setDataType(UNSIGNED);
                                 Measure measure = new Measure(tableField);
                                 measure.setAggregation(AGGREGATION.valueOf(fieldInstance.getType()));
-                                measure.setDisplayName(fieldInstance.getFieldLabel());
+                                measure.setDisplayName(contractInstance.getProperty(fieldInstance.getName()));
                                 tableColumns.add(measure);
                             } else {
                                 tableField.setDataType(STRING);
                                 Attribute attribute = new Attribute(tableField);
-                                attribute.setDisplayName(fieldInstance.getFieldLabel());
+                                attribute.setDisplayName(contractInstance.getProperty(fieldInstance.getName()));
                                 tableColumns.add(attribute);
                             }
                         });
