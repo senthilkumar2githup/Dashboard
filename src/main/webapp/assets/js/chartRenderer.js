@@ -170,12 +170,15 @@ function visualizeDDLChart(data) {
 		                				
 		                			} else if (option == 'Delete') {
 		                				var wid = document.getElementById(this._id).parentNode.id;
-		                                if (confirm("Are you sure want to delete the widget?") == true) {
-		                                	zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onDeleteChart', payload, {toServer:true}));
-		                                     document.getElementById(wid).style.display = 'none';
-		                                     if(multiChartSurface['_content']['_chart']){
-		                                    	 clearChart(multiChartSurface['_content']['_chart']['_id']);		                                    	 
-		                                     }
+		                                if (confirm("Are you sure want to delete the widget?") == true) {		                                	
+		                                   	zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onDeleteChart', payload, {toServer:true}));		                                     
+		                                	clearChart(wid);
+		                                    if(multiChartSurface['_content']['_chart']){
+		                                    	clearChart(multiChartSurface['_content']['_chart']['_id']);
+		                                    	clearChart(multiChartSurface['_content']['_id']);
+		                                    }else if(multiChartSurface['_content']['_id']){
+		                                    	clearChart(multiChartSurface['_content']['_id']); 	 
+		                                    }
 		                                     		                                     
 		                                } 
 		                				
@@ -219,13 +222,13 @@ function injectPreviewChart(flowType) {
                     .size({ width: 210, height: 210 });					
 				}
 				for(var d in oldData.vertices){						
-					if(oldData.vertices[d]['_title'] == previewData.title){
-						document.getElementById(oldData.vertices[d]['_id']).style.display = 'none';
-                        document.getElementById(oldData.vertices[d]['_content']['_id']).style.display = 'none';
-						//console.log(oldData.vertices[d]['_parentWidget']['_id']);
-						//clearChart(oldData.vertices[d]['_parentWidget']['_id']);
+					if(oldData.vertices[d]['_title'] == previewData.title){						
+						clearChart(oldData.vertices[d]['_id']);						
                         if(oldData.vertices[d]['_content']['_chart']){
                         	clearChart(oldData.vertices[d]['_content']['_chart']['_id']);
+                        	clearChart(oldData.vertices[d]['_content']['_id']);
+                        }else if(oldData.vertices[d]['_content']['_id']){
+                        	clearChart(oldData.vertices[d]['_content']['_id']);
                         }
 						console.log(oldData.vertices[d]['_pos']);						
 						newGraph['_pos']=oldData.vertices[d]['_pos'];						
@@ -264,24 +267,20 @@ function injectPreviewChart(flowType) {
         		multiChartSurface.menu(["Configure", "Delete"]);
         		multiChartSurface._menu.click = function(option) {
         			var payload = {};
-        			payload.chartId=multiChartSurface._title;
-        			/*for(var i in multiChartSurface){
-        				console.log(i+":"+multiChartSurface[i]);
-        			}*/
-        			if(option == 'Configure') {
-        				//console.log(multiChartSurface._title);
+        			payload.chartId=multiChartSurface._title;        			
+        			if(option == 'Configure') {        				
         				zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onEditChart', payload, {toServer:true}));
         				
-        			} else if (option == 'Delete') {
-        				//var wid = document.getElementById(multiChartSurface['_id']);
+        			} else if (option == 'Delete') {        				
                         if (confirm("Are you sure want to delete the widget?") == true) {
-                        	 zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onDeleteChart', payload, {toServer:true}));
-                        	 console.log(multiChartSurface);
-                             document.getElementById(multiChartSurface['_id']).style.display = 'none';                            
-                             document.getElementById(multiChartSurface['_content']['_chart']['_id']).style.display = 'none'; 
+                        	 zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onDeleteChart', payload, {toServer:true}));                        	 
+                             clearChart(multiChartSurface['_id']);
                              if(multiChartSurface['_content']['_chart']){
-                            	 clearChart(multiChartSurface['_content']['_chart']['_id']);
-                             }                            
+                             	clearChart(multiChartSurface['_content']['_chart']['_id']);
+                             	clearChart(multiChartSurface['_content']['_id']);
+                             }else if(multiChartSurface['_content']['_id']){
+                             	clearChart(multiChartSurface['_content']['_id']); 	 
+                             }
                         } 
         				
         			}
