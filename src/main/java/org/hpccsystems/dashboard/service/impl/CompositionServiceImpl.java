@@ -27,6 +27,7 @@ import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.widget.Widget;
+import org.hpccsystems.dashboard.exception.CompositionException;
 import org.hpccsystems.dashboard.manage.Interactivity;
 import org.hpccsystems.dashboard.manage.LiveWidget;
 import org.hpccsystems.dashboard.service.AuthenticationService;
@@ -40,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zkplus.spring.SpringUtil;
 
 
@@ -59,7 +61,7 @@ public class CompositionServiceImpl implements CompositionService{
     }
 
     @Override
-    public void createComposition(Dashboard dashboard, Widget widget,String user) throws Exception {
+    public void createComposition(Dashboard dashboard, Widget widget,String user) throws CompositionException {
     HIPIEService hipieService = HipieSingleton.getHipie();
     Composition composition;
     try {
@@ -86,13 +88,12 @@ public class CompositionServiceImpl implements CompositionService{
         composition = HipieSingleton.getHipie().saveCompositionAs(user, composition,compName + ".cmp");
         dashboard.setCompositionName(composition.getCanonicalName());   
     } catch (Exception e) {
-        LOGGER.error(Constants.EXCEPTION, e);
-        throw e;
+        throw new CompositionException(Labels.getLabel("unableToCreateComposition"),e);
     }
     }
     
     @Override
-    public void addCompositionChart(Dashboard dashboard, Widget widget,String user) throws Exception {
+    public void addCompositionChart(Dashboard dashboard, Widget widget,String user) throws CompositionException {
         HIPIEService hipieService = HipieSingleton.getHipie();
         Composition composition;
         try {           
@@ -106,8 +107,7 @@ public class CompositionServiceImpl implements CompositionService{
             }
             validateSaveCompositionContract(composition,contract,user);
         } catch (Exception e) {
-            LOGGER.error(Constants.EXCEPTION, e);
-            throw e;
+            throw new CompositionException(Labels.getLabel("unableToFetchComposition"),e);
         }
     }
     
@@ -211,15 +211,14 @@ public class CompositionServiceImpl implements CompositionService{
 
 
     @Override
-    public CompositionInstance runComposition(Dashboard dashboard,String user) throws Exception {
+    public CompositionInstance runComposition(Dashboard dashboard,String user) throws CompositionException {
         HIPIEService hipieService=HipieSingleton.getHipie();
         CompositionInstance compositionInstance = null;
         try {
            Composition comp = hipieService.getComposition(user,dashboard.getCompositionName());
            compositionInstance = hipieService.runComposition(comp, dashboard.getHpccConnection(), user);
         } catch (Exception e) {
-            LOGGER.error(Constants.EXCEPTION, e);
-            throw e;
+            throw new CompositionException(Labels.getLabel("unableToGetOrRunComposition"),e);
         }
         return compositionInstance;
     }
@@ -338,15 +337,23 @@ public class CompositionServiceImpl implements CompositionService{
      * Gets the composition's latest workuntit ID
      */
     @Override
-    public String getWorkunitId(Dashboard dashboard,String user) throws Exception {
+    public String getWorkunitId(Dashboard dashboard,String user) throws CompositionException {
         Composition composition = null;
         CompositionInstance latestInstance = null;
-        composition =  HipieSingleton.getHipie().getComposition(
-                user,
-                dashboard.getCompositionName());
+        try {
+            composition =  HipieSingleton.getHipie().getComposition(
+                    user,
+                    dashboard.getCompositionName());
+        } catch (Exception e) {
+            throw new CompositionException(Labels.getLabel("unableToFetchComposition"),e);
+        }
       
         if(composition != null) {
-            latestInstance = composition.getMostRecentInstance(user, true);
+            try {
+                latestInstance = composition.getMostRecentInstance(user, true);
+            } catch (Exception e) {
+                throw new CompositionException(Labels.getLabel("unableToGetRecentInstance"),e);
+            }
             //Compare last updated date
             LOGGER.debug("composition last updated date -->{}", new Date(composition.getLastModified()));
             
@@ -358,7 +365,11 @@ public class CompositionServiceImpl implements CompositionService{
                 ZonedDateTime lastModified = ZonedDateTime.ofInstant(Instant.ofEpochMilli(composition.getLastModified()), ZoneId.of("-0500"));
                 
                 if(LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Last run instance - {} date - {}, \n Modified date -{} ", latestInstance.getDate(latestInstance.getWorkunitId()).getTime(), lastRun, lastModified);
+                    try {
+                        LOGGER.debug("Last run instance - {} date - {}, \n Modified date -{} ", latestInstance.getDate(latestInstance.getWorkunitId()).getTime(), lastRun, lastModified);
+                    } catch (Exception e) {
+                        LOGGER.error(Constants.EXCEPTION,e);
+                    }
                 }
                 LOGGER.debug("Date - compared result-->{}",lastRun.compareTo(lastModified));
                 
@@ -368,9 +379,13 @@ public class CompositionServiceImpl implements CompositionService{
             } else {
                 latestInstance = runComposition(dashboard, user);
             }
-            if(latestInstance.getWorkunitStatus().contains("failed")) {
-                return null;
-             }
+            try {
+                if(latestInstance.getWorkunitStatus().contains("failed")) {
+                    return null;
+                 }
+            } catch (Exception e) {
+                throw new CompositionException(Labels.getLabel("failedToGetWorkUnitStatus"),e);
+            }
             
         }
         
@@ -379,12 +394,21 @@ public class CompositionServiceImpl implements CompositionService{
 
     @Override
     public void editCompositionChart(Dashboard dashboard, Widget widget,
-            String user) throws Exception {
+            String user) throws CompositionException {
         HIPIEService hipieService = HipieSingleton.getHipie();
         Composition composition;
         
-        composition = hipieService.getComposition(user, dashboard.getCompositionName());
-        ContractInstance contractInstance = composition.getContractInstanceByName(composition.getName());
+        try {
+            composition = hipieService.getComposition(user, dashboard.getCompositionName());
+        } catch (Exception e) {
+            throw new CompositionException(Labels.getLabel("unableToFetchComposition"),e);
+        }
+        ContractInstance contractInstance;
+        try {
+            contractInstance = composition.getContractInstanceByName(composition.getName());
+        } catch (Exception e) {
+            throw new CompositionException(Labels.getLabel("unableToGetContractInstance"),e);
+        }
         Contract contract = contractInstance.getContract();
         
         VisualElement visualElement = HipieUtil.getVisualElement(contract,widget.getName());
@@ -419,36 +443,41 @@ public class CompositionServiceImpl implements CompositionService{
 
 
     private void validateSaveCompositionContract(Composition composition,
-            Contract contract,String userId) throws Exception{
+            Contract contract,String userId) throws CompositionException{
         
         ErrorBlock errorBlock = contract.validate();
         for (HError error : errorBlock) {
             LOGGER.error(Constants.EXCEPTION,error.toString());
-            throw new Exception(error.getErrorString());
+            throw new CompositionException(error.getErrorString(), new Exception(error.getErrorString()));            
         }
        
         ErrorBlock error = composition.validate();
         for (HError herror : error) {
             LOGGER.error(Constants.EXCEPTION,herror.toString());
-            throw new Exception(herror.getErrorString());
+            throw new CompositionException(herror.getErrorString(), new Exception(herror.getErrorString()));
         }
         HIPIEService hipieService = HipieSingleton.getHipie(); 
         
         contract.setRepository(hipieService.getRepositoryManager().getDefaultRepository());
-        hipieService.saveContract(userId, contract);
-        hipieService.refreshData();
-        
-        HipieSingleton.getHipie().saveComposition(userId, composition);  
-        hipieService.refreshData();
+        try {
+            hipieService.saveContract(userId, contract);
+            hipieService.refreshData();
+            
+            HipieSingleton.getHipie().saveComposition(userId, composition);  
+            hipieService.refreshData();
+        } catch (Exception e) {
+            throw new CompositionException(Labels.getLabel("unableToReachHipieServices"), e);
+        }
     }
 
     @Override
-    public void deleteCompositionChart(Dashboard dashboard,String userId, String chartName) throws Exception{
+    public void deleteCompositionChart(Dashboard dashboard,String userId, String chartName) throws CompositionException{
         Composition composition = null;
         ContractInstance contractInstance = null;
         HIPIEService hipieService = HipieSingleton.getHipie();
         
-        composition = hipieService.getComposition(userId, dashboard.getCompositionName());
+        try {
+            composition = hipieService.getComposition(userId, dashboard.getCompositionName());
         contractInstance = composition.getContractInstanceByName(composition.getName());        
         Contract contract = contractInstance.getContract();
         
@@ -493,6 +522,9 @@ public class CompositionServiceImpl implements CompositionService{
         //updating dashboard's last updated date
         dashboardService.updateDashboard(dashboard);
         
+        } catch (Exception e) {
+            throw new CompositionException(Labels.getLabel("unableToDeleteCompositionChart"), e);
+        }
     }
     
     

@@ -1,6 +1,5 @@
 package org.hpccsystems.dashboard.service.impl;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.rmi.RemoteException;
@@ -10,8 +9,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.rpc.ServiceException;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -28,13 +25,14 @@ import org.hpccsystems.dashboard.entity.widget.Field;
 import org.hpccsystems.dashboard.entity.widget.Filter;
 import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.hpccsystems.dashboard.exception.HpccConnectionException;
+import org.hpccsystems.dashboard.exception.WSSQLException;
 import org.hpccsystems.dashboard.service.WSSQLService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
-import org.xml.sax.SAXException;
+import org.zkoss.util.resource.Labels;
 
 import ws_sql.ws.hpccsystems.ExecuteSQLRequest;
 import ws_sql.ws.hpccsystems.Ws_sqlLocator;
@@ -156,137 +154,122 @@ public  class WSSQLServiceImpl implements WSSQLService{
     }
     
     @Override
-    public List<String> getDistinctValues(Field field, HPCCConnection connection, String fileName, List<Filter> filters,int wssqlPort) throws Exception  {
+    public List<String> getDistinctValues(Field field, HPCCConnection connection, String fileName, List<Filter> filters,int wssqlPort) throws HpccConnectionException, XMLStreamException, WSSQLException  {
     	 List<String> dataList = null;
-         try {
-             final StringBuilder queryTxt = new StringBuilder(SELECT);
-             queryTxt.append(fileName);
-             queryTxt.append(".");
-             queryTxt.append(field.getColumn());
-             queryTxt.append(" from ");
-             queryTxt.append(fileName);
+         final StringBuilder queryTxt = new StringBuilder(SELECT);
+         queryTxt.append(fileName);
+         queryTxt.append(".");
+         queryTxt.append(field.getColumn());
+         queryTxt.append(" from ");
+         queryTxt.append(fileName);
 
-             queryTxt.append(" group by ");
-             queryTxt.append(fileName);
-             queryTxt.append(".");
-             queryTxt.append(field.getColumn());
+         queryTxt.append(" group by ");
+         queryTxt.append(fileName);
+         queryTxt.append(".");
+         queryTxt.append(field.getColumn());
 
-             if (LOGGER.isDebugEnabled()) {
-            	 LOGGER.debug("Query for Distinct values -> " + queryTxt.toString());
-             }
+         if (LOGGER.isDebugEnabled()) {
+        	 LOGGER.debug("Query for Distinct values -> " + queryTxt.toString());
+         }
 
-             final String resultString = executeSQL(connection, queryTxt.toString(),wssqlPort);
-             if (resultString != null && resultString.length() > 0) {
-            	 XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-            	 XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(new StringReader(resultString));
- 				 dataList=new ArrayList<String>();
- 				while(xmlEventReader.hasNext()){
- 					XMLEvent xmlEvent = xmlEventReader.nextEvent();
- 					if (xmlEvent.isStartElement()){
- 	                       StartElement startElement = xmlEvent.asStartElement();
- 	                       if(startElement.getName().getLocalPart().equals("Row") || startElement.getName().getLocalPart().equals("Dataset")){
- 	                    	   continue;
- 	                       }
- 	                       else {
- 	                           xmlEvent = xmlEventReader.nextEvent();
- 	                           if(xmlEvent.isCharacters()){
- 	                        	  dataList.add(xmlEvent.asCharacters().getData());
- 	                           }else{
- 	                        	  dataList.add("");
- 	                           }
- 	                          
- 	                       }
- 	                }
- 				}
-            	 
-             }else{
-            	 throw new HpccConnectionException(Constants.UNABLE_TO_FETCH_DATA);
-             }
-                 
-         }  catch (RemoteException e) {
-             if (e.getMessage().contains(UNAUTHORIZED)) {
-                 throw new HpccConnectionException("401 Unauthorized");
-             }
-             LOGGER.error(Constants.EXCEPTION, e);
-             throw e;
-         } catch (ServiceException | ParserConfigurationException | SAXException | IOException ex) {
-        	 LOGGER.error(Constants.EXCEPTION, ex);
-             throw ex;
+         String resultString;
+        try {
+            resultString = executeSQL(connection, queryTxt.toString(),wssqlPort);
+        } catch (Exception e) {
+            throw new WSSQLException(Labels.getLabel("unableToReachDatabaseOrUnacceptableQuery"), e);
+        }
+         if (resultString != null && resultString.length() > 0) {
+        	 XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        	 XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(new StringReader(resultString));
+        	 dataList=new ArrayList<String>();
+        	while(xmlEventReader.hasNext()){
+        		XMLEvent xmlEvent = xmlEventReader.nextEvent();
+        		if (xmlEvent.isStartElement()){
+                       StartElement startElement = xmlEvent.asStartElement();
+                       if(startElement.getName().getLocalPart().equals("Row") || startElement.getName().getLocalPart().equals("Dataset")){
+                    	   continue;
+                       }
+                       else {
+                           xmlEvent = xmlEventReader.nextEvent();
+                           if(xmlEvent.isCharacters()){
+                        	  dataList.add(xmlEvent.asCharacters().getData());
+                           }else{
+                        	  dataList.add("");
+                           }
+                          
+                       }
+                }
+        	}
+        	 
+         }else{
+        	 throw new HpccConnectionException(Constants.UNABLE_TO_FETCH_DATA);
          }
          return dataList;
     }
 
     @Override
     public Map<String, BigDecimal> getMinMax(Field field, HPCCConnection connection, String fileName, List<Filter> filters,int wssqlPort)
-            throws Exception {
+            throws WSSQLException, XMLStreamException, HpccConnectionException, RemoteException {
         Map<String, BigDecimal> resultMap = null;
 
-        try {
-
-            final StringBuilder queryTxt = new StringBuilder("select min(")
+        final StringBuilder queryTxt = new StringBuilder("select min(")
+            .append(fileName)
+            .append(".")
+            .append(field.getColumn())
+            .append("), max(")
                 .append(fileName)
                 .append(".")
                 .append(field.getColumn())
-                .append("), max(")
-                    .append(fileName)
-                    .append(".")
-                    .append(field.getColumn())
-                    .append(") from ");
-            queryTxt.append(fileName);
+                .append(") from ");
+        queryTxt.append(fileName);
 
-            final String resultString = executeSQL(connection, queryTxt.toString(),wssqlPort);
+        String resultString;
+        try {
+            resultString = executeSQL(connection, queryTxt.toString(),wssqlPort);
+        } catch (Exception e) {
+            throw new WSSQLException(Labels.getLabel("unableToReachDatabaseOrUnacceptableQuery"), e);
+        }
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("queryTxt in fetchFilterMinMax() -->" + queryTxt);
-            }
-            if (resultString != null && resultString.length() > 0) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("queryTxt in fetchFilterMinMax() -->" + queryTxt);
+        }
+        if (resultString != null && resultString.length() > 0) {
 
-                XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-                XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(new StringReader(resultString));
-                resultMap = new HashMap<String, BigDecimal>();
-                while (xmlEventReader.hasNext()) {
-                    XMLEvent xmlEvent = xmlEventReader.nextEvent();
-                    if (xmlEvent.isStartElement()) {
-                        StartElement startElement = xmlEvent.asStartElement();
-                        if (startElement.getName().getLocalPart().equals("Row")
-                                || startElement.getName().getLocalPart().equals("Dataset")) {
-                            continue;
-                        } else if (startElement.getName().getLocalPart().equals("minout1")) {
-                            xmlEvent = xmlEventReader.nextEvent();
-                            if (xmlEvent.isCharacters())
-                                resultMap.put("min", new BigDecimal((xmlEvent.asCharacters().getData())));
-                            else
-                                resultMap.put("min", new BigDecimal(0));
-                        } else {
-                            xmlEvent = xmlEventReader.nextEvent();
-                            if (xmlEvent.isCharacters())
-                                resultMap.put("max", new BigDecimal(xmlEvent.asCharacters().getData()));
-                            else
-                                resultMap.put("max", new BigDecimal(0));
-                        }
+            XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+            XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(new StringReader(resultString));
+            resultMap = new HashMap<String, BigDecimal>();
+            while (xmlEventReader.hasNext()) {
+                XMLEvent xmlEvent = xmlEventReader.nextEvent();
+                if (xmlEvent.isStartElement()) {
+                    StartElement startElement = xmlEvent.asStartElement();
+                    if (startElement.getName().getLocalPart().equals("Row")
+                            || startElement.getName().getLocalPart().equals("Dataset")) {
+                        continue;
+                    } else if (startElement.getName().getLocalPart().equals("minout1")) {
+                        xmlEvent = xmlEventReader.nextEvent();
+                        if (xmlEvent.isCharacters())
+                            resultMap.put("min", new BigDecimal((xmlEvent.asCharacters().getData())));
+                        else
+                            resultMap.put("min", new BigDecimal(0));
+                    } else {
+                        xmlEvent = xmlEventReader.nextEvent();
+                        if (xmlEvent.isCharacters())
+                            resultMap.put("max", new BigDecimal(xmlEvent.asCharacters().getData()));
+                        else
+                            resultMap.put("max", new BigDecimal(0));
                     }
                 }
-
-            } else {
-                throw new HpccConnectionException(Constants.UNABLE_TO_FETCH_DATA);
             }
 
-        } catch (RemoteException e) {
-            if (e.getMessage().contains(UNAUTHORIZED)) {
-                throw new HpccConnectionException("401 Unauthorized");
-            }
-            LOGGER.error(Constants.EXCEPTION, e);
-            throw e;
-        } catch (ServiceException | ParserConfigurationException | SAXException | IOException ex) {
-            LOGGER.error(Constants.EXCEPTION, ex);
-            throw new HpccConnectionException();
+        } else {
+            throw new HpccConnectionException(Constants.UNABLE_TO_FETCH_DATA);
         }
         LOGGER.debug("resultMap -->{}",resultMap);
         return resultMap;
     }
 
     @Override
-    public ChartdataJSON getChartdata(Widget widget, HPCCConnection connection,int wssqlPort) throws Exception {
+    public ChartdataJSON getChartdata(Widget widget, HPCCConnection connection,int wssqlPort) throws WSSQLException {
 
         final String queryTxt = widget.generateSQL();
 
@@ -295,7 +278,12 @@ public  class WSSQLServiceImpl implements WSSQLService{
             LOGGER.debug("WS_SQL Query ->" + queryTxt);
         }
 
-        final String resultString = executeSQL(connection, queryTxt,wssqlPort);
+        String resultString;
+        try {
+            resultString = executeSQL(connection, queryTxt,wssqlPort);
+        } catch (Exception e) {
+            throw new WSSQLException(Labels.getLabel("unableToReachDatabaseOrUnacceptableQuery"), e);
+        }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("resultString -->" +resultString);
         }
