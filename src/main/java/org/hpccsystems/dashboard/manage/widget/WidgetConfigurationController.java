@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.Constants.FLOW;
+import org.hpccsystems.dashboard.exception.CompositionException;
 import org.hpccsystems.dashboard.manage.WidgetConfiguration;
 import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.hpccsystems.dashboard.service.CompositionService;
@@ -103,7 +104,7 @@ public class WidgetConfigurationController extends SelectorComposer<Component> i
                     if(desktop.isAlive()){
                         Executions.schedule(desktop, this, new Event("OnRunCompositionCompleted",null,configuration.getDashboard().getCompositionName()));
                     }
-                } catch (Exception e) {
+                } catch (CompositionException e) {
                     if(desktop.isAlive()){
                         Executions.schedule(desktop, this, new Event("OnRunCompositionFailed", null, configuration.getDashboard().getCompositionName()));
                     }
@@ -121,7 +122,7 @@ public class WidgetConfigurationController extends SelectorComposer<Component> i
             this.getSelf().detach();
             drawChart();
            
-        } catch (Exception e) {
+        } catch (CompositionException e) {
             this.getSelf().detach();
             LOGGER.error(Constants.EXCEPTION,e);
             Events.postEvent(Constants.ON_UPDATE_COMPOSITION, configuration.getChartDiv(), null);
