@@ -160,7 +160,9 @@ public class NumericFilterController extends SelectorComposer<Component> {
         Popup popup = (Popup) this.getSelf().getParent().getParent();
         popup.close();
 
+        widgetconfig.getWidget().addFilter(filter);
         widgetconfig.getComposer().drawChart();
+        
         
         if (LOG.isDebugEnabled()) {
             LOG.debug("Drawn filtered chart with Numeric filter");

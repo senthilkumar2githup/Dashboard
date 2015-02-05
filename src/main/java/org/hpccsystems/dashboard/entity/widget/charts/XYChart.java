@@ -157,7 +157,7 @@ public class XYChart extends Widget{
         if(this.getFilters() != null){
             this.getFilters().forEach(filter->{
                 fieldNames.put(
-                        filter.getFilterName(filter,
+                        filter.getFilterName(
                                 getFilters().indexOf(filter), this.getName()),
                         filter.getColumn());
              });
@@ -189,7 +189,7 @@ public class XYChart extends Widget{
         if(this.getFilters() != null){
             this.getFilters().forEach(filter->{
                  InputElement filterElement = new InputElement();
-                 filterElement.setName(filter.getFilterName(filter,
+                 filterElement.setName(filter.getFilterName(
                          getFilters().indexOf(filter), this.getName()));
                  filterElement.addOption(ElementOption.CreateElementOption(Element.LABEL,
                          new FieldInstance(null,filter.getColumn())));

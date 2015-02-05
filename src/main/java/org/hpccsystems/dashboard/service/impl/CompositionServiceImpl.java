@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.hpcc.HIPIE.Composition;
 import org.hpcc.HIPIE.CompositionInstance;
@@ -101,7 +102,8 @@ public class CompositionServiceImpl implements CompositionService{
             Contract contract = composition.getContractInstanceByName(composition.getName()).getContract();
             
             if(checkFileExistence(composition,widget.getLogicalFile())){
-                appendOnVisualElement(composition,widget,user); 
+                ContractInstance rawdatasetWithSameFile = getFileRawdataset(composition,"~"+widget.getLogicalFile());
+                appendOnVisualElement(composition,widget,user,rawdatasetWithSameFile); 
             }else{
                 addOnRawdataset(composition,"~" + widget.getLogicalFile(),widget,dashboard.getHpccConnection(),user);
             }
@@ -111,6 +113,28 @@ public class CompositionServiceImpl implements CompositionService{
         }
     }
     
+    private ContractInstance getFileRawdataset(Composition composition,
+            String logicalFile) {
+
+        ContractInstance contractInstance = null;
+        Map<String, ContractInstance> contractInstances = composition
+                .getContractInstances();
+
+       for(ContractInstance instance : contractInstances.values()){
+           if (instance.getProperty("LogicalFilename") != null) {
+               if (logicalFile.equals(instance
+                       .getProperty("LogicalFilename"))) {
+                   contractInstance = instance;
+                   break;
+               }
+           }
+       }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Rawdataset contractInstance --->" + contractInstance);
+        }
+        return contractInstance;
+    }
+
     private boolean checkFileExistence(Composition composition, String logicalFile) {
         try {
             List<String> files = new ArrayList<String>();
@@ -148,7 +172,7 @@ public class CompositionServiceImpl implements CompositionService{
         //Adding additional input
         InputElement input=new InputElement();
         //setting Input Element name as dsInput2
-        input.setName("dsInput"+(contract.getInputElements().size()+1));
+        input.setName("dsInput"+getlastElementId(contract.getInputElements()));
         input.setType(InputElement.TYPE_DATASET);
         input.addOption(new ElementOption(Element.MAPBYNAME));
         input.addOption(new ElementOption(Element.OPTIONAL));
@@ -161,7 +185,7 @@ public class CompositionServiceImpl implements CompositionService{
         //Adding additional output
         OutputElement output=new OutputElement();
         //setting Output Element name as dsOutput2
-        output.setName("dsOutput"+(contract.getOutputElements().size()+1));
+        output.setName("dsOutput"+getlastElementId(contract.getInputElements()));
         output.setType(OutputElement.TYPE_DATASET);
         output.setBase(input.getName());
         output.addOption(new ElementOption("WUID"));
@@ -184,8 +208,23 @@ public class CompositionServiceImpl implements CompositionService{
         
         //here "dsOutput" -> Rawdataset's output
         contractInstance.addPrecursor(datasource2,"dsOutput",input.getName()); 
+        
     }
 
+
+    /**
+     * Method to return last Element's last character which helps to generate new Elemnet's name
+     * If Last Element name is dsInput3/dsOuput3, it return 4 to generate Input/Output as dsInput4/dsOuput4
+     * @param inputElements
+     * @return
+     */
+    private int getlastElementId(List<Element> inputElements) {
+        String lastElementame = inputElements.get(inputElements.size()-1).getName().trim();
+       LOGGER.debug("int -->{}", Character.getNumericValue(lastElementame.charAt(lastElementame.length()-1)));
+       LOGGER.debug("int -->{}",(int)lastElementame.charAt(lastElementame.length()-1));
+        int id = (int)lastElementame.charAt(lastElementame.length()-1);
+        return id+1;
+    }
 
     private ContractInstance cloneRawdataset(Composition composition,
             String fileName, HPCCConnection hpcc) throws Exception {
@@ -244,24 +283,30 @@ public class CompositionServiceImpl implements CompositionService{
      * @throws Exception
      * Adds additional visual element to the plugin file,with single(existing) input/output
      */
-    private void appendOnVisualElement(Composition composition,Widget widget,String user) throws Exception {
+    private void appendOnVisualElement(Composition composition, Widget widget,
+            String user, ContractInstance rawdatasetWithSameFile)
+            throws Exception {
         
         Contract contract = composition.getContractInstanceByName(composition.getName()).getContract();
-        
-        Element input=contract.getInputElements().iterator().next();
+        String inputName = getInputUsedSameFile(rawdatasetWithSameFile,composition.getContractInstanceByName(composition.getName()));
+        Element input = contract.getInputElements().stream()
+                .filter(element -> inputName.equals(element.getName()))
+                .findFirst().get();
+        LOGGER.debug("input used same file-->{}",input);
         widget.generateInputElement().stream().forEach(inputElement->
             input.addChildElement(inputElement)
         );
-        
+        Element output = contract
+                .getOutputElements()
+                .stream()
+                .filter(element -> ((OutputElement) element).getBase().equals(
+                        input.getName())).findFirst().get();
+        LOGGER.debug("output used same file-->{}",output);
         VisualElement visualization=contract.getVisualElements().iterator().next();
         VisualElement visualElement = widget.generateVisualElement();
         //Sets basis for visual element
-        Element output = contract.getOutputElements().iterator().next();
         visualElement.setBasis(output);
         visualization.addChildElement(visualElement);
-        visualization.getChildElements().stream().forEach(visual ->{
-            LOGGER.debug("visual -->{}",visual);
-        });
                
         ContractInstance contractInstance = composition.getContractInstanceByName(composition.getName());
         
@@ -270,6 +315,20 @@ public class CompositionServiceImpl implements CompositionService{
       
     }
     
+    private String getInputUsedSameFile(
+            ContractInstance rawdatasetWithSameFile,ContractInstance contractInstance) {
+        LOGGER.debug("id -->{}",rawdatasetWithSameFile.getInstanceID());
+        LOGGER.debug("precursors -->{}",contractInstance.getProps());
+        for(Entry<String, String[]> entry : contractInstance.getProps().entrySet()){
+            for(String valueStr :entry.getValue() ){
+                if(valueStr.contains(rawdatasetWithSameFile.getInstanceID())){
+                    return  entry.getKey();
+                }
+            }
+        }
+        return null;
+    }
+
     private ContractInstance createVisualContractInstance(String compName,Widget widget) throws Exception { 
         
         Contract contract = new Contract();
@@ -380,7 +439,7 @@ public class CompositionServiceImpl implements CompositionService{
                 latestInstance = runComposition(dashboard, user);
             }
             try {
-                if(latestInstance.getWorkunitStatus().contains("failed")) {
+                if(latestInstance.getWorkunitStatus(true).contains("failed")) {
                     return null;
                  }
             } catch (Exception e) {

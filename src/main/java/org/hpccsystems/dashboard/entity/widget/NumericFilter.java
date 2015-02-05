@@ -58,17 +58,17 @@ public class NumericFilter extends Filter {
     }
 
     @Override
-    public String getHipieFilterQuery(Filter filter, int index, String chartName) {
+    public String getHipieFilterQuery(int index, String chartName) {
         
         StringBuilder sql = new StringBuilder();
         sql.append("%");
-        sql.append(getFilterName(filter,index,chartName));
+        sql.append(getFilterName(index,chartName));
         sql.append("% ");
         sql.append(" <= ")
             .append(maxValue)
             .append(" AND ");
         sql.append("%");
-        sql.append(getFilterName(filter,index,chartName));
+        sql.append(getFilterName(index,chartName));
         sql.append("% ");
         sql.append(" >= ")
         .append(minValue);

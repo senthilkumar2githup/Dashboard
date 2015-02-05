@@ -11,6 +11,7 @@ import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.hpccsystems.dashboard.service.WSSQLService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -18,6 +19,7 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
@@ -74,21 +76,28 @@ public class StringFilterContoller extends SelectorComposer<Component> {
     public void onfiltersSelected() {
         Set<Listitem> selectedValues = filterListBox.getSelectedItems();
 
-        List<String> listOfLabels = new ArrayList<String>();
-        
-        selectedValues.forEach(value->{
-        	String label = value.getLabel();
-        	listOfLabels.add(label);
-        });
-       
-       
-       filter.setValues(new ArrayList<String>(listOfLabels));
-
-        // Detaching the filter's popup window
-        Popup popup = (Popup) this.getSelf().getParent().getParent();
-        popup.close();
-
-        widgetConfiguration.getComposer().drawChart();
+        if(selectedValues.isEmpty()){
+            Clients.showNotification(Labels.getLabel("selectValueToFilter"), "warning", this
+                    .getSelf().getParent().getParent().getParent().getParent(),
+                    "end_center", 3000, true);
+            return;
+        }
+            List<String> listOfLabels = new ArrayList<String>();
+            
+            selectedValues.forEach(value->{
+            	String label = value.getLabel();
+            	listOfLabels.add(label);
+            });
+           
+           
+           filter.setValues(new ArrayList<String>(listOfLabels));
+           widgetConfiguration.getWidget().addFilter(filter);
+           
+            // Detaching the filter's popup window
+            Popup popup = (Popup) this.getSelf().getParent().getParent();
+            popup.close();
+    
+            widgetConfiguration.getComposer().drawChart();
     }
 
 }

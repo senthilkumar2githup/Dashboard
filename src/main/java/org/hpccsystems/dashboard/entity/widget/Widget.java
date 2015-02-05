@@ -135,7 +135,7 @@ public abstract class Widget {
         Filter filter = null;
         while(filters.hasNext()){
             filter = filters.next();           
-            query.append(filter.getHipieFilterQuery(filter,filters.nextIndex()-1, this.getName()));
+            query.append(filter.getHipieFilterQuery(filters.nextIndex()-1, this.getName()));
             if(filters.hasNext()){
                 query.append(" AND ");
             }

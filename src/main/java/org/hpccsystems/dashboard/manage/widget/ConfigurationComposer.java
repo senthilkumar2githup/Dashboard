@@ -150,7 +150,6 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
                 && widgetConfiguration.getWidget().getFilters().contains(filter)){
             Clients.showNotification("Filter already exists","warning",filterbox,"end_center", 5000, true);
         } else {
-            widgetConfiguration.getWidget().addFilter(filter);
             filterModel.add(filter);
         }
     }

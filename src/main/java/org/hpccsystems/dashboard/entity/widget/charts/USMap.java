@@ -125,7 +125,7 @@ public class USMap extends Widget{
         if(this.getFilters() != null){
             this.getFilters().forEach(filter->{
                 fieldNames.put(
-                        filter.getFilterName(filter,
+                        filter.getFilterName(
                                 getFilters().indexOf(filter), this.getName()),
                         filter.getColumn());
              });
@@ -156,7 +156,7 @@ public class USMap extends Widget{
         if(this.getFilters() != null){
             this.getFilters().forEach(filter->{
                  InputElement filterElement = new InputElement();
-                 filterElement.setName(filter.getFilterName(filter,
+                 filterElement.setName(filter.getFilterName(
                          getFilters().indexOf(filter), this.getName()));
                  filterElement.addOption(ElementOption.CreateElementOption(Element.LABEL,
                          new FieldInstance(null,filter.getColumn())));
@@ -237,8 +237,8 @@ public class USMap extends Widget{
                         .getAggregation().toString() : null,getPluginMeasure())));
 
       //Setting color
-        visualElement.addOption(ElementOption.CreateElementOption(VisualElement.COLOR,
-                new FieldInstance(null, new String("Red_Yellow_Blue"))));
+       /* visualElement.addOption(ElementOption.CreateElementOption(VisualElement.COLOR,
+                new FieldInstance(null, new String("Red_Yellow_Blue"))));*/
             
     }
 

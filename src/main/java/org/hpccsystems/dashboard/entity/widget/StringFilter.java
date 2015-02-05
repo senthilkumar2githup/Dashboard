@@ -58,28 +58,31 @@ public class StringFilter extends Filter {
     }
     
     @Override
-    public String getHipieFilterQuery(Filter filter,int index,String chartName) {
+    public String getHipieFilterQuery(int index,String chartName) {
+        StringBuilder sql = null;
+        
+        if (values != null && !values.isEmpty()) {
+            sql = new StringBuilder();
+            sql.append("%");
+            sql.append(getFilterName(index, chartName));
+            sql.append("%");
+            sql.append(" IN [");
 
-        StringBuilder sql = new StringBuilder();
-       sql.append("%");
-       sql.append(getFilterName(filter,index,chartName));
-       sql.append("%");
-       sql.append(" IN [");
-
-        Iterator<String> valueIterator = ((StringFilter) filter).getValues()
-                .iterator();
-        while (valueIterator.hasNext()) {
-            sql.append("'").append(valueIterator.next());
-            if (valueIterator.hasNext()) {
-                sql.append("',");
-            } else {
-                sql.append("'");
+            Iterator<String> valueIterator = values.iterator();
+            while (valueIterator.hasNext()) {
+                sql.append("'").append(valueIterator.next());
+                if (valueIterator.hasNext()) {
+                    sql.append("',");
+                } else {
+                    sql.append("'");
+                }
             }
+            sql.append("]");
         }
-        sql.append("]");
         if(LOGGER.isDebugEnabled()){
             LOGGER.debug("Hipie filter query -->"+sql);
         }
+        
         
         return sql.toString();
 
