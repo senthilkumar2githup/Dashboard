@@ -171,6 +171,10 @@ public abstract class Widget {
         VisualElement visualElement = HipieUtil.getVisualElement(contract,chartName);
         
         Map<String, ChartConfiguration> chartTypes = Constants.CHART_CONFIGURATIONS;
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Visual element - {}", visualElement);
+            LOGGER.debug("Custom option - {}", visualElement.getCustomOption(Constants.HIPIE._CHARTTYPE));
+        }
         String _chartType = visualElement.getCustomOption(Constants.HIPIE._CHARTTYPE).getParam(0);
         LOGGER.debug("_chartType -->{}",_chartType);
         ChartConfiguration chartConfig = chartTypes.get(_chartType);
