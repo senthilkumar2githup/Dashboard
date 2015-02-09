@@ -1,5 +1,6 @@
 var dashboardViz = {};
 var previewData = {};
+var deleteChartData = {};
 
 function createPreview(target, chartType, data) {
 	clearChart(target);
@@ -170,18 +171,10 @@ function visualizeDDLChart(data) {
 		                				
 		                			} else if (option == 'Delete') {
 		                				var wid = document.getElementById(this._id).parentNode.id;
-		                                if (confirm("Are you sure want to delete the widget?") == true) {		                                	
-		                                   	zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onDeleteChart', payload, {toServer:true}));		                                     
-		                                	clearChart(wid);
-		                                    if(multiChartSurface['_content']['_chart']){
-		                                    	clearChart(multiChartSurface['_content']['_chart']['_id']);
-		                                    	clearChart(multiChartSurface['_content']['_id']);
-		                                    }else if(multiChartSurface['_content']['_id']){
-		                                    	clearChart(multiChartSurface['_content']['_id']); 	 
-		                                    }
-		                                     		                                     
-		                                } 
-		                				
+		                				deleteChartData.surfaceId = wid;
+		                				deleteChartData.surface = multiChartSurface;
+		                				zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onDeleteChart', payload, {toServer:true}));
+		                                	                				
 		                			}
 		                		};
 		                	});
@@ -267,22 +260,14 @@ function injectPreviewChart(flowType) {
         		multiChartSurface.menu(["Configure", "Delete"]);
         		multiChartSurface._menu.click = function(option) {
         			var payload = {};
-        			payload.chartId=multiChartSurface._title;        			
-        			if(option == 'Configure') {        				
+        			payload.chartId=multiChartSurface._title;
+        			if(option == 'Configure') {  
         				zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onEditChart', payload, {toServer:true}));
         				
-        			} else if (option == 'Delete') {        				
-                        if (confirm("Are you sure want to delete the widget?") == true) {
-                        	 zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onDeleteChart', payload, {toServer:true}));                        	 
-                             clearChart(multiChartSurface['_id']);
-                             if(multiChartSurface['_content']['_chart']){
-                             	clearChart(multiChartSurface['_content']['_chart']['_id']);
-                             	clearChart(multiChartSurface['_content']['_id']);
-                             }else if(multiChartSurface['_content']['_id']){
-                             	clearChart(multiChartSurface['_content']['_id']); 	 
-                             }
-                        } 
-        				
+        			} else if (option == 'Delete') {
+        				deleteChartData.surfaceId = multiChartSurface['_id'];
+        				deleteChartData.surface = multiChartSurface;
+        				 zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onDeleteChart', payload, {toServer:true})); 
         			}
         		}
         	});
@@ -316,3 +301,14 @@ function saveLayout(chartDivId){
 	zAu.send(new zk.Event(zk.Widget.$(chartDivId), "onSave", dashboardViz.graph.serialize(), {toServer:true}));
 }
 
+function deleteChart(){
+    clearChart(deleteChartData.surfaceId);
+	var multiChartSurface = deleteChartData.surface;
+	console.log("surfaceId -->"+deleteChartData.surfaceId)
+    if(multiChartSurface['_content']['_chart']){
+    	clearChart(multiChartSurface['_content']['_chart']['_id']);
+    	clearChart(multiChartSurface['_content']['_id']);
+    }else if(multiChartSurface['_content']['_id']){
+    	clearChart(multiChartSurface['_content']['_id']); 	 
+    }
+}

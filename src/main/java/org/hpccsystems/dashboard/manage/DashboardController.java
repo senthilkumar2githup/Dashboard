@@ -79,6 +79,8 @@ public class DashboardController extends SelectorComposer<Component> {
             JSONObject json = (JSONObject) new JSONParser().parse(event.getData().toString()); 
             LOGGER.debug("Deleting chart -->{}",json.get("chartId").toString());
             deleteChart(json.get("chartId").toString());
+          
+                        
         });
         
 		if(dashboard.getCompositionName() != null){
@@ -227,13 +229,31 @@ public class DashboardController extends SelectorComposer<Component> {
 
 
 	    private void deleteChart(String chartName) {
-            try {
-                compositionService.deleteCompositionChart(dashboard,authenticationService.getUserCredential().getId(),chartName);
-            } catch (Exception e) {
-                LOGGER.debug(Constants.EXCEPTION,e);
-                Clients.showNotification("Unable to delete the chart",
-                        Clients.NOTIFICATION_TYPE_ERROR, chartDiv, "middle_center",
-                        5000, true);
-              }
+
+	        EventListener<ClickEvent> clickListener = event -> {
+	            if (Messagebox.Button.YES.equals(event.getButton())) {
+	                try {
+	                    compositionService.deleteCompositionChart(dashboard,authenticationService.getUserCredential().getId(),chartName);
+	                    Clients.evalJavaScript("deleteChart()");
+	                } catch (Exception e) {
+	                    LOGGER.debug(Constants.EXCEPTION,e);
+	                    Clients.showNotification("Unable to delete the chart",
+	                            Clients.NOTIFICATION_TYPE_ERROR, chartDiv, "middle_center",
+	                            5000, true);
+	                  }
+	            }
+
+	        };
+
+	        Messagebox.show(
+	                Labels.getLabel("deleteChart"), 
+	                Labels.getLabel("deleteChartTitle"), 
+	                new Messagebox.Button[] {
+	                    Messagebox.Button.YES, Messagebox.Button.NO 
+	                }, 
+	                Messagebox.QUESTION, 
+	                clickListener);
+	    
+            
 	    }
  }

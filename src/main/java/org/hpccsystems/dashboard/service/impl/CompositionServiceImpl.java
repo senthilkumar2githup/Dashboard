@@ -257,6 +257,7 @@ public class CompositionServiceImpl implements CompositionService{
            Composition comp = hipieService.getComposition(user,dashboard.getCompositionName());
            compositionInstance = hipieService.runComposition(comp, dashboard.getHpccConnection(), user);
         } catch (Exception e) {
+            LOGGER.debug(Constants.EXCEPTION,e);
             throw new CompositionException(Labels.getLabel("unableToGetOrRunComposition"),e);
         }
         return compositionInstance;
