@@ -46,13 +46,25 @@ public class Field {
 	    return false;
 	}
    
+    /* 
+     *Returns true if two field has same name and same datatype
+     *and same aggregate function in case of numeric type
+     */
     @Override
-    public boolean equals(Object o){
-        final Field thisField=(Field) o;
-        if(this.column==thisField.column&&this.dataType==thisField.dataType)
+    public boolean equals(Object o) {
+        final Field thisField = (Field) o;
+        //Checking numeric fields
+        if (thisField.isNumeric()) {
+            if (this.column.equals(thisField.column)
+                    && ((Measure) this).getAggregation().equals(
+                            ((Measure) thisField).getAggregation())) {
+                return true;
+            }
+        } else if (this.column.equals(thisField.column)
+                && this.dataType.equalsIgnoreCase(thisField.dataType)) {
             return true;
-        else
-            return false;
+        }
+        return false;
     }
     
     @Override    

@@ -6,6 +6,7 @@ import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.charts.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.event.Events;
@@ -82,17 +83,22 @@ public class TableWidgetController extends ConfigurationComposer<Component>{
 	    public void onDropColumns(DropEvent event) {
 		  Listitem draggedItem = (Listitem) event.getDragged();
 	      Field field = draggedItem.getValue();
-	      LOGGER.debug("field -->"+field.isNumeric());
-	      if(field.isNumeric()) {
-	    	  Measure measure = new Measure((Measure)field);
-	    	  table.addColumn(measure);
-	    	  columns.add(measure);
-	      } else {
-	    	  Attribute attribute = new Attribute(field);
-	    	  table.addColumn(attribute);
-	    	  columns.add(attribute);
+	      if(!columns.contains(field)){
+	          if(field.isNumeric()) {
+	              Measure measure = new Measure((Measure)field);
+	              table.addColumn(measure);
+	              columns.add(measure);
+	          } else {
+	              Attribute attribute = new Attribute(field);
+	              table.addColumn(attribute);
+	              columns.add(attribute);
+	          }
+	      }else{
+            Clients.showNotification(Labels.getLabel("columnExists"),
+                    Clients.NOTIFICATION_TYPE_ERROR, columnListbox,
+                    "end_center", 5000, true);
+            return;
 	      }
-	     
 	    }
 
 	  @Listen("onClick = #drawChart")
