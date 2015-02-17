@@ -106,19 +106,19 @@ public class NumericFilterController extends SelectorComposer<Component> {
 
         html.append("$('#").append(filter.getColumn()).append("_sdiv').on( \"slide\", function( event, ui ) {")
                 .append("payload = \"").append(filter.getColumn()).append("_hbox,\" + ui.values;")
-                .append("zAu.send(new zk.Event(zk.Widget.$('$").append("numericFilterPopup")
+                .append("zAu.send(new zk.Event(zk.Widget.$('").append(this.getSelf().getUuid())
                 .append("'), 'onSlide', payload, {toServer:true}));").append("});");
 
         html.append("$('#").append(filter.getColumn()).append("_sdiv').on( \"slidestop\", function( event, ui ) {")
                 .append("payload = \"").append(filter.getColumn()).append("_hbox,\" + ui.values;")
-                .append("zAu.send(new zk.Event(zk.Widget.$('$").append("numericFilterPopup")
+                .append("zAu.send(new zk.Event(zk.Widget.$('").append(this.getSelf().getUuid())
                 .append("'), 'onSlideStop', payload, {toServer:true}));").append("});");
         html.append("</script>");
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Generated HTML " + html.toString());
         }
-
+        sliderDiv.getChildren().clear();
         sliderDiv.appendChild(new Html(html.toString()));
 
     }
@@ -132,6 +132,8 @@ public class NumericFilterController extends SelectorComposer<Component> {
 
         // Converting position into value
         // value = pos . rangeFactor + min
+        LOG.debug("minimumLabel-->"+minimumLabel.getUuid());
+        LOG.debug("maximumLabel-->"+maximumLabel.getUuid());
         minimumLabel.setValue(String.valueOf(rangeFactor.multiply(new BigDecimal(startPosition)).add(min).intValue()));
         maximumLabel.setValue(String.valueOf(rangeFactor.multiply(new BigDecimal(endPosition)).add(min).intValue()));
     }
